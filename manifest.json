@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Lincle",
+  "name": "Lincle (Link Cleaner)",
   "version": "1.0",
   "description": "Zararlı ve agresif link kısaltıcıların veri toplamasını engelleyerek doğrudan hedef linke ulaştırır.",
   "permissions": [
@@ -13,5 +13,8 @@
   ],
   "background": {
     "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
   }
 }
