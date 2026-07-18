@@ -4,21 +4,50 @@
     <meta charset="UTF-8">
     <style>
         body {
-            width: 200px;
-            font-family: Arial, sans-serif;
-            margin: 10px;
+            width: 280px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #1e1e24;
+            color: #ffffff;
             text-align: center;
         }
-        .status {
+        h3 {
+            margin-top: 0;
+            color: #00caf5;
+        }
+        .status-box {
+            background-color: #282830;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #3f3f4c;
+        }
+        .clean-text {
             color: #2ecc71;
             font-weight: bold;
+        }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #00caf5;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <h3>Lincle</h3>
-    <p>Durum: <span class="status">Aktif</span></p>
-    <hr>
-    <small>Linkleriniz temizleniyor.</small>
+    <h3>Lincle (Link Cleaner)</h3>
+    <div class="status-box">
+        <p>Durum: <span class="clean-text">Kalkan Aktif 🛡️</span></p>
+        <p id="info">Zararlı scriptler engellendi. Hedef link çözülüyor...</p>
+        <div class="loader"></div>
+    </div>
 </body>
 </html>
