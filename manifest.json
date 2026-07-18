@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Lincle (Link Cleaner)",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Zararlı ve agresif link kısaltıcıların veri toplamasını engelleyerek doğrudan hedef linke ulaştırır.",
   "permissions": [
     "declarativeNetRequest",
@@ -16,5 +16,11 @@
   },
   "action": {
     "default_popup": "popup.html"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["popup.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
