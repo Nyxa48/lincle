@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Lincle (Link Cleaner)",
+  "version": "2.0",
+  "author": "Emir Samed (Nyxa48)",
+  "description": "Zararlı ve agresif link kısaltıcıları/reklam kapılarını otomatik algılayıp atlayarak doğrudan hedef linke ulaştırır. Domain eklemene gerek yok.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["resolver.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
