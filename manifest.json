@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Lincle",
+  "version": "1.0",
+  "description": "Zararlı ve agresif link kısaltıcıların veri toplamasını engelleyerek doğrudan hedef linke ulaştırır.",
+  "permissions": [
+    "declarativeNetRequest",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
