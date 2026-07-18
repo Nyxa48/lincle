@@ -7,13 +7,11 @@
   h3 { margin-top: 0; color: #00caf5; text-align: center; }
   .status-box { background-color: #282830; border-radius: 8px; padding: 10px; margin: 10px 0; border: 1px solid #3f3f4c; text-align: center; }
   .clean-text { color: #2ecc71; font-weight: bold; }
-  .loader { border: 3px solid #f3f3f3; border-top: 3px solid #00caf5; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 10px auto; }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   .domain-list { list-style: none; padding: 0; margin: 8px 0; max-height: 130px; overflow-y: auto; text-align: left; }
   .domain-list li { display: flex; justify-content: space-between; align-items: center; background: #282830; border: 1px solid #3f3f4c; border-radius: 6px; padding: 6px 8px; margin-bottom: 4px; font-size: 13px; }
   .domain-list button { background: #e74c3c; border: none; color: #fff; border-radius: 4px; padding: 3px 7px; cursor: pointer; font-size: 11px; }
-  .add-row { display: flex; gap: 6px; margin-top: 8px; }
-  .add-row input { flex: 1; padding: 6px; border-radius: 6px; border: 1px solid #3f3f4c; background: #14141a; color: #fff; }
+  .add-row { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .add-row input { padding: 6px; border-radius: 6px; border: 1px solid #3f3f4c; background: #14141a; color: #fff; }
   .add-row button { background: #00caf5; border: none; color: #101014; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-weight: bold; }
   small { color: #8a8a99; }
 </style>
@@ -21,24 +19,16 @@
 <body>
   <h3>Lincle (Link Cleaner)</h3>
 
-  <!-- Bir kısaltıcı linki yakalandığında gösterilir -->
-  <div id="resolveView" class="status-box" style="display:none;">
-    <p>Durum: <span class="clean-text">Kalkan Aktif 🛡️</span></p>
-    <p id="info">Zararlı scriptler engellendi. Hedef link çözülüyor...</p>
-    <div class="loader" id="spinner"></div>
+  <div class="status-box">
+    <span class="clean-text">Kalkan Aktif 🛡️</span>
+    <p><small>Takip edilen kısaltıcıları yönet. Bir siteyi eklediğinde, o sitede otomatik "devam et" tıklaması ve link çözme devreye girer.</small></p>
   </div>
 
-  <!-- Araç çubuğundan normal açıldığında gösterilir -->
-  <div id="manageView" style="display:none;">
-    <div class="status-box">
-      <span class="clean-text">Kalkan Aktif 🛡️</span>
-      <p><small>Takip edilen kısaltıcı listeni yönet.</small></p>
-    </div>
-    <ul class="domain-list" id="domainList"></ul>
-    <div class="add-row">
-      <input type="text" id="newDomain" placeholder="ornek.com" />
-      <button id="addDomainBtn">Ekle</button>
-    </div>
+  <ul class="domain-list" id="domainList"></ul>
+  <div class="add-row">
+    <input type="text" id="newDomain" placeholder="domain, örn: kisalt.co" />
+    <input type="text" id="newSelector" placeholder="(opsiyonel) atla butonu CSS seçici" />
+    <button id="addDomainBtn">Ekle</button>
   </div>
 
   <script src="popup.js"></script>

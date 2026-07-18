@@ -1,1 +1,4 @@
-["bc.vc", "adf.ly"]
+[
+  { "domain": "bc.vc" },
+  { "domain": "adf.ly" }
+]

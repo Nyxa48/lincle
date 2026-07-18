@@ -3,29 +3,43 @@
 Kısaltıcı/reklam sayfalarını (bc.vc, adf.ly, vb.) atlayıp kullanıcıyı doğrudan
 hedef linke, çerez ve izleyiciler olmadan ulaştıran bir Chrome uzantısı.
 
-## Nasıl çalışır
-1. `background.js`, izlenen domain listesine göre bir `declarativeNetRequest`
-   yönlendirme kuralı kurar. Bu kural, eşleşen bir siteye gidildiğinde
-   isteği `popup.html?continue=<orijinal_url>` adresine yönlendirir
-   (orijinal URL kaybolmadan taşınır).
-2. `popup.html` bu şekilde açıldığında, `popup.js` hedef sayfayı
-   çerezsiz (`credentials: "omit"`) olarak indirir ve içindeki
-   `var url = "..."` / `location.href = "..."` gibi kalıplardan gerçek
-   hedefi çıkarmaya çalışır.
-3. Bulursa kullanıcıyı doğrudan oraya, bulamazsa orijinal (kısaltılmış)
-   adrese yönlendirir.
-4. Uzantı araç çubuğundan normal açıldığında (yönlendirme değil), aynı
-   popup bu sefer izlenen domain listesini eklemek/silmek için bir
-   yönetim ekranı gösterir (`chrome.storage.local` üzerinde saklanır).
+## Nasıl çalışır (v1.2)
+Önceki sürüm, sayfayı hiç yüklemeden `fetch()` ile HTML'ini indirip
+regex ile hedefi arıyordu. Bu, geri sayım veya "devam et" butonuna
+ihtiyaç duyan sitelerde işe yaramıyordu çünkü sayfanın JS'i hiç
+çalışmıyordu. v1.2 bunu değiştiriyor:
+
+1. `background.js`, izlenen domain listesine göre `resolver.js` içerik
+   betiğini `chrome.scripting.registerContentScripts` ile kaydeder.
+2. Kullanıcı izlenen bir siteye girdiğinde sayfa **normal şekilde**
+   yüklenir (JS, geri sayımlar, butonlar dahil) ve `resolver.js` o
+   sayfanın içine enjekte edilir.
+3. `resolver.js` sırasıyla dener:
+   - Sayfa kaynağında `var url = "..."` gibi klasik kalıpları arar.
+   - Bulamazsa "devam et / skip / continue" gibi anahtar kelimelere
+     sahip görünür ve aktif bir butonu bulup otomatik tıklar.
+   - Reklam/izleyici domain listesinde olmayan yeni bir dış link
+     belirene kadar (veya 20 saniye zaman aşımına kadar) sayfayı
+     izlemeye devam eder.
+4. Hedef bulununca kullanıcıyı doğrudan oraya yönlendirir.
+
+## Domain yönetimi
+Araç çubuğu simgesine tıklayınca açılan ekrandan izlenecek domainleri
+ekleyip silebilirsin. İsteğe bağlı olarak, otomatik buton tespiti
+başarısız olan bir site için CSS seçici de girebilirsin (örn.
+`#skip-button`); resolver önce bunu dener.
 
 ## Bilinen sınırlamalar
-- Hedef site hangi domain olursa olsun içeriğini indirebilmek için
-  `host_permissions: ["<all_urls>"]` gerekiyor — bu geniş bir izin,
-  Chrome Web Store incelemesinde gerekçelendirilmesi gerekir.
-- `continue` parametresi yalnızca `http:`/`https:` şemasına izin
-  verecek şekilde doğrulanıyor, ama teknik olarak herhangi bir sayfa
-  uzantının popup.html'ini bu parametreyle açabilir. Asıl güvenlik
-  sınırı, bu adrese çerezsiz `fetch` atılması ve sadece düz metin
-  regex ile ayrıştırılmasıdır (script çalıştırılmaz).
-- Regex tabanlı ayrıştırma kırılgandır; kısaltıcı sitesi HTML yapısını
-  değiştirirse yeni bir kalıp eklemek gerekebilir.
+- Bazı siteler gerçek bir CAPTCHA veya bot-tespit sistemi kullanır
+  (ör. "robot değilim" doğrulaması, davranışsal analiz). Bunlar
+  bilerek otomasyona kapalıdır ve dürüstçe söylemek gerekirse hiçbir
+  uzantı bunları güvenilir şekilde atlayamaz — bu durumda resolver
+  20 saniye sonra "manuel tıklayın" uyarısı gösterip durur.
+- `host_permissions: ["<all_urls>"]` ve içerik betiği enjeksiyonu
+  geniş izinler gerektirir; hedef domain önceden bilinemediği için
+  bu kaçınılmaz. Chrome Web Store incelemesinde bunu açıklayan kısa
+  bir gerekçe eklemen gerekebilir.
+- Otomatik buton tıklama, ilgili sitenin reklam gelirini atlamak
+  anlamına gelir — bu senin kişisel tarayıcı deneyimin için normal
+  bir reklam engelleme davranışıdır, ama bazı sitelerin kullanım
+  şartlarıyla çelişebileceğini bilerek kullan.
