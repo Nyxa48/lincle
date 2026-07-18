@@ -1,24 +1,70 @@
-// Lincle Resolver - izlenen kısaltıcı sayfalarına enjekte edilir.
-// Sayfanın kendi JS'ini engellemeden çalışır: önce statik kalıpları dener,
-// bulamazsa "devam et / skip" butonunu otomatik tıklamayı dener,
-// sonunda gerçek hedef linki bulup kullanıcıyı oraya yönlendirir.
+// Lincle Resolver v2 - artık HER sayfaya enjekte edilir (manifest'teki
+// content_scripts sayesinde), domain'i elle eklemene gerek yok.
+//
+// Ama bu yüzden çok dikkatli davranmak zorunda: normal bir sitede rastgele
+// "Devam Et" / "Continue" butonuna basmak istemeyiz (ör. bir checkout
+// akışını bozabilir). Bu yüzden üç katmanlı çalışır:
+//
+//   Katman 0 (her zaman güvenli): sayfa kaynağında klasik
+//     `var url = "..."` gibi bir kalıp var mı? Varsa direkt oraya git.
+//     Bu hiçbir şeye tıklamaz, sadece statik metni okur.
+//
+//   Katman 1 (önceden bilinen / kullanıcı onaylı siteler): domains.json
+//     ile gelen bilinen kısaltıcılar ya da popup'tan "güvenilir" olarak
+//     eklenmiş domainler -> otomatik buton tıklama + link izleme devrede.
+//
+//   Katman 2 (otomatik algılama, YENİ): bilmediğimiz bir domain olsa
+//     bile, sayfada hem (a) "devam et/skip" gibi görünür bir buton HEM DE
+//     (b) geri sayım sayacı ya da "reklamı geç / link koruma altında /
+//     please wait" gibi kapı sayfası ifadeleri varsa, bunu bir kısaltıcı
+//     sayfası kabul edip aynı akışı çalıştırır. Sadece reklam scripti
+//     olması (ör. Google Ads) YETERLİ DEĞİL çünkü internetteki neredeyse
+//     her site reklam/analitik scripti kullanıyor - bu tek başına sinyal
+//     olarak kullanılırsa normal sitelerde yanlış tetiklenir. Buton +
+//     geri sayım/kapı-metni kombinasyonu çok daha nadir ve kısaltıcılara
+//     özgü bir kalıp.
+//
+// Hiçbir katman eşleşmezse script sessizce hiçbir şey yapmadan çıkar.
 
 (function () {
-    const STORAGE_KEY = "lincleDomains";
+    const STORAGE_KEY = "lincleDomains";     // bilinen / güvenilir domainler (opsiyonel skipSelector ile)
+    const EXCLUDE_KEY = "lincleExcluded";    // kullanıcının hiç dokunulmasını istemediği domainler
+    const SETTINGS_KEY = "lincleSettings";   // { autoDetect: true/false }
     const MAX_WAIT_MS = 20000;
-    const POLL_MS = 500;
+    const POLL_MS = 400;
 
+    // Sadece bilgi amaçlı / gelecekte kullanılmak üzere tutulan reklam ağı listesi.
+    // NOT: Katman 2 tetiklemesinde TEK BAŞINA kullanılmıyor (bkz. yukarıdaki not).
     const AD_DOMAIN_BLOCKLIST = [
         "doubleclick.net", "googlesyndication.com", "google-analytics.com",
         "amazon-adsystem.com", "taboola.com", "outbrain.com",
         "propellerads.com", "popads.net", "adsterra.com", "exoclick.com",
-        "googletagmanager.com", "facebook.com", "googleapis.com"
+        "googletagmanager.com", "facebook.com"
     ];
 
     const SKIP_KEYWORDS = [
         "continue", "skip ad", "skip", "get link", "devam et", "devam",
         "linke git", "proceed", "i understand", "reveal link", "show link",
-        "get destination", "linki göster"
+        "get destination", "linki göster", "download", "indir"
+    ];
+
+    // Katman 2 için: "kapı sayfası" ifadeleri (link kısaltıcılara özgü).
+    const GATE_TEXT_PATTERNS = [
+        /reklam(ı)?\s*geç/i,
+        /link(iniz)?\s*koruma\s*altında/i,
+        /devam\s*etmek\s*için\s*bekleyin/i,
+        /please\s*wait/i,
+        /verifying\s*you'?re\s*human/i,
+        /skip\s*ad/i,
+        /generat(ing|ed)\s*link/i,
+        /destination\s*link/i,
+        /your\s*link\s*is\s*ready/i,
+        /wait\s*\d+\s*seconds?/i
+    ];
+
+    // Katman 2 için: geri sayım sayacı ifadeleri.
+    const COUNTDOWN_TEXT_PATTERNS = [
+        /\b([0-9]|1[0-9]|2[0-9])\s*(saniye|second|sec|sn)\b/i
     ];
 
     const STATIC_REGEXES = [
@@ -92,6 +138,15 @@
         return candidate ? candidate.href : null;
     }
 
+    // Katman 2: sayfa gerçekten bir "kısaltıcı kapısı" gibi mi davranıyor?
+    // Buton bulunması TEK BAŞINA yetmez (normal sitelerde de "Devam Et"
+    // olur) - geri sayım veya kapı-metni ile birlikte olması gerekiyor.
+    function looksLikeGatePage(bodyText) {
+        const hasCountdown = COUNTDOWN_TEXT_PATTERNS.some(r => r.test(bodyText));
+        const hasGatePhrase = GATE_TEXT_PATTERNS.some(r => r.test(bodyText));
+        return hasCountdown || hasGatePhrase;
+    }
+
     function showBanner(text) {
         let el = document.getElementById("lincle-banner");
         if (!el) {
@@ -110,24 +165,38 @@
         setTimeout(() => { location.href = url; }, 300);
     }
 
-    async function getSkipSelectorForThisDomain() {
+    async function isDomainExcluded() {
+        try {
+            const data = await chrome.storage.local.get(EXCLUDE_KEY);
+            const list = data[EXCLUDE_KEY] || [];
+            return list.some(d => location.hostname === d || location.hostname.endsWith("." + d));
+        } catch {
+            return false;
+        }
+    }
+
+    async function getTrustedEntry() {
         try {
             const data = await chrome.storage.local.get(STORAGE_KEY);
             const list = data[STORAGE_KEY] || [];
-            const entry = list.find(d => location.hostname === d.domain || location.hostname.endsWith("." + d.domain));
-            return entry && entry.skipSelector ? entry.skipSelector : null;
+            return list.find(d => location.hostname === d.domain || location.hostname.endsWith("." + d.domain)) || null;
         } catch {
             return null;
         }
     }
 
-    async function init() {
-        const staticUrl = tryStaticExtraction();
-        if (staticUrl) { goTo(staticUrl); return; }
+    async function getAutoDetectSetting() {
+        try {
+            const data = await chrome.storage.local.get(SETTINGS_KEY);
+            const settings = data[SETTINGS_KEY] || {};
+            return settings.autoDetect !== false; // varsayılan: açık
+        } catch {
+            return true;
+        }
+    }
 
+    function runActiveResolver(customSelector) {
         showBanner("Lincle: sayfa çözülüyor...");
-        const customSelector = await getSkipSelectorForThisDomain();
-
         const startedAt = Date.now();
         let clicked = false;
 
@@ -152,6 +221,33 @@
                 }
             }
         }, POLL_MS);
+    }
+
+    async function init() {
+        if (await isDomainExcluded()) return;
+
+        // Katman 0: her zaman güvenli, hiçbir tıklama gerektirmez.
+        const staticUrl = tryStaticExtraction();
+        if (staticUrl) { goTo(staticUrl); return; }
+
+        const trusted = await getTrustedEntry();
+
+        // Katman 1: bilinen/güvenilir domain -> direkt aktif çözücüyü başlat.
+        if (trusted) {
+            runActiveResolver(trusted.skipSelector || null);
+            return;
+        }
+
+        // Katman 2: otomatik algılama - buton VE (geri sayım veya kapı metni) birlikte olmalı.
+        const autoDetectOn = await getAutoDetectSetting();
+        if (!autoDetectOn) return;
+
+        const bodyText = (document.body ? document.body.innerText : "").slice(0, 4000);
+        const hasButton = !!findSkipButton(null);
+        if (hasButton && looksLikeGatePage(bodyText)) {
+            runActiveResolver(null);
+        }
+        // Aksi halde: bu normal bir sayfa, hiçbir şey yapma.
     }
 
     if (document.readyState === "loading") {

@@ -1,18 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Lincle (Link Cleaner)",
-  "version": "1.2",
-  "description": "Zararlı ve agresif link kısaltıcıların veri toplamasını engelleyerek doğrudan hedef linke ulaştırır.",
+  "version": "2.0",
+  "description": "Zararlı ve agresif link kısaltıcıları/reklam kapılarını otomatik algılayıp atlayarak doğrudan hedef linke ulaştırır. Domain eklemene gerek yok.",
   "permissions": [
-    "storage",
-    "scripting"
+    "storage"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
-  "background": {
-    "service_worker": "background.js"
-  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["resolver.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
   "action": {
     "default_popup": "popup.html"
   }

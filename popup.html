@@ -3,11 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  body { width: 300px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 15px; background-color: #1e1e24; color: #ffffff; }
+  body { width: 320px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 15px; background-color: #1e1e24; color: #ffffff; }
   h3 { margin-top: 0; color: #00caf5; text-align: center; }
+  h4 { margin: 14px 0 4px; color: #8a8a99; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
   .status-box { background-color: #282830; border-radius: 8px; padding: 10px; margin: 10px 0; border: 1px solid #3f3f4c; text-align: center; }
   .clean-text { color: #2ecc71; font-weight: bold; }
-  .domain-list { list-style: none; padding: 0; margin: 8px 0; max-height: 130px; overflow-y: auto; text-align: left; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; background: #282830; border: 1px solid #3f3f4c; border-radius: 6px; padding: 8px 10px; margin: 8px 0; }
+  .toggle-row label { font-size: 13px; }
+  .domain-list { list-style: none; padding: 0; margin: 8px 0; max-height: 110px; overflow-y: auto; text-align: left; }
   .domain-list li { display: flex; justify-content: space-between; align-items: center; background: #282830; border: 1px solid #3f3f4c; border-radius: 6px; padding: 6px 8px; margin-bottom: 4px; font-size: 13px; }
   .domain-list button { background: #e74c3c; border: none; color: #fff; border-radius: 4px; padding: 3px 7px; cursor: pointer; font-size: 11px; }
   .add-row { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
@@ -20,15 +23,29 @@
   <h3>Lincle (Link Cleaner)</h3>
 
   <div class="status-box">
-    <span class="clean-text">Kalkan Aktif 🛡️</span>
-    <p><small>Takip edilen kısaltıcıları yönet. Bir siteyi eklediğinde, o sitede otomatik "devam et" tıklaması ve link çözme devreye girer.</small></p>
+    <span class="clean-text">Otomatik Kalkan Aktif 🛡️</span>
+    <p><small>Artık domain eklemene gerek yok: kısaltıcı/reklam kapısı gibi görünen
+    her sayfa otomatik algılanıp atlanır. Aşağıdaki listeler sadece ince ayar için.</small></p>
   </div>
 
+  <div class="toggle-row">
+    <label for="autoDetectToggle">Otomatik algılama</label>
+    <input type="checkbox" id="autoDetectToggle" checked />
+  </div>
+
+  <h4>Güvenilir / zorla çalıştır</h4>
   <ul class="domain-list" id="domainList"></ul>
   <div class="add-row">
     <input type="text" id="newDomain" placeholder="domain, örn: kisalt.co" />
     <input type="text" id="newSelector" placeholder="(opsiyonel) atla butonu CSS seçici" />
     <button id="addDomainBtn">Ekle</button>
+  </div>
+
+  <h4>Hiç dokunma (hariç tut)</h4>
+  <ul class="domain-list" id="excludeList"></ul>
+  <div class="add-row">
+    <input type="text" id="newExclude" placeholder="domain, örn: bankam.com" />
+    <button id="addExcludeBtn">Hariç Tut</button>
   </div>
 
   <script src="popup.js"></script>

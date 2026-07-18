@@ -1,45 +1,78 @@
 # Lincle - Link Cleaner
 
-Kısaltıcı/reklam sayfalarını (bc.vc, adf.ly, vb.) atlayıp kullanıcıyı doğrudan
-hedef linke, çerez ve izleyiciler olmadan ulaştıran bir Chrome uzantısı.
+Kısaltıcı/reklam sayfalarını (bc.vc, adf.ly, linkvertise.com, vb.) atlayıp
+kullanıcıyı doğrudan hedef linke, çerez ve izleyiciler olmadan ulaştıran bir
+Chrome uzantısı.
 
-## Nasıl çalışır (v1.2)
-Önceki sürüm, sayfayı hiç yüklemeden `fetch()` ile HTML'ini indirip
-regex ile hedefi arıyordu. Bu, geri sayım veya "devam et" butonuna
-ihtiyaç duyan sitelerde işe yaramıyordu çünkü sayfanın JS'i hiç
-çalışmıyordu. v1.2 bunu değiştiriyor:
+## Nasıl çalışır (v2.0) — artık domain eklemene gerek yok
 
-1. `background.js`, izlenen domain listesine göre `resolver.js` içerik
-   betiğini `chrome.scripting.registerContentScripts` ile kaydeder.
-2. Kullanıcı izlenen bir siteye girdiğinde sayfa **normal şekilde**
-   yüklenir (JS, geri sayımlar, butonlar dahil) ve `resolver.js` o
-   sayfanın içine enjekte edilir.
-3. `resolver.js` sırasıyla dener:
-   - Sayfa kaynağında `var url = "..."` gibi klasik kalıpları arar.
-   - Bulamazsa "devam et / skip / continue" gibi anahtar kelimelere
-     sahip görünür ve aktif bir butonu bulup otomatik tıklar.
-   - Reklam/izleyici domain listesinde olmayan yeni bir dış link
-     belirene kadar (veya 20 saniye zaman aşımına kadar) sayfayı
-     izlemeye devam eder.
-4. Hedef bulununca kullanıcıyı doğrudan oraya yönlendirir.
+Önceki sürümde (v1.2) resolver.js sadece popup'tan elle eklediğin
+domainlerde çalışıyordu: her yeni kısaltıcı için siteyi ziyaret edip
+domaini yazman, (opsiyonel) CSS seçici bulman ve "Ekle"ye basman
+gerekiyordu. v2.0 bunu ortadan kaldırıyor:
 
-## Domain yönetimi
-Araç çubuğu simgesine tıklayınca açılan ekrandan izlenecek domainleri
-ekleyip silebilirsin. İsteğe bağlı olarak, otomatik buton tespiti
-başarısız olan bir site için CSS seçici de girebilirsin (örn.
-`#skip-button`); resolver önce bunu dener.
+`resolver.js` artık `manifest.json` üzerinden **her sayfaya** enjekte
+ediliyor (dinamik `chrome.scripting.registerContentScripts` yerine statik
+`content_scripts` girişi — bu yüzden ayrı bir `background.js` servis
+çalışanına da gerek kalmadı). Her sayfada üç katman sırayla denenir:
+
+1. **Katman 0 — her zaman güvenli:** sayfa kaynağında klasik
+   `var url = "..."` / meta-refresh gibi bir kalıp var mı? Varsa hiçbir
+   şeye tıklamadan direkt oraya gider.
+2. **Katman 1 — bilinen kısaltıcılar:** uzantı, aralarında `bc.vc`,
+   `adf.ly`, `linkvertise.com`, `ouo.io`, `exe.io`, `gplinks.in` gibi
+   yaygın kısaltıcıların da olduğu bir listeyle geliyor — bunlar hiçbir
+   kurulum gerektirmeden çalışır. Popup'tan kendi domainlerini de bu
+   listeye ekleyebilirsin (artık zorunlu değil, sadece ince ayar).
+3. **Katman 2 — otomatik algılama (yeni):** listede olmayan bilinmeyen
+   bir kısaltıcıya girdiğinde, sayfada hem (a) "devam et / skip / get
+   link" gibi görünür bir buton HEM DE (b) bir geri sayım sayacı ya da
+   "reklamı geç", "link koruma altında", "please wait" gibi kapı-sayfası
+   ifadelerinden biri varsa, bunu otomatik olarak kısaltıcı kabul edip
+   aynı akışı (buton tıkla, çıkış linkini bul, yönlendir) çalıştırır.
+
+   **Neden sadece reklam scripti yeterli değil:** İnternetteki neredeyse
+   her site Google Ads/Analytics gibi bir şey kullanıyor. Sadece "sayfada
+   reklam scripti var" sinyaline güvenirsek uzantı normal sitelerde de
+   (ör. bir checkout akışındaki "Devam Et" butonuna) yanlışlıkla
+   tıklayabilir. Buton + geri sayım/kapı-metni kombinasyonu çok daha nadir
+   ve kısaltıcılara özgü bir kalıp olduğu için yanlış pozitif riski düşük.
+
+Hiçbir katman eşleşmezse (normal bir web sitesi) resolver.js sessizce
+hiçbir şey yapmadan çıkar — banner göstermez, hiçbir şeye tıklamaz.
+
+## Domain yönetimi (artık opsiyonel)
+
+Araç çubuğu simgesine tıklayınca açılan ekrandan:
+- **Otomatik algılamayı** açıp kapatabilirsin (varsayılan: açık).
+- **Güvenilir/zorla çalıştır** listesine domain ekleyip, otomatik buton
+  tespiti başarısız olan inatçı bir site için CSS seçici girebilirsin
+  (örn. `#skip-button`) — bu, Katman 2'nin heuristiğini atlayıp doğrudan
+  Katman 1 gibi davranmasını sağlar.
+- **Hiç dokunma** listesine, uzantının kesinlikle karışmasını istemediğin
+  domainleri (ör. bankan, e-posta sağlayıcın) ekleyebilirsin. Bu listedeki
+  domainlerde resolver.js hiçbir şey yapmadan hemen çıkar.
 
 ## Bilinen sınırlamalar
-- Bazı siteler gerçek bir CAPTCHA veya bot-tespit sistemi kullanır
-  (ör. "robot değilim" doğrulaması, davranışsal analiz). Bunlar
-  bilerek otomasyona kapalıdır ve dürüstçe söylemek gerekirse hiçbir
-  uzantı bunları güvenilir şekilde atlayamaz — bu durumda resolver
-  20 saniye sonra "manuel tıklayın" uyarısı gösterip durur.
-- `host_permissions: ["<all_urls>"]` ve içerik betiği enjeksiyonu
-  geniş izinler gerektirir; hedef domain önceden bilinemediği için
-  bu kaçınılmaz. Chrome Web Store incelemesinde bunu açıklayan kısa
-  bir gerekçe eklemen gerekebilir.
-- Otomatik buton tıklama, ilgili sitenin reklam gelirini atlamak
-  anlamına gelir — bu senin kişisel tarayıcı deneyimin için normal
-  bir reklam engelleme davranışıdır, ama bazı sitelerin kullanım
-  şartlarıyla çelişebileceğini bilerek kullan.
+
+- Bazı siteler gerçek bir CAPTCHA veya bot-tespit sistemi kullanır (ör.
+  "robot değilim" doğrulaması, davranışsal analiz). Bunlar bilerek
+  otomasyona kapalıdır — resolver 20 saniye sonra "manuel tıklayın"
+  uyarısı gösterip durur.
+- Otomatik algılama (Katman 2) bir heuristiktir, %100 değildir:
+  - **Yanlış negatif** ihtimali var: alışılmadık ifadeler kullanan bir
+    kısaltıcıyı atlayabilir. Çözüm: o domaini popup'tan güvenilir listeye
+    ekle (gerekirse CSS seçiciyle).
+  - **Yanlış pozitif** ihtimali teorik olarak var ama düşük: buton VE
+    geri sayım/kapı-metni ikisi birden gerektiği için normal sitelerde
+    (form sihirbazları, checkout adımları vb.) bu kombinasyon nadiren
+    bir arada bulunur. Yine de hassas olduğun siteler için "Hiç dokunma"
+    listesini kullanmanı öneririm.
+- `host_permissions: ["<all_urls>"]` ve her sayfaya content script
+  enjeksiyonu geniş izinler gerektirir; hedef domain önceden
+  bilinemediği için bu kaçınılmaz. Chrome Web Store incelemesinde bunu
+  açıklayan kısa bir gerekçe eklemen gerekebilir.
+- Otomatik buton tıklama, ilgili sitenin reklam gelirini atlamak anlamına
+  gelir — bu senin kişisel tarayıcı deneyimin için normal bir reklam
+  engelleme davranışıdır, ama bazı sitelerin kullanım şartlarıyla
+  çelişebileceğini bilerek kullan.
