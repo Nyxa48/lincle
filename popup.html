@@ -15,20 +15,16 @@
   }
   body { width: 320px; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); overflow-x: hidden; }
   
-  /* Üst Bar */
   .header { background: var(--card-bg); padding: 15px; text-align: center; border-bottom: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
   .header h3 { margin: 0; color: var(--primary); font-size: 18px; letter-spacing: 1px; }
   
-  /* Sayfa Konteynerleri */
   .view { padding: 20px; transition: transform 0.3s ease-in-out; }
   #settingsView { display: none; }
 
-  /* Ana Ekran (Dashboard) */
-  .status-circle { width: 80px; height: 80px; border-radius: 50%; background: rgba(46, 204, 113, 0.1); border: 2px solid var(--success); margin: 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); }
-  .status-title { text-align: center; color: var(--success); font-weight: bold; font-size: 16px; margin-top: 10px; }
-  .status-desc { text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 25px; }
+  .status-circle { width: 80px; height: 80px; border-radius: 50%; background: rgba(46, 204, 113, 0.1); border: 2px solid var(--success); margin: 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); transition: 0.3s; }
+  .status-title { text-align: center; color: var(--success); font-weight: bold; font-size: 16px; margin-top: 10px; transition: 0.3s; }
+  .status-desc { text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 25px; transition: 0.3s; }
 
-  /* Modern Toggle (Aç/Kapat Anahtarı) */
   .toggle-row { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; }
   .toggle-row span { font-weight: 500; font-size: 14px; }
   .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
@@ -38,14 +34,12 @@
   input:checked + .slider { background-color: var(--primary); }
   input:checked + .slider:before { transform: translateX(18px); }
 
-  /* Butonlar */
   .btn-settings { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.2s; }
   .btn-settings:hover { background: var(--card-bg); border-color: var(--primary); color: var(--primary); }
   
   .btn-back { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
   .btn-back:hover { color: var(--primary); }
 
-  /* Gelişmiş Ayarlar Paneli */
   h4 { margin: 10px 0 5px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
   .domain-list { list-style: none; padding: 0; margin: 0 0 15px; max-height: 100px; overflow-y: auto; }
   .domain-list li { display: flex; justify-content: space-between; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 5px; font-size: 12px; }
@@ -56,9 +50,7 @@
   .add-row input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 12px; outline: none; }
   .add-row input:focus { border-color: var(--primary); }
   .add-row button { background: var(--primary); border: none; color: var(--bg); border-radius: 6px; padding: 0 12px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
-  .add-row button:hover { opacity: 0.8; }
-
-  /* Footer */
+  
   .footer { text-align: center; margin-top: 20px; font-size: 10px; color: var(--border); letter-spacing: 1px; }
 </style>
 </head>
@@ -69,14 +61,14 @@
 
   <!-- ANA EKRAN -->
   <div id="mainView" class="view">
-    <div class="status-circle">🛡️</div>
-    <div class="status-title">Sistem Koruması Aktif</div>
-    <div class="status-desc">Arka planda gereksiz kapılar atlanıyor</div>
+    <div class="status-circle" id="statusIcon">🛡️</div>
+    <div class="status-title" id="statusTitle">Sistem Koruması Aktif</div>
+    <div class="status-desc" id="statusDesc">Arka planda gereksiz kapılar atlanıyor</div>
 
     <div class="toggle-row">
-      <span>Otomatik Algılama</span>
+      <span>Lincle Koruması</span>
       <label class="switch">
-        <input type="checkbox" id="autoDetectToggle">
+        <input type="checkbox" id="masterToggle">
         <span class="slider"></span>
       </label>
     </div>
@@ -85,7 +77,7 @@
     <div class="footer">DEVELOPED BY NYXA48</div>
   </div>
 
-  <!-- GELİŞMİŞ AYARLAR (Varsayılan olarak gizli) -->
+  <!-- GELİŞMİŞ AYARLAR -->
   <div id="settingsView" class="view">
     <button id="btnCloseSettings" class="btn-back">← Ana Ekrana Dön</button>
 

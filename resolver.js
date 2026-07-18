@@ -1,4 +1,4 @@
-// Lincle Resolver v2.2 - Global Heuristic & Optimized Observer
+// Lincle Resolver v2.3 - Master Kill Switch & Global Heuristic
 // Developed by: Emir Samed (Nyxa48)
 
 (function () {
@@ -7,8 +7,6 @@
     const SETTINGS_KEY = "lincleSettings";
     const MAX_WAIT_MS = 20000;
 
-    // 1. KÜRESEL BEYAZ LİSTE (Asla dokunulmayacak, motorun durdurulacağı siteler)
-    // pixeldrain.com'u da ekledik ki dosya indirirken yanlışlıkla tetiklenmesin.
     const GLOBAL_EXCLUDE_LIST = [
         "github.com", "google.com", "youtube.com", "twitter.com", "x.com",
         "facebook.com", "instagram.com", "linkedin.com", "reddit.com",
@@ -16,7 +14,6 @@
         "whatsapp.com", "telegram.org", "amazon.com", "netflix.com", "pixeldrain.com"
     ];
 
-    // 2. KÜRESEL KARA LİSTE (Doğrudan vurulacak bilinen kısaltıcılar)
     const DEFAULT_KNOWN_SHORTENERS = [
         "bc.vc", "adf.ly", "linkvertise.com", "link-to.net", "ouo.io",
         "exe.io", "gplinks.in", "gplinks.co", "shrinkme.io", "shorte.st",
@@ -30,7 +27,6 @@
         "googletagmanager.com", "facebook.com"
     ];
 
-    // 18 Dilde Tıklanacak Hedef Kelimeler
     const SKIP_KEYWORDS = [
         "continue", "skip ad", "skip", "get link", "proceed", "i understand", "reveal link", "show link", "get destination", "download", "next",
         "devam et", "devam", "linke git", "linki göster", "indir", "geç", "reklamı geç",
@@ -159,10 +155,11 @@
         } catch { return null; }
     }
 
-    async function getAutoDetectSetting() {
+    // YENİ: Kalkanın durumunu soran (Ana Şalter Kontrolü) fonksiyon
+    async function getMasterKillSwitchSetting() {
         try {
             const data = await chrome.storage.local.get(SETTINGS_KEY);
-            return (data[SETTINGS_KEY] || {}).autoDetect !== false;
+            return (data[SETTINGS_KEY] || {}).isActive !== false; // Varsayılanı true (açık)
         } catch { return true; }
     }
 
@@ -217,6 +214,10 @@
     }
 
     async function init() {
+        // EN ÖNEMLİ KISIM: Kalkan Kapalıysa Lincle hiçbir kod çalıştırmadan direkt çıkar.
+        const isLincleActive = await getMasterKillSwitchSetting();
+        if (!isLincleActive) return;
+
         const host = location.hostname;
         if (await isDomainExcluded(host)) return;
 
@@ -228,9 +229,6 @@
             runActiveResolver(trusted.skipSelector || null);
             return;
         }
-
-        const autoDetectOn = await getAutoDetectSetting();
-        if (!autoDetectOn) return;
 
         const bodyText = (document.body ? document.body.innerText : "").slice(0, 4000);
         if (!!findSkipButton(null) && looksLikeGatePage(bodyText)) {

@@ -3,14 +3,13 @@
 
 const DOMAINS_KEY = "lincleDomains";
 const EXCLUDE_KEY = "lincleExcluded";
-const SETTINGS_KEY = "lincleSettings";
+const SETTINGS_KEY = "lincleSettings"; // { isActive: true/false }
 
 document.addEventListener('DOMContentLoaded', () => {
     initUI();
     initManager();
 });
 
-// Sayfa Geçiş Yönetimi
 function initUI() {
     const mainView = document.getElementById('mainView');
     const settingsView = document.getElementById('settingsView');
@@ -28,21 +27,36 @@ function initUI() {
     });
 }
 
-// Veri Yönetimi
-async function loadDomains() {
-    const data = await chrome.storage.local.get(DOMAINS_KEY);
-    return data[DOMAINS_KEY] || [];
+// Arayüz Rengini ve Yazısını Değiştiren Animasyonlu Fonksiyon
+function updateStatusUI(isActive) {
+    const icon = document.getElementById('statusIcon');
+    const title = document.getElementById('statusTitle');
+    const desc = document.getElementById('statusDesc');
+
+    if (isActive) {
+        icon.innerHTML = "🛡️";
+        icon.style.borderColor = "var(--success)";
+        icon.style.backgroundColor = "rgba(46, 204, 113, 0.1)";
+        icon.style.boxShadow = "0 0 15px rgba(46, 204, 113, 0.2)";
+        title.textContent = "Sistem Koruması Aktif";
+        title.style.color = "var(--success)";
+        desc.textContent = "Arka planda gereksiz kapılar atlanıyor";
+    } else {
+        icon.innerHTML = "❌";
+        icon.style.borderColor = "var(--danger)";
+        icon.style.backgroundColor = "rgba(231, 76, 60, 0.1)";
+        icon.style.boxShadow = "0 0 15px rgba(231, 76, 60, 0.2)";
+        title.textContent = "Sistem Koruması Kapalı";
+        title.style.color = "var(--danger)";
+        desc.textContent = "Lincle şu an sitelere müdahale etmiyor";
+    }
 }
+
+async function loadDomains() { const data = await chrome.storage.local.get(DOMAINS_KEY); return data[DOMAINS_KEY] || []; }
 async function saveDomains(domains) { await chrome.storage.local.set({ [DOMAINS_KEY]: domains }); }
-async function loadExcluded() {
-    const data = await chrome.storage.local.get(EXCLUDE_KEY);
-    return data[EXCLUDE_KEY] || [];
-}
+async function loadExcluded() { const data = await chrome.storage.local.get(EXCLUDE_KEY); return data[EXCLUDE_KEY] || []; }
 async function saveExcluded(list) { await chrome.storage.local.set({ [EXCLUDE_KEY]: list }); }
-async function loadSettings() {
-    const data = await chrome.storage.local.get(SETTINGS_KEY);
-    return Object.assign({ autoDetect: true }, data[SETTINGS_KEY] || {});
-}
+async function loadSettings() { const data = await chrome.storage.local.get(SETTINGS_KEY); return Object.assign({ isActive: true }, data[SETTINGS_KEY] || {}); }
 async function saveSettings(settings) { await chrome.storage.local.set({ [SETTINGS_KEY]: settings }); }
 
 async function initManager() {
@@ -54,12 +68,17 @@ async function initManager() {
     const excludeInput = document.getElementById('newExclude');
     const addExcludeBtn = document.getElementById('addExcludeBtn');
 
-    const autoToggle = document.getElementById('autoDetectToggle');
+    const masterToggle = document.getElementById('masterToggle');
 
+    // Ayarları Yükle ve Şalteri Ayarla
     const settings = await loadSettings();
-    autoToggle.checked = settings.autoDetect;
-    autoToggle.addEventListener('change', async () => {
-        await saveSettings({ autoDetect: autoToggle.checked });
+    masterToggle.checked = settings.isActive;
+    updateStatusUI(settings.isActive); // Yüklenirken rengi ayarla
+
+    // Şaltere Tıklanınca Çalışacak Olay
+    masterToggle.addEventListener('change', async () => {
+        await saveSettings({ isActive: masterToggle.checked });
+        updateStatusUI(masterToggle.checked);
     });
 
     async function renderDomains() {
@@ -82,14 +101,9 @@ async function initManager() {
 
     addBtn.addEventListener('click', async () => {
         const rawDomain = domainInput.value.trim().toLowerCase();
-        if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(rawDomain)) {
-            alert("Geçerli bir domain girin, örn: kisalt.co"); return;
-        }
+        if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(rawDomain)) { alert("Geçerli bir domain girin, örn: kisalt.co"); return; }
         const domains = await loadDomains();
-        if (!domains.find(d => d.domain === rawDomain)) {
-            domains.push({ domain: rawDomain });
-            await saveDomains(domains);
-        }
+        if (!domains.find(d => d.domain === rawDomain)) { domains.push({ domain: rawDomain }); await saveDomains(domains); }
         domainInput.value = '';
         renderDomains();
     });
@@ -114,14 +128,9 @@ async function initManager() {
 
     addExcludeBtn.addEventListener('click', async () => {
         const rawDomain = excludeInput.value.trim().toLowerCase();
-        if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(rawDomain)) {
-            alert("Geçerli bir domain girin, örn: bankam.com"); return;
-        }
+        if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(rawDomain)) { alert("Geçerli bir domain girin, örn: bankam.com"); return; }
         const list = await loadExcluded();
-        if (!list.includes(rawDomain)) {
-            list.push(rawDomain);
-            await saveExcluded(list);
-        }
+        if (!list.includes(rawDomain)) { list.push(rawDomain); await saveExcluded(list); }
         excludeInput.value = '';
         renderExcluded();
     });
