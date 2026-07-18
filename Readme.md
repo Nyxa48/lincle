@@ -1,78 +1,67 @@
-# Lincle - Link Cleaner
+# 🛡️ Lincle - The Ultimate Link Cleaner & Bypass Tool
 
-Kısaltıcı/reklam sayfalarını (bc.vc, adf.ly, linkvertise.com, vb.) atlayıp
-kullanıcıyı doğrudan hedef linke, çerez ve izleyiciler olmadan ulaştıran bir
-Chrome uzantısı.
+![Version](https://img.shields.io/badge/version-2.3-blue.svg)
+![Manifest](https://img.shields.io/badge/Manifest-V3-success.svg)
+![Privacy](https://img.shields.io/badge/Privacy-Zero_Telemetry-brightgreen.svg)
+![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
-## Nasıl çalışır (v2.0) — artık domain eklemene gerek yok
+> 🌍 **Bilingual README**: [English](#english) | [Türkçe](#türkçe)
 
-Önceki sürümde (v1.2) resolver.js sadece popup'tan elle eklediğin
-domainlerde çalışıyordu: her yeni kısaltıcı için siteyi ziyaret edip
-domaini yazman, (opsiyonel) CSS seçici bulman ve "Ekle"ye basman
-gerekiyordu. v2.0 bunu ortadan kaldırıyor:
+---
 
-`resolver.js` artık `manifest.json` üzerinden **her sayfaya** enjekte
-ediliyor (dinamik `chrome.scripting.registerContentScripts` yerine statik
-`content_scripts` girişi — bu yüzden ayrı bir `background.js` servis
-çalışanına da gerek kalmadı). Her sayfada üç katman sırayla denenir:
+<a id="english"></a>
+## 🇬🇧 English
 
-1. **Katman 0 — her zaman güvenli:** sayfa kaynağında klasik
-   `var url = "..."` / meta-refresh gibi bir kalıp var mı? Varsa hiçbir
-   şeye tıklamadan direkt oraya gider.
-2. **Katman 1 — bilinen kısaltıcılar:** uzantı, aralarında `bc.vc`,
-   `adf.ly`, `linkvertise.com`, `ouo.io`, `exe.io`, `gplinks.in` gibi
-   yaygın kısaltıcıların da olduğu bir listeyle geliyor — bunlar hiçbir
-   kurulum gerektirmeden çalışır. Popup'tan kendi domainlerini de bu
-   listeye ekleyebilirsin (artık zorunlu değil, sadece ince ayar).
-3. **Katman 2 — otomatik algılama (yeni):** listede olmayan bilinmeyen
-   bir kısaltıcıya girdiğinde, sayfada hem (a) "devam et / skip / get
-   link" gibi görünür bir buton HEM DE (b) bir geri sayım sayacı ya da
-   "reklamı geç", "link koruma altında", "please wait" gibi kapı-sayfası
-   ifadelerinden biri varsa, bunu otomatik olarak kısaltıcı kabul edip
-   aynı akışı (buton tıkla, çıkış linkini bul, yönlendir) çalıştırır.
+### 📖 About the Project
+**Lincle** is a privacy-first, open-source Chrome/Brave extension designed to protect your digital footprint. It automatically bypasses aggressive link shorteners, ad-gates, and countdown timers (such as bc.vc, adf.ly, linkvertise, etc.), taking you directly to your intended destination without exposing you to malware, tracking cookies, or annoying pop-ups.
 
-   **Neden sadece reklam scripti yeterli değil:** İnternetteki neredeyse
-   her site Google Ads/Analytics gibi bir şey kullanıyor. Sadece "sayfada
-   reklam scripti var" sinyaline güvenirsek uzantı normal sitelerde de
-   (ör. bir checkout akışındaki "Devam Et" butonuna) yanlışlıkla
-   tıklayabilir. Buton + geri sayım/kapı-metni kombinasyonu çok daha nadir
-   ve kısaltıcılara özgü bir kalıp olduğu için yanlış pozitif riski düşük.
+### ✨ Key Features
+* **🧠 Heuristic Engine (18 Languages):** Auto-detects countdowns and "skip ad" buttons globally (English, Spanish, Russian, Chinese, Arabic, and more).
+* **🚫 Zero Telemetry:** 100% offline. No external APIs, no analytics. Your data never leaves your browser.
+* **⚡ 3-Layer Bypass Architecture:** Combines static DOM extraction, global blacklists, and dynamic mutation observers to catch links in milliseconds.
+* **🎛️ Master Kill Switch:** A modern, sleek UI that allows you to instantly enable or disable the extension with a single click.
+* **🛡️ Global Whitelist:** Prevents false positives. Automatically sleeps on trusted domains like GitHub, Google, Amazon, and banking sites.
 
-Hiçbir katman eşleşmezse (normal bir web sitesi) resolver.js sessizce
-hiçbir şey yapmadan çıkar — banner göstermez, hiçbir şeye tıklamaz.
+### 🏗️ How It Works (The Architecture)
+Lincle does not rely on a simple clicker. It evaluates every page through a 3-layer security protocol:
+1. **Layer 0 (Static Extraction):** Scans the raw HTML for hidden destination URLs (`var url = "..."` or meta-refreshes) and redirects you without executing any malicious page scripts.
+2. **Layer 1 (Known Threats):** Instantly triggers the bypass engine for known ad-gate networks hardcoded into the global blacklist.
+3. **Layer 2 (Auto-Detect MutationObserver):** If a site is unknown, Lincle monitors the DOM in real-time. If it detects a combination of a countdown timer and a gateway phrase (e.g., "Please wait" + "Skip Ad"), it surgically extracts the link or forces the button click safely.
 
-## Domain yönetimi (artık opsiyonel)
+### 🛠️ Installation (Developer Mode)
+Since Lincle is currently an independent open-source project, you can install it manually in 3 simple steps:
+1. Download this repository as a `.zip` file and extract it, or clone it:
+   `git clone https://github.com/Nyxa48/lincle.git`
+2. Open your Chromium-based browser (Chrome, Brave, Edge) and navigate to `chrome://extensions/`.
+3. Enable **"Developer mode"** in the top right corner, click **"Load unpacked"**, and select the `lincle` folder.
 
-Araç çubuğu simgesine tıklayınca açılan ekrandan:
-- **Otomatik algılamayı** açıp kapatabilirsin (varsayılan: açık).
-- **Güvenilir/zorla çalıştır** listesine domain ekleyip, otomatik buton
-  tespiti başarısız olan inatçı bir site için CSS seçici girebilirsin
-  (örn. `#skip-button`) — bu, Katman 2'nin heuristiğini atlayıp doğrudan
-  Katman 1 gibi davranmasını sağlar.
-- **Hiç dokunma** listesine, uzantının kesinlikle karışmasını istemediğin
-  domainleri (ör. bankan, e-posta sağlayıcın) ekleyebilirsin. Bu listedeki
-  domainlerde resolver.js hiçbir şey yapmadan hemen çıkar.
+---
 
-## Bilinen sınırlamalar
+<a id="türkçe"></a>
+## 🇹🇷 Türkçe
 
-- Bazı siteler gerçek bir CAPTCHA veya bot-tespit sistemi kullanır (ör.
-  "robot değilim" doğrulaması, davranışsal analiz). Bunlar bilerek
-  otomasyona kapalıdır — resolver 20 saniye sonra "manuel tıklayın"
-  uyarısı gösterip durur.
-- Otomatik algılama (Katman 2) bir heuristiktir, %100 değildir:
-  - **Yanlış negatif** ihtimali var: alışılmadık ifadeler kullanan bir
-    kısaltıcıyı atlayabilir. Çözüm: o domaini popup'tan güvenilir listeye
-    ekle (gerekirse CSS seçiciyle).
-  - **Yanlış pozitif** ihtimali teorik olarak var ama düşük: buton VE
-    geri sayım/kapı-metni ikisi birden gerektiği için normal sitelerde
-    (form sihirbazları, checkout adımları vb.) bu kombinasyon nadiren
-    bir arada bulunur. Yine de hassas olduğun siteler için "Hiç dokunma"
-    listesini kullanmanı öneririm.
-- `host_permissions: ["<all_urls>"]` ve her sayfaya content script
-  enjeksiyonu geniş izinler gerektirir; hedef domain önceden
-  bilinemediği için bu kaçınılmaz. Chrome Web Store incelemesinde bunu
-  açıklayan kısa bir gerekçe eklemen gerekebilir.
-- Otomatik buton tıklama, ilgili sitenin reklam gelirini atlamak anlamına
-  gelir — bu senin kişisel tarayıcı deneyimin için normal bir reklam
-  engelleme davranışıdır, ama bazı sitelerin kullanım şartlarıyla
-  çelişebileceğini bilerek kullan.
+### 📖 Proje Hakkında
+**Lincle**, dijital ayak izinizi korumak için tasarlanmış, gizlilik odaklı ve açık kaynaklı bir Chrome/Brave eklentisidir. Agresif link kısaltıcıları, reklam kapılarını ve geri sayım sayaçlarını (bc.vc, adf.ly, linkvertise vb.) otomatik olarak atlayarak, sizi kötü amaçlı yazılımlara veya takip çerezlerine maruz bırakmadan doğrudan hedef linkinize ulaştırır.
+
+### ✨ Temel Özellikler
+* **🧠 Sezgisel Algılama Motoru (18 Dil):** Geri sayım sayaçlarını ve "Reklamı Geç" butonlarını küresel ölçekte (İngilizce, İspanyolca, Rusça, Çince, Arapça vb.) otomatik tanır.
+* **🚫 Sıfır Veri Toplama (Zero Telemetry):** %100 yerel (offline) çalışır. Harici API veya analiz aracı kullanmaz. Verileriniz tarayıcınızdan asla dışarı çıkmaz.
+* **⚡ 3 Katmanlı Atlatma Mimarisi:** Statik DOM çıkarımı, küresel kara listeler ve dinamik DOM izleyicilerini (MutationObserver) birleştirerek linkleri milisaniyeler içinde çözer.
+* **🎛️ Ana Şalter (Kill Switch):** Eklentiyi tek bir tıklamayla anında açıp kapatmanızı sağlayan modern ve şık bir arayüz.
+* **🛡️ Küresel Beyaz Liste:** Yanlış algılamaları (false-positive) önler. GitHub, Google, Amazon gibi güvenilir sitelerde sistem otomatik olarak uyku moduna geçer.
+
+### 🏗️ Nasıl Çalışır? (Mimari)
+Lincle sadece basit bir "butona tıklama" aracı değildir. Her sayfayı 3 katmanlı bir güvenlik protokolünden geçirir:
+1. **Katman 0 (Statik Çıkarım):** Gizli hedef URL'leri sayfanın ham HTML kodunda arar ve zararlı sayfa scriptleri (reklamlar vb.) çalışmadan önce sizi güvenliğe yönlendirir.
+2. **Katman 1 (Bilinen Tehditler):** Sisteme önceden kodlanmış bilinen reklam ağı listesine girildiğinde doğrudan çözücü motoru tetikler.
+3. **Katman 2 (Sezgisel Otomatik Algılama):** Site bilinmiyorsa, Lincle DOM'u gerçek zamanlı izler. Bir geri sayım sayacı ile kapı metninin ("Lütfen bekleyin" + "Geç") birleşimini gördüğü an hedef linki cımbızla çeker veya güvenli bir şekilde butona tıklar.
+
+### 🛠️ Kurulum (Geliştirici Modu)
+Lincle şu an bağımsız, açık kaynaklı bir proje olduğu için tarayıcınıza 3 basit adımla manuel olarak kurabilirsiniz:
+1. Bu depoyu `.zip` olarak indirin ve klasöre çıkartın veya terminalden klonlayın:
+   `git clone https://github.com/Nyxa48/lincle.git`
+2. Tarayıcınızı (Chrome, Brave, Edge) açın ve `chrome://extensions/` adresine gidin.
+3. Sağ üst köşeden **"Geliştirici modu"** (Developer mode) seçeneğini açın, **"Paketlenmemiş öğe yükle"** (Load unpacked) butonuna tıklayın ve çıkarttığınız `lincle` klasörünü seçin.
+
+---
+**Developed by** [Emir Samed (Nyxa48)](https://github.com/Nyxa48) | **License:** MIT
