@@ -86,7 +86,12 @@ async function initManager() {
         listEl.innerHTML = '';
         domains.forEach(entry => {
             const li = document.createElement('li');
-            li.innerHTML = `<span>${entry.domain}</span>`;
+            
+            // XSS Güvenlik Yaması: innerHTML yerine textContent kullanımı
+            const span = document.createElement('span');
+            span.textContent = entry.domain;
+            li.appendChild(span);
+
             const btn = document.createElement('button');
             btn.textContent = 'Sil';
             btn.addEventListener('click', async () => {
@@ -113,7 +118,12 @@ async function initManager() {
         excludeListEl.innerHTML = '';
         list.forEach(domain => {
             const li = document.createElement('li');
-            li.innerHTML = `<span>${domain}</span>`;
+            
+            // XSS Güvenlik Yaması: innerHTML yerine textContent kullanımı
+            const span = document.createElement('span');
+            span.textContent = domain;
+            li.appendChild(span);
+
             const btn = document.createElement('button');
             btn.textContent = 'Sil';
             btn.addEventListener('click', async () => {
