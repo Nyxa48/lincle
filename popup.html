@@ -3,55 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  body { width: 320px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 15px; background-color: #1e1e24; color: #ffffff; }
-  h3 { margin-top: 0; color: #00caf5; text-align: center; }
-  h4 { margin: 14px 0 4px; color: #8a8a99; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-  .status-box { background-color: #282830; border-radius: 8px; padding: 10px; margin: 10px 0; border: 1px solid #3f3f4c; text-align: center; }
-  .clean-text { color: #2ecc71; font-weight: bold; }
-  .toggle-row { display: flex; align-items: center; justify-content: space-between; background: #282830; border: 1px solid #3f3f4c; border-radius: 6px; padding: 8px 10px; margin: 8px 0; }
-  .toggle-row label { font-size: 13px; }
-  .domain-list { list-style: none; padding: 0; margin: 8px 0; max-height: 110px; overflow-y: auto; text-align: left; }
-  .domain-list li { display: flex; justify-content: space-between; align-items: center; background: #282830; border: 1px solid #3f3f4c; border-radius: 6px; padding: 6px 8px; margin-bottom: 4px; font-size: 13px; }
-  .domain-list button { background: #e74c3c; border: none; color: #fff; border-radius: 4px; padding: 3px 7px; cursor: pointer; font-size: 11px; }
-  .add-row { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-  .add-row input { padding: 6px; border-radius: 6px; border: 1px solid #3f3f4c; background: #14141a; color: #fff; }
-  .add-row button { background: #00caf5; border: none; color: #101014; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-weight: bold; }
-  small { color: #8a8a99; }
+  :root {
+      --bg: #1e1e24;
+      --card-bg: #282830;
+      --border: #3f3f4c;
+      --primary: #00caf5;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --text: #ffffff;
+      --text-muted: #8a8a99;
+  }
+  body { width: 320px; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); overflow-x: hidden; }
+  
+  /* Üst Bar */
+  .header { background: var(--card-bg); padding: 15px; text-align: center; border-bottom: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  .header h3 { margin: 0; color: var(--primary); font-size: 18px; letter-spacing: 1px; }
+  
+  /* Sayfa Konteynerleri */
+  .view { padding: 20px; transition: transform 0.3s ease-in-out; }
+  #settingsView { display: none; }
+
+  /* Ana Ekran (Dashboard) */
+  .status-circle { width: 80px; height: 80px; border-radius: 50%; background: rgba(46, 204, 113, 0.1); border: 2px solid var(--success); margin: 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); }
+  .status-title { text-align: center; color: var(--success); font-weight: bold; font-size: 16px; margin-top: 10px; }
+  .status-desc { text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 25px; }
+
+  /* Modern Toggle (Aç/Kapat Anahtarı) */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; }
+  .toggle-row span { font-weight: 500; font-size: 14px; }
+  .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .3s; border-radius: 34px; }
+  .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+  input:checked + .slider { background-color: var(--primary); }
+  input:checked + .slider:before { transform: translateX(18px); }
+
+  /* Butonlar */
+  .btn-settings { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+  .btn-settings:hover { background: var(--card-bg); border-color: var(--primary); color: var(--primary); }
+  
+  .btn-back { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+  .btn-back:hover { color: var(--primary); }
+
+  /* Gelişmiş Ayarlar Paneli */
+  h4 { margin: 10px 0 5px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .domain-list { list-style: none; padding: 0; margin: 0 0 15px; max-height: 100px; overflow-y: auto; }
+  .domain-list li { display: flex; justify-content: space-between; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 5px; font-size: 12px; }
+  .domain-list button { background: var(--danger); border: none; color: #fff; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 11px; transition: 0.2s; }
+  .domain-list button:hover { background: #c0392b; }
+  
+  .add-row { display: flex; gap: 5px; margin-bottom: 15px; }
+  .add-row input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 12px; outline: none; }
+  .add-row input:focus { border-color: var(--primary); }
+  .add-row button { background: var(--primary); border: none; color: var(--bg); border-radius: 6px; padding: 0 12px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
+  .add-row button:hover { opacity: 0.8; }
+
+  /* Footer */
+  .footer { text-align: center; margin-top: 20px; font-size: 10px; color: var(--border); letter-spacing: 1px; }
 </style>
 </head>
 <body>
-  <h3>Lincle (Link Cleaner)</h3>
-
-  <div class="status-box">
-    <span class="clean-text">Otomatik Kalkan Aktif 🛡️</span>
-    <p><small>Artık domain eklemene gerek yok: kısaltıcı/reklam kapısı gibi görünen
-    her sayfa otomatik algılanıp atlanır. Aşağıdaki listeler sadece ince ayar için.</small></p>
+  <div class="header">
+    <h3>LINCLE</h3>
   </div>
 
-  <div class="toggle-row">
-    <label for="autoDetectToggle">Otomatik algılama</label>
-    <input type="checkbox" id="autoDetectToggle" checked />
+  <!-- ANA EKRAN -->
+  <div id="mainView" class="view">
+    <div class="status-circle">🛡️</div>
+    <div class="status-title">Sistem Koruması Aktif</div>
+    <div class="status-desc">Arka planda gereksiz kapılar atlanıyor</div>
+
+    <div class="toggle-row">
+      <span>Otomatik Algılama</span>
+      <label class="switch">
+        <input type="checkbox" id="autoDetectToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <button id="btnOpenSettings" class="btn-settings">⚙️ Gelişmiş Ayarları Aç</button>
+    <div class="footer">DEVELOPED BY NYXA48</div>
   </div>
 
-  <h4>Güvenilir / zorla çalıştır</h4>
-  <ul class="domain-list" id="domainList"></ul>
-  <div class="add-row">
-    <input type="text" id="newDomain" placeholder="domain, örn: kisalt.co" />
-    <input type="text" id="newSelector" placeholder="(opsiyonel) atla butonu CSS seçici" />
-    <button id="addDomainBtn">Ekle</button>
+  <!-- GELİŞMİŞ AYARLAR (Varsayılan olarak gizli) -->
+  <div id="settingsView" class="view">
+    <button id="btnCloseSettings" class="btn-back">← Ana Ekrana Dön</button>
+
+    <h4>Güvenilir (Zorla Çalıştır)</h4>
+    <div class="add-row">
+      <input type="text" id="newDomain" placeholder="Örn: kisalt.co" />
+      <button id="addDomainBtn">Ekle</button>
+    </div>
+    <ul class="domain-list" id="domainList"></ul>
+
+    <h4>Hiç Dokunma (Hariç Tut)</h4>
+    <div class="add-row">
+      <input type="text" id="newExclude" placeholder="Örn: bankam.com" />
+      <button id="addExcludeBtn">Ekle</button>
+    </div>
+    <ul class="domain-list" id="excludeList"></ul>
   </div>
 
-  <h4>Hiç dokunma (hariç tut)</h4>
-  <ul class="domain-list" id="excludeList"></ul>
-  <div class="add-row">
-    <input type="text" id="newExclude" placeholder="domain, örn: bankam.com" />
-    <button id="addExcludeBtn">Hariç Tut</button>
-  </div>
-
-  <script src="popup.js"></script>
-<div style="text-align: center; margin-top: 15px; font-size: 11px; color: #8a8a99; letter-spacing: 1px;">
-    DEVELOPED BY NYXA48
-  </div>
   <script src="popup.js"></script>
 </body>
 </html>

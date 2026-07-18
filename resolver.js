@@ -1,4 +1,4 @@
-// Lincle Resolver v2.1 - Global Heuristic & Optimized Observer
+// Lincle Resolver v2.2 - Global Heuristic & Optimized Observer
 // Developed by: Emir Samed (Nyxa48)
 
 (function () {
@@ -7,6 +7,22 @@
     const SETTINGS_KEY = "lincleSettings";
     const MAX_WAIT_MS = 20000;
 
+    // 1. KÜRESEL BEYAZ LİSTE (Asla dokunulmayacak, motorun durdurulacağı siteler)
+    // pixeldrain.com'u da ekledik ki dosya indirirken yanlışlıkla tetiklenmesin.
+    const GLOBAL_EXCLUDE_LIST = [
+        "github.com", "google.com", "youtube.com", "twitter.com", "x.com",
+        "facebook.com", "instagram.com", "linkedin.com", "reddit.com",
+        "stackoverflow.com", "wikipedia.org", "microsoft.com", "apple.com",
+        "whatsapp.com", "telegram.org", "amazon.com", "netflix.com", "pixeldrain.com"
+    ];
+
+    // 2. KÜRESEL KARA LİSTE (Doğrudan vurulacak bilinen kısaltıcılar)
+    const DEFAULT_KNOWN_SHORTENERS = [
+        "bc.vc", "adf.ly", "linkvertise.com", "link-to.net", "ouo.io",
+        "exe.io", "gplinks.in", "gplinks.co", "shrinkme.io", "shorte.st",
+        "adfoc.us", "sub2unlock.com", "mboost.me", "droplink.co", "clk.sh", "tii.la"
+    ];
+
     const AD_DOMAIN_BLOCKLIST = [
         "doubleclick.net", "googlesyndication.com", "google-analytics.com",
         "amazon-adsystem.com", "taboola.com", "outbrain.com",
@@ -14,26 +30,40 @@
         "googletagmanager.com", "facebook.com"
     ];
 
-    // Global SKIP KEYWORDS (TR, EN, ES, RU, PT, DE)
+    // 18 Dilde Tıklanacak Hedef Kelimeler
     const SKIP_KEYWORDS = [
-        "continue", "skip ad", "skip", "get link", "devam et", "devam",
-        "linke git", "proceed", "i understand", "reveal link", "show link",
-        "get destination", "linki göster", "download", "indir",
-        "saltar", "saltar anuncio", "пропустить", "получить ссылку", 
-        "pular", "pular anúncio", "überspringen", "weiter"
+        "continue", "skip ad", "skip", "get link", "proceed", "i understand", "reveal link", "show link", "get destination", "download", "next",
+        "devam et", "devam", "linke git", "linki göster", "indir", "geç", "reklamı geç",
+        "saltar", "saltar anuncio", "continuar", "siguiente", "obtener enlace", "descargar",
+        "pular", "pular anúncio", "obter link", "próximo", "baixar",
+        "пропустить", "пропустить рекламу", "продолжить", "получить ссылку", "далее", "скачать",
+        "überspringen", "weiter", "link erhalten", "herunterladen",
+        "passer", "passer l'annonce", "continuer", "suivant", "obtenir le lien", "télécharger",
+        "salta", "salta annuncio", "continua", "avanti", "ottieni link", "scarica",
+        "lewati", "lewati iklan", "lanjutkan", "berikutnya", "dapatkan tautan", "unduh",
+        "pomiń", "pomiń reklamę", "kontynuuj", "dalej", "pobierz",
+        "overslaan", "advertentie overslaan", "doorgaan", "volgende", "downloaden",
+        "bỏ qua", "bỏ qua quảng cáo", "tiếp tục", "lấy liên kết", "tải xuống",
+        "ข้าม", "ข้ามโฆษณา", "ดำเนินการต่อ", "รับลิงก์", "ดาวน์โหลด",
+        "スキップ", "広告をスキップ", "次へ", "続行", "リンクを取得", "ダウンロード",
+        "건너뛰기", "광고 건너뛰기", "계속", "링크 받기", "다운로드",
+        "跳过", "跳过广告", "继续", "获取链接", "下载", "下一步",
+        "تخطي", "تخطي الإعلان", "استمرار", "متابعة", "احصل على الرابط", "تحميل",
+        "छोड़ें", "विज्ञापन छोड़ें", "जारी रखें", "लिंक प्राप्त करें", "डाउनलोड"
     ];
 
-    // Global GATE PATTERNS
     const GATE_TEXT_PATTERNS = [
-        /reklam(ı)?\s*geç/i, /link(iniz)?\s*koruma\s*altında/i, /devam\s*etmek\s*için\s*bekleyin/i,
-        /please\s*wait/i, /verifying\s*you'?re\s*human/i, /skip\s*ad/i,
-        /generat(ing|ed)\s*link/i, /destination\s*link/i, /your\s*link\s*is\s*ready/i,
-        /wait\s*\d+\s*seconds?/i, /por\s*favor\s*espere/i, /пожалуйста,\s*подождите/i
+        /please\s*wait/i, /verifying\s*you'?re\s*human/i, /skip\s*ad/i, /generat(ing|ed)\s*link/i, /destination\s*link/i, /your\s*link\s*is\s*ready/i,
+        /reklam(ı)?\s*geç/i, /link(iniz)?\s*koruma\s*altında/i, /devam\s*etmek\s*için\s*bekleyin/i, /lütfen\s*bekleyin/i,
+        /por\s*favor\s*espere/i, /tu\s*enlace\s*está\s*listo/i, /seu\s*link\s*está\s*pronto/i,
+        /пожалуйста,\s*подождите/i, /ссылка\s*готова/i, /пропустить\s*рекламу/i,
+        /veuillez\s*patienter/i, /votre\s*lien\s*est\s*prêt/i, /si\s*prega\s*di\s*attendere/i, /il\s*tuo\s*link\s*è\s*pronto/i,
+        /harap\s*tunggu/i, /tautan\s*anda\s*sudah\s*siap/i, /bitte\s*warten/i, /dein\s*link\s*ist\s*bereit/i, /een\s*moment\s*geduld/i, /proszę\s*czekać/i,
+        /vui\s*lòng\s*chờ/i, /กรุณารอสักครู่/i, /お待ちください/i, /잠시\s*기다려\s*주세요/i, /请稍候/i, /الرجاء\s*الانتظار/i, /कृपया\s*प्रतीक्षा\s*करें/i
     ];
 
-    // Global COUNTDOWN PATTERNS
     const COUNTDOWN_TEXT_PATTERNS = [
-        /\b([0-9]|1[0-9]|2[0-9])\s*(saniye|second|sec|sn|segundos|секунд|sekunden)\b/i
+        /(?:\b|\s)([0-9]|1[0-9]|2[0-9])\s*(saniye|second|sec|sn|segundos|секунд|sekunden|secondes|secondi|detik|sekund|giây|วินาที|秒|ثانية|सेकंड)/i
     ];
 
     const STATIC_REGEXES = [
@@ -44,26 +74,20 @@
     ];
 
     function isSafeHttpUrl(value) {
-        try {
-            const u = new URL(value, location.href);
-            return u.protocol === "http:" || u.protocol === "https:";
-        } catch { return false; }
+        try { const u = new URL(value, location.href); return u.protocol === "http:" || u.protocol === "https:"; } 
+        catch { return false; }
     }
 
     function isAdOrTrackingUrl(value) {
-        try {
-            const host = new URL(value, location.href).hostname;
-            return AD_DOMAIN_BLOCKLIST.some(d => host.includes(d));
-        } catch { return true; }
+        try { const host = new URL(value, location.href).hostname; return AD_DOMAIN_BLOCKLIST.some(d => host.includes(d)); } 
+        catch { return true; }
     }
 
     function tryStaticExtraction() {
         const html = document.documentElement.outerHTML;
         for (const pattern of STATIC_REGEXES) {
             const match = html.match(pattern);
-            if (match && match[1] && isSafeHttpUrl(match[1]) && !isAdOrTrackingUrl(match[1])) {
-                return match[1];
-            }
+            if (match && match[1] && isSafeHttpUrl(match[1]) && !isAdOrTrackingUrl(match[1])) return match[1];
         }
         return null;
     }
@@ -73,9 +97,7 @@
             const el = document.querySelector(customSelector);
             if (el && el.offsetParent !== null && !el.disabled) return el;
         }
-        const candidates = Array.from(document.querySelectorAll(
-            "a, button, div[role='button'], input[type='button'], input[type='submit']"
-        ));
+        const candidates = Array.from(document.querySelectorAll("a, button, div[role='button'], input[type='button'], input[type='submit']"));
         return candidates.find(el => {
             if (el.offsetParent === null || el.disabled) return false;
             const text = (el.innerText || el.value || "").trim().toLowerCase();
@@ -108,9 +130,7 @@
         if (!el) {
             el = document.createElement("div");
             el.id = "lincle-banner";
-            el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:2147483647;" +
-                "background:#1e1e24;color:#00caf5;font:13px 'Segoe UI',Arial,sans-serif;" +
-                "padding:6px 10px;text-align:center;box-shadow: 0 2px 10px rgba(0,0,0,0.5);";
+            el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:2147483647;background:#1e1e24;color:#00caf5;font:13px 'Segoe UI',Arial,sans-serif;padding:6px 10px;text-align:center;box-shadow: 0 2px 10px rgba(0,0,0,0.5);";
             (document.body || document.documentElement).appendChild(el);
         }
         el.textContent = text;
@@ -121,19 +141,21 @@
         setTimeout(() => { location.href = url; }, 300);
     }
 
-    async function isDomainExcluded() {
+    async function isDomainExcluded(host) {
         try {
+            if (GLOBAL_EXCLUDE_LIST.some(d => host === d || host.endsWith("." + d))) return true;
             const data = await chrome.storage.local.get(EXCLUDE_KEY);
             const list = data[EXCLUDE_KEY] || [];
-            return list.some(d => location.hostname === d || location.hostname.endsWith("." + d));
+            return list.some(d => host === d || host.endsWith("." + d));
         } catch { return false; }
     }
 
-    async function getTrustedEntry() {
+    async function getTrustedEntry(host) {
         try {
+            if (DEFAULT_KNOWN_SHORTENERS.some(d => host === d || host.endsWith("." + d))) return { domain: host };
             const data = await chrome.storage.local.get(STORAGE_KEY);
             const list = data[STORAGE_KEY] || [];
-            return list.find(d => location.hostname === d.domain || location.hostname.endsWith("." + d.domain)) || null;
+            return list.find(d => host === d.domain || host.endsWith("." + d.domain)) || null;
         } catch { return null; }
     }
 
@@ -151,12 +173,11 @@
         let observer = null;
         let throttleTimer = null;
 
-        // Çözüm mantığını yürüten ana fonksiyon
         function evaluateDOM() {
             if (Date.now() - startedAt > MAX_WAIT_MS) {
                 if (observer) observer.disconnect();
                 showBanner("Lincle: Otomatik atlanamadı. Lütfen manuel tıklayın.");
-                return true; // İşlemi durdur
+                return true; 
             }
 
             const url = tryStaticExtraction();
@@ -172,26 +193,23 @@
                     btn.click();
                 }
             }
-            return false; // Aramaya devam et
+            return false; 
         }
 
-        // 1. Sayfa yüklendiğinde ilk kontrolü yap
         if (evaluateDOM()) return;
 
-        // 2. Performans Dostu MutationObserver (Sürekli tarama yerine DOM değiştiğinde çalışır)
         observer = new MutationObserver(() => {
             if (throttleTimer) return;
             throttleTimer = setTimeout(() => {
                 throttleTimer = null;
                 evaluateDOM();
-            }, 250); // 250ms Throttle ile işlemciyi korur
+            }, 250); 
         });
 
         observer.observe(document.body || document.documentElement, {
             childList: true, subtree: true, attributes: true, attributeFilter: ['disabled', 'class', 'style']
         });
 
-        // Emniyet sübabı: Maksimum süre dolduğunda observer'ı kapat
         setTimeout(() => {
             if (observer) observer.disconnect();
             evaluateDOM();
@@ -199,12 +217,13 @@
     }
 
     async function init() {
-        if (await isDomainExcluded()) return;
+        const host = location.hostname;
+        if (await isDomainExcluded(host)) return;
 
         const staticUrl = tryStaticExtraction();
         if (staticUrl) { goTo(staticUrl); return; }
 
-        const trusted = await getTrustedEntry();
+        const trusted = await getTrustedEntry(host);
         if (trusted) {
             runActiveResolver(trusted.skipSelector || null);
             return;
