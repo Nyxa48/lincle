@@ -119,10 +119,27 @@ async function initUI() {
 
                 const response = await fetch(text.trim());
                 const html = await response.text();
-                const match = html.match(/(?:var\s+url\s*=\s*|url=)['"]([^'"]+)['"]/i);
                 
-                if (match && match[1] && match[1].startsWith('http')) {
-                    await navigator.clipboard.writeText(match[1]);
+                // Güçlendirilmiş Statik Motor (Options ile aynı güce sahip)
+                const STATIC_PATTERNS = [
+                    /(?:var\s+url\s*=\s*|url=)['"]([^'"]+)['"]/i,
+                    /window\.location\.href\s*=\s*['"]([^'"]+)['"]/i,
+                    /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]+;\s*url=([^"']+)["']/i,
+                    /<a[^>]+class=["'][^"']*(?:wfl_button|button|btn)[^"']*["'][^>]*href=["'](http[^"']+)["']/i,
+                    /<a[^>]+href=["'](http[^"']+)["'][^>]*class=["'][^"']*(?:wfl_button|button|btn)[^"']*["']/i
+                ];
+
+                let foundUrl = null;
+                for (const pattern of STATIC_PATTERNS) {
+                    const match = html.match(pattern);
+                    if (match && match[1] && match[1].startsWith('http')) {
+                        foundUrl = match[1];
+                        break;
+                    }
+                }
+                
+                if (foundUrl) {
+                    await navigator.clipboard.writeText(foundUrl);
                     showStatus(msgs.found, "var(--success)");
                 } else {
                     showStatus(msgs.fail, "var(--danger)");

@@ -201,7 +201,9 @@ async function runBulkResolver() {
     const STATIC_PATTERNS = [
         /var\s+url\s*=\s*['"]([^'"]+)['"]/i,
         /window\.location\.href\s*=\s*['"]([^'"]+)['"]/i,
-        /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]+;\s*url=([^"']+)["']/i
+        /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]+;\s*url=([^"']+)["']/i,
+        /<a[^>]+class=["'][^"']*(?:wfl_button|button|btn)[^"']*["'][^>]*href=["'](http[^"']+)["']/i,
+        /<a[^>]+href=["'](http[^"']+)["'][^>]*class=["'][^"']*(?:wfl_button|button|btn)[^"']*["']/i
     ];
     
     let customPatterns = [];
