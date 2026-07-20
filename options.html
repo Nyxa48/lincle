@@ -127,7 +127,29 @@
         <button id="saveBtn">Ayarları Kaydet</button>
         <span id="saveStatus" style="color: #00b894; margin-left: 15px; font-weight: bold; display: none;">✓
             Kaydedildi!</span>
+
+        <div class="section">
+            <h3>⌨️ Klavye Kısayolu</h3>
+            <p style="font-size: 0.9em; color: #636e72;">Kısayollar güvenlik sebebiyle koda gömülmez (No Hardcode).
+                İstediğiniz tuş kombinasyonunu Chrome'un yerel ayarlarından değiştirebilirsiniz.</p>
+            <button id="btnShortcuts" style="background: #0984e3;">Kısayol Tuşlarını Düzenle</button>
+        </div>
+
+        <div class="section">
+            <h3>🔗 Yönlendirme Zinciri (Redirect Chain)</h3>
+            <p class="helper-text">Lincle'ın arka planda sizi kurtardığı son yönlendirme zincirleri (Debugging için
+                idealdir).</p>
+            <div id="chainContainer"
+                style="background: #2d3436; color: #00b894; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; max-height: 250px; overflow-y: auto;">
+                <!-- Zincirler buraya Javascript ile dinamik basılacak -->
+                Zaman çizelgesi yükleniyor...
+            </div>
+            <button id="btnClearChain"
+                style="background: #d63031; margin-top: 10px; padding: 8px 16px; font-size: 13px;">Zinciri
+                Temizle</button>
+        </div>
     </div>
+
     <script src="options.js"></script>
 </body>
 

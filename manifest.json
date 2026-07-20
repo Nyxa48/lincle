@@ -25,5 +25,14 @@
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
+  },
+  "commands": {
+    "trigger-lincle": {
+      "suggested_key": {
+        "default": "Alt+L",
+        "mac": "Command+Shift+L"
+      },
+      "description": "Lincle: Mevcut sayfayı zorla temizle"
+    }
   }
 }

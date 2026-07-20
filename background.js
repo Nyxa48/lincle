@@ -15,3 +15,15 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         chrome.tabs.create({ url: info.linkUrl });
     }
 });
+
+// Aşama 2: Dinamik Klavye Kısayolu Dinleyicisi
+chrome.commands.onCommand.addListener((command) => {
+    if (command === "trigger-lincle") {
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            if (tabs[0]) {
+                // Mevcut sekmeye 'zorla çalıştır' emri gönder
+                chrome.tabs.sendMessage(tabs[0].id, { action: "manualBypass" });
+            }
+        });
+    }
+});
