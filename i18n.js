@@ -87,7 +87,7 @@ const lincleDict = {
 // Sayfadaki "data-i18n" etiketine sahip tüm yazıları seçilen dile göre çevirir
 async function applyTranslations() {
     const data = await chrome.storage.local.get("lincleLang");
-    const lang = data.lincleLang || 'tr';
+    const lang = data.lincleLang || 'en'; 
     const dict = lincleDict[lang];
 
     document.querySelectorAll('[data-i18n]').forEach(el => {

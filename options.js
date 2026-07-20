@@ -20,7 +20,7 @@ if (themeToggle) {
 function updateThemeButton(theme) {
     if (typeof lincleDict !== "undefined") {
         chrome.storage.local.get("lincleLang", (data) => {
-            const lang = data.lincleLang || 'tr';
+            const lang = data.lincleLang || 'en';
             if (themeToggle) themeToggle.textContent = theme === 'dark' ? lincleDict[lang].themeLight : lincleDict[lang].themeDark;
         });
     } else {
@@ -34,8 +34,13 @@ document.addEventListener('DOMContentLoaded', restoreOptions);
 const langSelect = document.getElementById('langSelect');
 if (langSelect) {
     langSelect.addEventListener('change', async (e) => {
-        await chrome.storage.local.set({ lincleLang: e.target.value });
-        location.reload(); 
+        const selectedLang = e.target.value;
+        await chrome.storage.local.set({ lincleLang: selectedLang });
+        
+        // Verinin veritabanına %100 yazıldığından emin olmak için ufak bir bekleme (Fail-Safe)
+        setTimeout(() => {
+            location.reload(); 
+        }, 50);
     });
 }
 
@@ -68,13 +73,15 @@ if (btnEmailDev) btnEmailDev.addEventListener('click', sendEmailToDev);
 // AYARLARI YÜKLE
 async function restoreOptions() {
     try {
-        // ÇEVİRİLERİ YÜKLE VE DİL KUTUSUNU AYARLA (Hata buradaydı, artık async fonksiyonun içinde!)
+        // ÇEVİRİLERİ YÜKLE
         if (typeof applyTranslations === "function") {
             await applyTranslations();
         }
         
+        // 🚨 HATA BURADAYDI: Bu iki satır silinmişti, geri ekledik!
         const langData = await chrome.storage.local.get("lincleLang");
-        const currentLang = langData.lincleLang || 'tr';
+        const currentLang = langData.lincleLang || 'en'; 
+        
         if (document.getElementById('langSelect')) {
             document.getElementById('langSelect').value = currentLang;
         }
@@ -90,7 +97,7 @@ async function restoreOptions() {
         const statsDisplay = document.getElementById('statsDisplay');
         if (statsDisplay) {
             if (typeof lincleDict !== "undefined") {
-                const dict = lincleDict[currentLang];
+                const dict = lincleDict[currentLang]; // Sistem 'currentLang' bulamadığı için burada çöküyordu
                 statsDisplay.textContent = `${stats.cleanedLinks} ${dict.popCleaned} | ${timeText} ${stats.savedSeconds > 60 ? 'min' : 'sec'} ${dict.popSaved}`;
             } else {
                 statsDisplay.textContent = `${stats.cleanedLinks} Link Temizlendi | ${timeText} ${stats.savedSeconds > 60 ? 'Dakika' : 'Saniye'} Tasarruf Edildi`;

@@ -4,7 +4,7 @@
 document.addEventListener('DOMContentLoaded', initUI);
 
 async function initUI() {
-    let currentLang = 'tr';
+    let currentLang = 'en';
 
     // 1. ÇEVİRİ MOTORUNU ÇALIŞTIR
     try {
@@ -12,7 +12,7 @@ async function initUI() {
             await applyTranslations();
         }
         const langData = await chrome.storage.local.get("lincleLang");
-        currentLang = langData.lincleLang || 'tr';
+        currentLang = langData.lincleLang || 'en'; 
     } catch (e) {
         console.error("[Lincle] Çeviri yüklenme hatası:", e);
     }
