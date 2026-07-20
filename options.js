@@ -1,9 +1,45 @@
-// Lincle Gelişmiş Ayarlar Motoru (Unified & Fail-Safe)
+// Lincle Gelişmiş Ayarlar Motoru (Theme, i18n & Fail-Safe)
 // Developed by: Emir Samed (Nyxa48)
+
+// TEMA YÖNETİMİ (Açık/Koyu Mod)
+const themeToggle = document.getElementById('themeToggle');
+const currentTheme = localStorage.getItem('lincleTheme') || 'light';
+document.documentElement.setAttribute('data-theme', currentTheme);
+updateThemeButton(currentTheme);
+
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        let theme = document.documentElement.getAttribute('data-theme');
+        theme = theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('lincleTheme', theme);
+        updateThemeButton(theme);
+    });
+}
+
+function updateThemeButton(theme) {
+    if (typeof lincleDict !== "undefined") {
+        chrome.storage.local.get("lincleLang", (data) => {
+            const lang = data.lincleLang || 'tr';
+            if (themeToggle) themeToggle.textContent = theme === 'dark' ? lincleDict[lang].themeLight : lincleDict[lang].themeDark;
+        });
+    } else {
+        if (themeToggle) themeToggle.textContent = theme === 'dark' ? 'Açık Mod' : 'Koyu Mod';
+    }
+}
 
 document.addEventListener('DOMContentLoaded', restoreOptions);
 
-// Buton dinleyicilerini (varsa) güvenli bir şekilde ekle
+// DİL DEĞİŞTİRİCİ DİNLEYİCİSİ
+const langSelect = document.getElementById('langSelect');
+if (langSelect) {
+    langSelect.addEventListener('change', async (e) => {
+        await chrome.storage.local.set({ lincleLang: e.target.value });
+        location.reload(); 
+    });
+}
+
+// Buton Dinleyicileri
 const btnSave = document.getElementById('saveBtn');
 if (btnSave) btnSave.addEventListener('click', saveOptions);
 
@@ -29,21 +65,39 @@ const btnEmailDev = document.getElementById('btnEmailDev');
 if (btnEmailDev) btnEmailDev.addEventListener('click', sendEmailToDev);
 
 
-// AYARLARI EKRANA YÜKLE
+// AYARLARI YÜKLE
 async function restoreOptions() {
     try {
+        // ÇEVİRİLERİ YÜKLE VE DİL KUTUSUNU AYARLA (Hata buradaydı, artık async fonksiyonun içinde!)
+        if (typeof applyTranslations === "function") {
+            await applyTranslations();
+        }
+        
+        const langData = await chrome.storage.local.get("lincleLang");
+        const currentLang = langData.lincleLang || 'tr';
+        if (document.getElementById('langSelect')) {
+            document.getElementById('langSelect').value = currentLang;
+        }
+
         const data = await chrome.storage.local.get([
             "lincleStats", "lincleOptions", "lincleDomains", 
             "lincleHistory", "lincleCustomRegex", "lincleFailures"
         ]);
         
-        // 1. İstatistikler
+        // İstatistikleri Dinamik Yazdır (Dil destekli)
         const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
-        const timeText = stats.savedSeconds > 60 ? `${(stats.savedSeconds / 60).toFixed(1)} Dakika` : `${Math.floor(stats.savedSeconds)} Saniye`;
+        const timeText = stats.savedSeconds > 60 ? `${(stats.savedSeconds / 60).toFixed(1)}` : `${Math.floor(stats.savedSeconds)}`;
         const statsDisplay = document.getElementById('statsDisplay');
-        if (statsDisplay) statsDisplay.textContent = `🚀 ${stats.cleanedLinks} Link Temizlendi | ⏳ ${timeText} Tasarruf Edildi`;
+        if (statsDisplay) {
+            if (typeof lincleDict !== "undefined") {
+                const dict = lincleDict[currentLang];
+                statsDisplay.textContent = `${stats.cleanedLinks} ${dict.popCleaned} | ${timeText} ${stats.savedSeconds > 60 ? 'min' : 'sec'} ${dict.popSaved}`;
+            } else {
+                statsDisplay.textContent = `${stats.cleanedLinks} Link Temizlendi | ${timeText} ${stats.savedSeconds > 60 ? 'Dakika' : 'Saniye'} Tasarruf Edildi`;
+            }
+        }
 
-        // 2. Ana Ayarlar (Görselde çalışmayan kısım buradaydı)
+        // Seçenekleri Doldur
         const options = data.lincleOptions || { assumedGateTime: 10, maxWaitTime: 20, enableLogging: false, enableBreadcrumbs: false };
         
         if (document.getElementById('assumedTime')) document.getElementById('assumedTime').value = options.assumedGateTime || 10;
@@ -51,43 +105,39 @@ async function restoreOptions() {
         if (document.getElementById('maxWaitTime')) document.getElementById('maxWaitTime').value = options.maxWaitTime || 20;
         if (document.getElementById('breadcrumbToggle')) document.getElementById('breadcrumbToggle').checked = options.enableBreadcrumbs || false;
 
-        // 3. Kara Liste
         const domains = data.lincleDomains || [];
         if (document.getElementById('domainList')) document.getElementById('domainList').value = domains.map(d => d.domain).join('\n');
 
-        // 4. Özel Regexler
         const customRegex = data.lincleCustomRegex || [];
         if (document.getElementById('customRegexList')) document.getElementById('customRegexList').value = customRegex.join('\n');
 
-        // 5. Yönlendirme Zinciri (History)
         const history = data.lincleHistory || [];
         const chainContainer = document.getElementById('chainContainer');
         if (chainContainer) {
             if (history.length === 0) {
-                chainContainer.innerHTML = "<span style='color: #636e72;'>Henüz kaydedilmiş bir yönlendirme zinciri yok.</span>";
+                chainContainer.innerHTML = "-";
             } else {
                 chainContainer.innerHTML = history.map(item => `
-                    <div style="margin-bottom: 12px; border-bottom: 1px solid #dfe6e9; padding-bottom: 8px;">
-                        <span style="color: #0984e3; font-weight:bold;">[${item.time}]</span> ⏱️ Kazanç: ${item.saved}s<br>
-                        <span style="color: #d63031;">❌ ${item.from}</span><br>
-                        <span style="color: #00b894;">↳ 🟢 ${item.to}</span>
+                    <div class="chain-item">
+                        <span class="chain-time">[${item.time}]</span> ${item.saved}s<br>
+                        <span class="chain-from">SRC: ${item.from}</span><br>
+                        <span class="chain-to">DST: ${item.to}</span>
                     </div>
                 `).join('');
             }
         }
 
-        // 6. Başarısızlık Raporları
         const failures = data.lincleFailures || [];
         const failureBox = document.getElementById('failureList');
         if (failureBox) {
             if (failures.length > 0) {
-                failureBox.value = failures.map(f => `Tarih: ${f.date}\nHost: ${f.host}\nLink: ${f.url}\nHata: ${f.error}\nBulunan Metinler: ${f.gatePhrases.join(', ')}\n-------------------`).join('\n\n');
+                failureBox.value = failures.map(f => `Host: ${f.host}\nURL: ${f.url}\nPhrases: ${f.gatePhrases.join(', ')}\n-------------------`).join('\n\n');
             } else {
                 failureBox.value = "";
             }
         }
     } catch (e) {
-        console.error("[Lincle] Ayarlar yüklenirken kritik hata:", e);
+        console.error("[Lincle] Ayarlar yüklenirken hata oluştu:", e);
     }
 }
 
@@ -123,11 +173,11 @@ async function saveOptions() {
             setTimeout(() => { status.style.display = 'none'; }, 2000);
         }
     } catch(e) {
-         console.error("[Lincle] Ayarlar kaydedilirken hata:", e);
+         console.error("[Lincle] Kayıt hatası:", e);
     }
 }
 
-// TOPLU ÇÖZÜMLEYİCİ (BULK RESOLVER) FONKSİYONU
+// TOPLU ÇÖZÜMLEYİCİ
 async function runBulkResolver() {
     const inputEl = document.getElementById('bulkInput');
     const outBox = document.getElementById('bulkOutput');
@@ -138,7 +188,6 @@ async function runBulkResolver() {
     const inputLines = inputEl.value.split('\n').filter(l => l.trim() !== '');
     if(inputLines.length === 0) return;
     
-    btn.textContent = "⏳ Çözümleniyor...";
     btn.disabled = true;
     outBox.value = "";
 
@@ -166,36 +215,32 @@ async function runBulkResolver() {
             for (const pattern of allPatterns) {
                 const match = html.match(pattern);
                 if (match && match[1] && match[1].startsWith('http')) {
-                    results.push(`✅ [TEMİZ]: ${match[1]}`);
+                    results.push(`[OK] ${match[1]}`);
                     found = true;
                     break;
                 }
             }
-            if (!found) results.push(`❌ [BULUNAMADI]: ${link}`);
+            if (!found) results.push(`[NOT FOUND] ${link}`);
         } catch (e) {
-            results.push(`⚠️ [HATA]: Bağlantı kurulamadı - ${link}`);
+            results.push(`[ERROR] ${link}`);
         }
     }
 
     outBox.value = results.join('\n');
-    btn.textContent = "🚀 Toplu Çözümle";
     btn.disabled = false;
 }
 
-// GELİŞTİRİCİYE MAİL GÖNDERME FONKSİYONU
+// GELİŞTİRİCİYE MAİL GÖNDERME
 async function sendEmailToDev() {
     const fData = await chrome.storage.local.get("lincleFailures");
     const failures = fData.lincleFailures || [];
     
-    if (failures.length === 0) {
-        alert("Gönderilecek bir hata raporu bulunmuyor!");
-        return;
-    }
+    if (failures.length === 0) return;
 
-    const reportText = failures.map(f => `Host: ${f.host}\nURL: ${f.url}\nPhrases: ${f.gatePhrases.join(', ')}`).join('\n\n');
-    const email = "iletisim@emirsamed.com"; 
-    const subject = encodeURIComponent("Lincle v2.4 - Hata Raporu (Failures)");
-    const body = encodeURIComponent(`Merhaba Emir,\n\nAşağıdaki linkleri Lincle atlayamadı. İncelemen için gönderiyorum:\n\n${reportText}`);
+    const reportText = failures.map(f => `Host: ${f.host}\nURL: ${f.url}\nBulgular: ${f.gatePhrases.join(', ')}`).join('\n\n');
+    const email = "nyxa4807@gmail.com"; 
+    const subject = encodeURIComponent("Lincle - Hata Raporu");
+    const body = encodeURIComponent(`Merhaba Emir,\n\nAşağıdaki bağlantılar Lincle tarafından atlanamadı. Analiz için gönderiyorum:\n\n${reportText}`);
     
     window.open(`mailto:${email}?subject=${subject}&body=${body}`);
 }

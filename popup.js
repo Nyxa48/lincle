@@ -1,210 +1,143 @@
-// Lincle - Modern UI Manager
+// Lincle Popup UI Engine (Fully Localized & Fail-Safe)
 // Developed by: Emir Samed (Nyxa48)
 
-// Firefox/Safari 'browser' nesnesini (Promise tabanlı, native) sağlar.
-// Chrome'da MV3'te 'chrome' de callback verilmediğinde Promise döndürür.
-const ext = (typeof browser !== "undefined") ? browser : chrome;
+document.addEventListener('DOMContentLoaded', initUI);
 
-const DOMAINS_KEY = "lincleDomains";
-const EXCLUDE_KEY = "lincleExcluded";
-const SETTINGS_KEY = "lincleSettings"; // { isActive: true/false }
+async function initUI() {
+    let currentLang = 'tr';
 
-document.addEventListener('DOMContentLoaded', () => {
-    initUI();
-    initManager();
-});
+    // 1. ÇEVİRİ MOTORUNU ÇALIŞTIR
+    try {
+        if (typeof applyTranslations === "function") {
+            await applyTranslations();
+        }
+        const langData = await chrome.storage.local.get("lincleLang");
+        currentLang = langData.lincleLang || 'tr';
+    } catch (e) {
+        console.error("[Lincle] Çeviri yüklenme hatası:", e);
+    }
 
-function initUI() {
+    // 2. TEMA YÖNETİMİ
+    const themeToggle = document.getElementById('themeToggle');
+    const currentTheme = localStorage.getItem('lincleTheme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    updateThemeBtn(currentTheme);
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            theme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('lincleTheme', theme);
+            updateThemeBtn(theme);
+        });
+    }
+
+    function updateThemeBtn(theme) {
+        if (typeof lincleDict !== "undefined") {
+            themeToggle.textContent = theme === 'dark' ? lincleDict[currentLang].themeLight : lincleDict[currentLang].themeDark;
+        } else {
+            themeToggle.textContent = theme === 'dark' ? 'Açık Mod' : 'Koyu Mod';
+        }
+    }
+
+    // 3. KALKAN KONTROLÜ
+    const masterToggle = document.getElementById('masterToggle');
+    if (masterToggle) {
+        chrome.storage.local.get("lincleSettings", (data) => {
+            const settings = data.lincleSettings || {};
+            masterToggle.checked = settings.isActive !== false;
+        });
+
+        masterToggle.addEventListener('change', (e) => {
+            chrome.storage.local.set({ lincleSettings: { isActive: e.target.checked } });
+        });
+    }
+
+    // 4. İSTATİSTİKLERİ YÜKLE (Dinamik Birim Desteği)
+    chrome.storage.local.get("lincleStats", (data) => {
+        const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
+        
+        let timeText = "";
+        const isTr = (currentLang === 'tr');
+        
+        if (stats.savedSeconds >= 60) {
+            timeText = `${(stats.savedSeconds / 60).toFixed(1)} ${isTr ? 'dk' : 'min'}`;
+        } else {
+            timeText = `${Math.floor(stats.savedSeconds)} ${isTr ? 'sn' : 'sec'}`;
+        }
+        
+        const valLinks = document.getElementById('valLinks');
+        const valTime = document.getElementById('valTime');
+        
+        if (valLinks) valLinks.textContent = stats.cleanedLinks;
+        if (valTime) valTime.textContent = timeText;
+    });
+
+    // 5. GELİŞMİŞ AYARLAR BUTONU
     const btnOpenSettings = document.getElementById('btnOpenSettings');
-
-    // 1. Ayarlar Butonu Düzeltmesi: Tıklandığında GERÇEK options.html sayfasını yeni sekmede açar
     if (btnOpenSettings) {
         btnOpenSettings.addEventListener('click', () => {
             if (chrome.runtime.openOptionsPage) {
-                chrome.runtime.openOptionsPage(); // Chrome'un yerel ayarlar sayfasını tetikler
+                chrome.runtime.openOptionsPage();
             } else {
-                window.open(chrome.runtime.getURL('options.html')); // Alternatif açılış
+                window.open(chrome.runtime.getURL('options.html'));
             }
         });
     }
 
-    // 2. İstatistikleri Yükle ve Ekrana Bas (Priority 1)
-    chrome.storage.local.get("lincleStats", (data) => {
-        const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
-        
-        let timeText = `${Math.floor(stats.savedSeconds)} Saniye`;
-        if (stats.savedSeconds >= 60) {
-            timeText = `${(stats.savedSeconds / 60).toFixed(1)} Dakika`;
-        }
-        
-        const statsBadge = document.getElementById('statsBadge');
-        if (statsBadge) {
-            statsBadge.textContent = `🚀 ${stats.cleanedLinks} Link Temizlendi | ⏳ ${timeText} Kazanıldı`;
-        }
-    });
-
-    // Explicit Opt-In Clipboard Cleaner
+    // 6. PANO TEMİZLEYİCİ
     const btnCleanClipboard = document.getElementById('btnCleanClipboard');
     const clipboardStatus = document.getElementById('clipboardStatus');
 
     if (btnCleanClipboard) {
         btnCleanClipboard.addEventListener('click', async () => {
+            let msgs = {
+                noLink: "Panoda geçerli bir bağlantı bulunamadı.",
+                search: "Bağlantı çözümleniyor...",
+                found: "Hedef bulundu ve panoya kopyalandı.",
+                fail: "Statik bir hedef bulunamadı."
+            };
+            
+            if (typeof lincleDict !== "undefined") {
+                msgs = {
+                    noLink: lincleDict[currentLang].clipNoLink,
+                    search: lincleDict[currentLang].clipSearch,
+                    found: lincleDict[currentLang].clipFound,
+                    fail: lincleDict[currentLang].clipFail
+                };
+            }
+
             try {
                 const text = await navigator.clipboard.readText();
                 if (!text.startsWith('http')) {
-                    clipboardStatus.style.color = "var(--danger)";
-                    clipboardStatus.textContent = "Panoda geçerli bir link bulunamadı.";
-                    clipboardStatus.style.display = "block";
+                    showStatus(msgs.noLink, "var(--danger)");
                     return;
                 }
 
-                clipboardStatus.style.color = "#0984e3";
-                clipboardStatus.textContent = "⏳ Hedef link arka planda aranıyor...";
-                clipboardStatus.style.display = "block";
+                showStatus(msgs.search, "var(--primary)");
 
-                // Arka planda Layer 0 taraması yap
                 const response = await fetch(text.trim());
                 const html = await response.text();
-                
-                // Hızlı basit Regex kontrolü
                 const match = html.match(/(?:var\s+url\s*=\s*|url=)['"]([^'"]+)['"]/i);
                 
                 if (match && match[1] && match[1].startsWith('http')) {
-                    // Temiz linki panoya geri yaz!
                     await navigator.clipboard.writeText(match[1]);
-                    clipboardStatus.style.color = "var(--success)";
-                    clipboardStatus.textContent = "✅ Hedef link bulundu ve panonuza kopyalandı!";
+                    showStatus(msgs.found, "var(--success)");
                 } else {
-                    clipboardStatus.style.color = "var(--danger)";
-                    clipboardStatus.textContent = "❌ Statik bir hedef bulunamadı.";
+                    showStatus(msgs.fail, "var(--danger)");
                 }
             } catch (err) {
-                clipboardStatus.style.color = "var(--danger)";
-                clipboardStatus.textContent = "Pano okuma izni reddedildi.";
-                clipboardStatus.style.display = "block";
+                showStatus(msgs.noLink, "var(--danger)");
             }
         });
     }
-}
 
-// Arayüz Rengini ve Yazısını Değiştiren Animasyonlu Fonksiyon
-function updateStatusUI(isActive) {
-    const icon = document.getElementById('statusIcon');
-    const title = document.getElementById('statusTitle');
-    const desc = document.getElementById('statusDesc');
-
-    if (isActive) {
-        icon.innerHTML = "🛡️";
-        icon.style.borderColor = "var(--success)";
-        icon.style.backgroundColor = "rgba(46, 204, 113, 0.1)";
-        icon.style.boxShadow = "0 0 15px rgba(46, 204, 113, 0.2)";
-        title.textContent = "Sistem Koruması Aktif";
-        title.style.color = "var(--success)";
-        desc.textContent = "Arka planda gereksiz kapılar atlanıyor";
-    } else {
-        icon.innerHTML = "❌";
-        icon.style.borderColor = "var(--danger)";
-        icon.style.backgroundColor = "rgba(231, 76, 60, 0.1)";
-        icon.style.boxShadow = "0 0 15px rgba(231, 76, 60, 0.2)";
-        title.textContent = "Sistem Koruması Kapalı";
-        title.style.color = "var(--danger)";
-        desc.textContent = "Lincle şu an sitelere müdahale etmiyor";
+    function showStatus(msg, color) {
+        if (clipboardStatus) {
+            clipboardStatus.style.color = color;
+            clipboardStatus.textContent = msg;
+            clipboardStatus.style.display = "block";
+        }
     }
-}
-
-async function loadDomains() { const data = await ext.storage.local.get(DOMAINS_KEY); return data[DOMAINS_KEY] || []; }
-async function saveDomains(domains) { await ext.storage.local.set({ [DOMAINS_KEY]: domains }); }
-async function loadExcluded() { const data = await ext.storage.local.get(EXCLUDE_KEY); return data[EXCLUDE_KEY] || []; }
-async function saveExcluded(list) { await ext.storage.local.set({ [EXCLUDE_KEY]: list }); }
-async function loadSettings() { const data = await ext.storage.local.get(SETTINGS_KEY); return Object.assign({ isActive: true }, data[SETTINGS_KEY] || {}); }
-async function saveSettings(settings) { await ext.storage.local.set({ [SETTINGS_KEY]: settings }); }
-
-async function initManager() {
-    const listEl = document.getElementById('domainList');
-    const domainInput = document.getElementById('newDomain');
-    const addBtn = document.getElementById('addDomainBtn');
-
-    const excludeListEl = document.getElementById('excludeList');
-    const excludeInput = document.getElementById('newExclude');
-    const addExcludeBtn = document.getElementById('addExcludeBtn');
-
-    const masterToggle = document.getElementById('masterToggle');
-
-    // Ayarları Yükle ve Şalteri Ayarla
-    const settings = await loadSettings();
-    masterToggle.checked = settings.isActive;
-    updateStatusUI(settings.isActive); // Yüklenirken rengi ayarla
-
-    // Şaltere Tıklanınca Çalışacak Olay
-    masterToggle.addEventListener('change', async () => {
-        await saveSettings({ isActive: masterToggle.checked });
-        updateStatusUI(masterToggle.checked);
-    });
-
-    async function renderDomains() {
-        const domains = await loadDomains();
-        listEl.innerHTML = '';
-        domains.forEach(entry => {
-            const li = document.createElement('li');
-            
-            // XSS Güvenlik Yaması: innerHTML yerine textContent kullanımı
-            const span = document.createElement('span');
-            span.textContent = entry.domain;
-            li.appendChild(span);
-
-            const btn = document.createElement('button');
-            btn.textContent = 'Sil';
-            btn.addEventListener('click', async () => {
-                const updated = (await loadDomains()).filter(d => d.domain !== entry.domain);
-                await saveDomains(updated);
-                renderDomains();
-            });
-            li.appendChild(btn);
-            listEl.appendChild(li);
-        });
-    }
-
-    addBtn.addEventListener('click', async () => {
-        const rawDomain = domainInput.value.trim().toLowerCase();
-        if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(rawDomain)) { alert("Geçerli bir domain girin, örn: kisalt.co"); return; }
-        const domains = await loadDomains();
-        if (!domains.find(d => d.domain === rawDomain)) { domains.push({ domain: rawDomain }); await saveDomains(domains); }
-        domainInput.value = '';
-        renderDomains();
-    });
-
-    async function renderExcluded() {
-        const list = await loadExcluded();
-        excludeListEl.innerHTML = '';
-        list.forEach(domain => {
-            const li = document.createElement('li');
-            
-            // XSS Güvenlik Yaması: innerHTML yerine textContent kullanımı
-            const span = document.createElement('span');
-            span.textContent = domain;
-            li.appendChild(span);
-
-            const btn = document.createElement('button');
-            btn.textContent = 'Sil';
-            btn.addEventListener('click', async () => {
-                const updated = (await loadExcluded()).filter(d => d !== domain);
-                await saveExcluded(updated);
-                renderExcluded();
-            });
-            li.appendChild(btn);
-            excludeListEl.appendChild(li);
-        });
-    }
-
-    addExcludeBtn.addEventListener('click', async () => {
-        const rawDomain = excludeInput.value.trim().toLowerCase();
-        if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(rawDomain)) { alert("Geçerli bir domain girin, örn: bankam.com"); return; }
-        const list = await loadExcluded();
-        if (!list.includes(rawDomain)) { list.push(rawDomain); await saveExcluded(list); }
-        excludeInput.value = '';
-        renderExcluded();
-    });
-
-    renderDomains();
-    renderExcluded();
 }

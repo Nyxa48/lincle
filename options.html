@@ -1,267 +1,376 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Lincle - Gelişmiş Ayarlar</title>
-    <style>
-      body {
-        font-family: "Segoe UI", Tahoma, sans-serif;
-        background: #f8f9fa;
-        color: #2d3436;
-        margin: 0;
-        padding: 30px;
-      }
 
-      .container {
-        max-width: 700px;
-        margin: auto;
-        background: #fff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      }
+<head>
+  <meta charset="UTF-8">
+  <title>Lincle - Gelişmiş Ayarlar</title>
+  <!-- CSS aynı, buraya dokunmadım (mevcut options CSS'in aynısını kullan) -->
+  <style>
+    :root {
+      --bg-body: #f3f4f6;
+      --bg-card: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --input-bg: #f9fafb;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
 
-      h2 {
-        color: #0984e3;
-        margin-top: 0;
-      }
+    [data-theme="dark"] {
+      --bg-body: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --primary: #3b82f6;
+      --primary-hover: #60a5fa;
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.1);
+      --input-bg: #0f172a;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    }
 
-      .stat-box {
-        background: #e3f2fd;
-        border: 1px solid #bbdefb;
-        padding: 20px;
-        border-radius: 8px;
-        text-align: center;
-        font-size: 1.3em;
-        font-weight: bold;
-        color: #1976d2;
-        margin-bottom: 30px;
-      }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      margin: 0;
+      padding: 40px 20px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-      .section {
-        margin-bottom: 25px;
-        padding-bottom: 25px;
-        border-bottom: 1px solid #ecf0f1;
-      }
+    .container {
+      max-width: 760px;
+      margin: auto;
+    }
 
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-      }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
 
-      input[type="number"],
-      textarea {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #dfe6e9;
-        border-radius: 6px;
-        box-sizing: border-box;
-        font-family: monospace;
-      }
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
 
-      textarea {
-        height: 120px;
-        resize: vertical;
-      }
+    .card {
+      background-color: var(--bg-card);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: background-color 0.3s, border-color 0.3s;
+    }
 
-      .toggle-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-      }
+    .card-title {
+      margin-top: 0;
+      font-size: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
 
-      button {
-        background: #00b894;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        font-size: 15px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-      }
+    .stat-box {
+      background-color: rgba(37, 99, 235, 0.05);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+      margin-bottom: 24px;
+    }
 
-      button:hover {
-        background: #00a884;
-      }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
 
-      .helper-text {
-        font-size: 0.85em;
-        color: #636e72;
-        margin-top: 6px;
-        display: block;
-      }
-    </style>
-  </head>
+    .helper-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      margin-bottom: 12px;
+      display: block;
+      line-height: 1.5;
+    }
 
-  <body>
-    <div class="container">
-      <h2>⚙️ Lincle Gelişmiş Ayarlar</h2>
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background-color: var(--input-bg);
+      color: var(--text-main);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      box-sizing: border-box;
+      transition: border-color 0.2s, background-color 0.3s;
+    }
 
-      <div class="stat-box" id="statsDisplay">⏳ Veriler Hesaplanıyor...</div>
+    select {
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+    }
 
-      <div class="section">
-        <h3>📊 Algoritma ve Loglama</h3>
-        <div class="toggle-row">
-          <input type="checkbox" id="loggingToggle" />
-          <label for="loggingToggle" style="margin: 0"
-            >Geliştirici Konsol Loglarını Aktif Et (Debugging)</label
-          >
-        </div>
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
 
-        <label for="assumedTime">Ortalama Hedef Bekleme Süresi (Saniye):</label>
-        <input type="number" id="assumedTime" min="1" max="60" value="10" />
-        <span class="helper-text"
-          >Sabit (hardcode) zaman kullanmak yerine Lincle tasarruf ettiği zamanı
-          bu değere göre dinamik hesaplar.</span
-        >
-      </div>
-      <!-- Algoritma Bölümünün İçine Eklenecek -->
-      <label for="maxWaitTime" style="margin-top: 10px"
-        >Zaman Aşımı / Pes Etme Süresi (Saniye):</label
-      >
-      <input type="number" id="maxWaitTime" min="5" max="60" value="20" />
+    textarea {
+      height: 120px;
+      resize: vertical;
+      line-height: 1.5;
+    }
 
-      <div
-        class="toggle-row"
-        style="
-          margin-top: 15px;
-          border-top: 1px solid #dfe6e9;
-          padding-top: 15px;
-        "
-      >
-        <input type="checkbox" id="breadcrumbToggle" />
-        <label for="breadcrumbToggle" style="margin: 0; color: #d63031"
-          >[GİZLİLİK RİSKİ] Breadcrumb İzleyiciyi Aktif Et (Arka plandaki tüm
-          yönlendirme URL'lerini kaydeder)</label
-        >
-      </div>
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
 
-      <div class="section">
-        <h3>🐞 Başarısızlık Raporları (Resolver Failures)</h3>
-        <p class="helper-text">
-          Atlanamayan ve sizin raporladığınız linkler. Lincle'ı geliştirmek için
-          bu verileri e-posta ile geliştiriciye gönderebilirsiniz.
-        </p>
-        <textarea
-          id="failureList"
-          style="height: 150px; background: #2d3436; color: #fab1a0"
-          readonly
-          placeholder="Henüz kaydedilmiş bir hata raporu yok..."
-        ></textarea>
-        <button id="btnEmailDev" style="background: #e17055; margin-top: 10px">
-          📧 Geliştiriciye (Emir'e) Gönder
-        </button>
-        <button
-          id="btnClearFailures"
-          style="background: #b2bec3; margin-top: 10px; color: #2d3436"
-        >
-          Raporları Temizle
-        </button>
-      </div>
-      <div class="section">
-        <h3>🛡️ Toplu Kara Liste Yönetimi</h3>
-        <label for="domainList"
-          >Engellenen/Atlanan Domainler (Her satıra bir domain girin):</label
-        >
-        <textarea
-          id="domainList"
-          placeholder="ornek.com&#10;kisalt.co"
-        ></textarea>
-      </div>
+    .toggle-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
 
-      <button id="saveBtn">Ayarları Kaydet</button>
-      <span
-        id="saveStatus"
-        style="
-          color: #00b894;
-          margin-left: 15px;
-          font-weight: bold;
-          display: none;
-        "
-        >✓ Kaydedildi!</span
-      >
-      <div class="section">
-        <h3>🔬 Araştırmacı: Özel Regex Kuralları</h3>
-        <p class="helper-text">
-          Kendi Statik (Layer 0) URL ayıklama kurallarınızı ekleyin (Her satıra
-          bir kural). <br />Örn: <code>url=["']([^"']+)</code>
-        </p>
-        <textarea id="customRegexList" placeholder="url=([^&]+)"></textarea>
-      </div>
+    .toggle-row label {
+      margin: 0;
+      font-weight: 400;
+      cursor: pointer;
+    }
 
-      <div class="section">
-        <h3>📦 Araştırmacı: Toplu Çözümleyici (Bulk Resolver)</h3>
-        <p class="helper-text">
-          Sekmelerde açmadan, arka planda Layer 0 motoruyla toplu link çözer.
-          Hızlı ve güvenlidir.
-        </p>
-        <textarea
-          id="bulkInput"
-          placeholder="Çözümlenecek linkleri her satıra bir tane olacak şekilde yapıştırın..."
-        ></textarea>
-        <button
-          id="btnBulkResolve"
-          style="background: #6c5ce7; margin-top: 10px"
-        >
-          🚀 Toplu Çözümle
-        </button>
-        <textarea
-          id="bulkOutput"
-          placeholder="Temizlenmiş hedefler burada görünecek..."
-          style="background: #f1f2f6; margin-top: 10px"
-          readonly
-        ></textarea>
-      </div>
-      <div class="section">
-        <h3>⌨️ Klavye Kısayolu</h3>
-        <p style="font-size: 0.9em; color: #636e72">
-          Kısayollar güvenlik sebebiyle koda gömülmez (No Hardcode). İstediğiniz
-          tuş kombinasyonunu Chrome'un yerel ayarlarından değiştirebilirsiniz.
-        </p>
-        <button id="btnShortcuts" style="background: #0984e3">
-          Kısayol Tuşlarını Düzenle
-        </button>
-      </div>
+    .danger-zone {
+      background-color: var(--danger-bg);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
 
-      <div class="section">
-        <h3>🔗 Yönlendirme Zinciri (Redirect Chain)</h3>
-        <p class="helper-text">
-          Lincle'ın arka planda sizi kurtardığı son yönlendirme zincirleri
-          (Debugging için idealdir).
-        </p>
-        <div
-          id="chainContainer"
-          style="
-            background: #2d3436;
-            color: #00b894;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 13px;
-            max-height: 250px;
-            overflow-y: auto;
-          "
-        >
-          <!-- Zincirler buraya Javascript ile dinamik basılacak -->
-          Zaman çizelgesi yükleniyor...
-        </div>
-        <button
-          id="btnClearChain"
-          style="
-            background: #d63031;
-            margin-top: 10px;
-            padding: 8px 16px;
-            font-size: 13px;
-          "
-        >
-          Zinciri Temizle
-        </button>
+    .danger-text {
+      color: var(--danger);
+      font-weight: 500;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--input-bg);
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background-color: #b91c1c;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    #themeToggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 16px;
+    }
+
+    #themeToggle:hover {
+      background: var(--input-bg);
+    }
+
+    .terminal-box {
+      background-color: var(--input-bg);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 13px;
+      max-height: 250px;
+      overflow-y: auto;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .chain-item {
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+
+    .chain-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .chain-time {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .chain-from {
+      color: var(--danger);
+    }
+
+    .chain-to {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header-row">
+      <h2 data-i18n="optTitle">Lincle Ayarları</h2>
+      <div style="display: flex; gap: 10px;">
+        <select id="langSelect" style="width: auto; padding: 8px 12px;">
+          <option value="tr">Türkçe</option>
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+        </select>
+        <button id="themeToggle" class="btn-secondary" data-i18n="themeDark">Koyu Mod</button>
       </div>
     </div>
-    <!-- Section Sonu -->
-    <script src="options.js"></script>
-  </body>
+
+    <div class="stat-box" id="statsDisplay" data-i18n="optCalc">Veriler Hesaplanıyor...</div>
+
+    <div class="card">
+      <h3 class="card-title" data-i18n="algTitle">Algoritma ve Sistem</h3>
+      <div class="toggle-row">
+        <input type="checkbox" id="loggingToggle">
+        <label for="loggingToggle" data-i18n="debugOpt">Geliştirici Konsol Loglarını Aktif Et (Debugging)</label>
+      </div>
+
+      <label for="assumedTime" style="margin-top: 20px;" data-i18n="avgWait">Ortalama Hedef Bekleme Süresi
+        (Saniye):</label>
+      <input type="number" id="assumedTime" min="1" max="60" value="10">
+      <span class="helper-text" data-i18n="avgWaitHelp">Lincle'ın tasarruf ettiği zamanı dinamik hesaplamak için
+        kullanılır.</span>
+
+      <label for="maxWaitTime" style="margin-top: 20px;" data-i18n="timeoutOpt">Zaman Aşımı Süresi (Saniye):</label>
+      <input type="number" id="maxWaitTime" min="5" max="60" value="20">
+
+      <div class="danger-zone" style="margin-top: 24px;">
+        <div class="toggle-row" style="margin-bottom: 0;">
+          <input type="checkbox" id="breadcrumbToggle">
+          <label for="breadcrumbToggle" class="danger-text" data-i18n="breadcrumb">Breadcrumb İzleyiciyi Aktif Et (Tüm
+            URL yönlendirmelerini kaydeder)</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title" data-i18n="wlTitle">Beyaz Liste ve Kısayollar</h3>
+      <label for="domainList" data-i18n="domainOpt">Engellenen/Atlanan Domainler (Her satıra bir domain):</label>
+      <textarea id="domainList" data-i18n="domainPlh" placeholder="ornek.com&#10;kisalt.co"></textarea>
+
+      <label style="margin-top: 20px;" data-i18n="shortcutOpt">Klavye Kısayolu:</label>
+      <span class="helper-text" data-i18n="shortcutHelp">Kısayol tuşlarını tarayıcının yerel ayarlarından güvenle
+        değiştirebilirsiniz.</span>
+      <button id="btnShortcuts" class="btn-secondary" data-i18n="btnShortcut">Kısayol Tuşlarını Düzenle</button>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title" data-i18n="bulkTitle">Araştırmacı: Toplu Çözümleyici</h3>
+      <span class="helper-text" data-i18n="bulkHelp">Sekme açmadan, arka planda statik (Layer 0) motoruyla toplu link
+        çözer.</span>
+      <textarea id="bulkInput" placeholder="..."></textarea>
+      <button id="btnBulkResolve" style="margin-top: 12px; width: 100%;" data-i18n="btnBulk">Toplu Çözümle</button>
+      <textarea id="bulkOutput" placeholder="..." style="margin-top: 12px;" readonly></textarea>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title" data-i18n="regexTitle">Araştırmacı: Özel Regex Kuralları</h3>
+      <span class="helper-text" data-i18n="regexHelp">Layer 0 URL ayıklama kurallarınızı ekleyin. Örn:
+        url=['\"]([^'\"]+)</span>
+      <textarea id="customRegexList" placeholder="url=([^&]+)"></textarea>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title" data-i18n="logTitle">Sistem Logları</h3>
+      <label data-i18n="chainOpt">Yönlendirme Zinciri (Redirect Chain)</label>
+      <div id="chainContainer" class="terminal-box" style="margin-bottom: 12px;">...</div>
+      <button id="btnClearChain" class="btn-secondary" data-i18n="btnClearChain">Zinciri Temizle</button>
+
+      <label style="margin-top: 24px;" data-i18n="failOpt">Başarısızlık Raporları (Resolver Failures)</label>
+      <textarea id="failureList" class="terminal-box" style="margin-bottom: 12px; color: var(--danger);"
+        readonly></textarea>
+      <div class="button-group">
+        <button id="btnEmailDev" data-i18n="btnEmail">Geliştiriciye Raporla</button>
+        <button id="btnClearFailures" class="btn-secondary" data-i18n="btnClearFail">Raporları Temizle</button>
+      </div>
+    </div>
+
+    <div style="text-align: right; margin-bottom: 40px;">
+      <button id="saveBtn" style="padding: 12px 32px; font-size: 15px;" data-i18n="btnSave">Tüm Ayarları Kaydet</button>
+      <span id="saveStatus" style="color: var(--primary); margin-left: 15px; font-weight: 600; display: none;"
+        data-i18n="saveStatus">Kaydedildi!</span>
+    </div>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="options.js"></script>
+</body>
+
 </html>
