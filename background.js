@@ -27,3 +27,47 @@ chrome.commands.onCommand.addListener((command) => {
         });
     }
 });
+
+// AŞAMA 3.1: Redirect Breadcrumb Tracker (Sekme Yönlendirme İzleyicisi)
+let breadcrumbsEnabled = false;
+let tabBreadcrumbs = {};
+
+// Ayarları dinle ve izleyiciyi sadece rıza varsa aç
+chrome.storage.local.get("lincleOptions", (data) => {
+    breadcrumbsEnabled = data.lincleOptions?.enableBreadcrumbs || false;
+});
+chrome.storage.onChanged.addListener((changes) => {
+    if (changes.lincleOptions) {
+        breadcrumbsEnabled = changes.lincleOptions.newValue.enableBreadcrumbs || false;
+    }
+});
+
+// Sekme hareketlerini (Görünmez HTTP yönlendirmeleri dahil) kaydet
+chrome.webNavigation.onCommitted.addListener((details) => {
+    if (!breadcrumbsEnabled || details.frameId !== 0) return; // Sadece ana sayfayı ve izin varsa kaydet
+
+    if (!tabBreadcrumbs[details.tabId]) tabBreadcrumbs[details.tabId] = [];
+    
+    // Geçiş tipi (Örn: server_redirect, client_redirect, link)
+    const transition = (details.transitionQualifiers || []).includes("server_redirect") ? "⚡ Sunucu Yönlendirmesi" : "🖱️ Sayfa Yüklemesi";
+
+    tabBreadcrumbs[details.tabId].push({
+        time: new Date().toLocaleTimeString('tr-TR'),
+        url: details.url,
+        type: transition
+    });
+
+    // Zincir çok uzarsa eskiyi sil (Performans)
+    if (tabBreadcrumbs[details.tabId].length > 10) tabBreadcrumbs[details.tabId].shift();
+
+    // Veritabanına yaz ki Options sayfasından okunabilsin
+    chrome.storage.local.set({ lincleBreadcrumbs: tabBreadcrumbs });
+});
+
+// Sekme kapatıldığında izleri sil (Garbage Collection)
+chrome.tabs.onRemoved.addListener((tabId) => {
+    if (tabBreadcrumbs[tabId]) {
+        delete tabBreadcrumbs[tabId];
+        chrome.storage.local.set({ lincleBreadcrumbs: tabBreadcrumbs });
+    }
+});

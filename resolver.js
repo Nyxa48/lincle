@@ -408,20 +408,52 @@ const lincleStartTime = performance.now();
         }
     }
 
-    function runActiveResolver(customSelector) {
+    async function runActiveResolver(customSelector) {
         showBanner("Lincle: Sayfa analiz ediliyor...");
         const startedAt = Date.now();
         let clicked = false;
         let observer = null;
         let throttleTimer = null;
 
+        const data = await chrome.storage.local.get("lincleOptions");
+        const maxWaitMs = (data.lincleOptions?.maxWaitTime || 20) * 1000;
+
         function evaluateDOM() {
-            if (Date.now() - startedAt > MAX_WAIT_MS) {
+            // 1. ZAMAN AŞIMI (TIMEOUT) VE HATA RAPORU
+            if (Date.now() - startedAt > maxWaitMs) {
                 if (observer) observer.disconnect();
-                showBanner("Lincle: Otomatik atlanamadı. Lütfen manuel tıklayın.");
+
+                // Etkileşimli (İsteğe bağlı) Hata Raporu UI
+                let el = document.getElementById("lincle-banner");
+                if (el) {
+                    el.innerHTML = `Lincle: Otomatik atlanamadı. 
+            <button id="lincle-report-btn" style="background:#d63031;color:white;border:none;border-radius:4px;padding:4px 8px;margin-left:10px;cursor:pointer;font-weight:bold;">🐞 Bunu Raporla</button>`;
+
+                    document.getElementById('lincle-report-btn').addEventListener('click', async () => {
+                        // Sitedeki hangi kelimeler bizim listemizle eşleşti?
+                        const bodyText = (document.body.innerText || "").slice(0, 3000);
+                        const matchedGates = GATE_TEXT_PATTERNS.filter(p => p.test(bodyText)).map(p => p.source);
+
+                        const report = {
+                            date: new Date().toLocaleString('tr-TR'),
+                            url: location.href,
+                            host: location.hostname,
+                            gatePhrases: matchedGates.length > 0 ? matchedGates : ["Kapı metni bulunamadı"],
+                            error: "Timeout (Bekleme süresi aşıldı, buton veya link bulunamadı)"
+                        };
+
+                        // Yalnızca YEREL depolamaya kaydet (Privacy)
+                        const repData = await chrome.storage.local.get("lincleFailures");
+                        const failures = repData.lincleFailures || [];
+                        failures.push(report);
+                        await chrome.storage.local.set({ lincleFailures: failures });
+
+                        el.innerHTML = "✅ Rapor yerel olarak kaydedildi. Lütfen Ayarlar'dan geliştiriciye iletin.";
+                        setTimeout(() => el.remove(), 4000);
+                    });
+                }
                 return true;
             }
-
             const url = tryStaticExtraction();
             if (url) {
                 if (observer) observer.disconnect();
@@ -470,14 +502,6 @@ const lincleStartTime = performance.now();
     }
 
     async function init() {
-
-        // Özel Regexleri Yükle (Dinamik Regex Dönüşümü)
-        const customRegexData = await chrome.storage.local.get("lincleCustomRegex");
-        const customStrs = customRegexData.lincleCustomRegex || [];
-        CUSTOM_STATIC_REGEXES = customStrs.map(str => {
-            try { return new RegExp(str, 'i'); }
-            catch (e) { return null; }
-        }).filter(r => r !== null);
         // EN ÖNEMLİ KISIM: Kalkan Kapalıysa Lincle hiçbir kod çalıştırmadan direkt çıkar.
         const isLincleActive = await getMasterKillSwitchSetting();
         if (!isLincleActive) return;

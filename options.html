@@ -118,7 +118,49 @@
           bu değere göre dinamik hesaplar.</span
         >
       </div>
+      <!-- Algoritma Bölümünün İçine Eklenecek -->
+      <label for="maxWaitTime" style="margin-top: 10px"
+        >Zaman Aşımı / Pes Etme Süresi (Saniye):</label
+      >
+      <input type="number" id="maxWaitTime" min="5" max="60" value="20" />
 
+      <div
+        class="toggle-row"
+        style="
+          margin-top: 15px;
+          border-top: 1px solid #dfe6e9;
+          padding-top: 15px;
+        "
+      >
+        <input type="checkbox" id="breadcrumbToggle" />
+        <label for="breadcrumbToggle" style="margin: 0; color: #d63031"
+          >[GİZLİLİK RİSKİ] Breadcrumb İzleyiciyi Aktif Et (Arka plandaki tüm
+          yönlendirme URL'lerini kaydeder)</label
+        >
+      </div>
+
+      <div class="section">
+        <h3>🐞 Başarısızlık Raporları (Resolver Failures)</h3>
+        <p class="helper-text">
+          Atlanamayan ve sizin raporladığınız linkler. Lincle'ı geliştirmek için
+          bu verileri e-posta ile geliştiriciye gönderebilirsiniz.
+        </p>
+        <textarea
+          id="failureList"
+          style="height: 150px; background: #2d3436; color: #fab1a0"
+          readonly
+          placeholder="Henüz kaydedilmiş bir hata raporu yok..."
+        ></textarea>
+        <button id="btnEmailDev" style="background: #e17055; margin-top: 10px">
+          📧 Geliştiriciye (Emir'e) Gönder
+        </button>
+        <button
+          id="btnClearFailures"
+          style="background: #b2bec3; margin-top: 10px; color: #2d3436"
+        >
+          Raporları Temizle
+        </button>
+      </div>
       <div class="section">
         <h3>🛡️ Toplu Kara Liste Yönetimi</h3>
         <label for="domainList"
@@ -219,7 +261,7 @@
         </button>
       </div>
     </div>
-
+    <!-- Section Sonu -->
     <script src="options.js"></script>
   </body>
 </html>
