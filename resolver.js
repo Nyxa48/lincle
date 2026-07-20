@@ -1,5 +1,6 @@
 // Lincle Resolver v2.3 - Master Kill Switch & Global Heuristic
 // Developed by: Emir Samed (Nyxa48)
+const lincleStartTime = performance.now();
 
 (function () {
     const STORAGE_KEY = "lincleDomains";
@@ -132,10 +133,38 @@
         el.textContent = text;
     }
 
-    function goTo(url) {
-        showBanner("Lincle: Temiz linke yönlendiriliyor...");
-        setTimeout(() => { location.href = url; }, 300);
+    async function goTo(url) {
+    // 1. Gerçek işlem süresini ölç (Hardcode yok, performance API kullanıldı)
+    const executionTimeMs = performance.now() - lincleStartTime;
+    const executionTimeSec = executionTimeMs / 1000;
+    
+    try {
+        const data = await chrome.storage.local.get(["lincleStats", "lincleOptions"]);
+        const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
+        // Varsayılan ayarlar (Kullanıcı henüz options sayfasına girmeden de çalışabilmesi için)
+        const options = Object.assign({ assumedGateTime: 10, enableLogging: false }, data.lincleOptions);
+        
+        // 2. Dinamik Tasarruf Hesaplama: (Kullanıcının girdiği bekleme süresi) - (Lincle'ın çalışma hızı)
+        let savedThisTime = options.assumedGateTime - executionTimeSec;
+        if (savedThisTime < 0) savedThisTime = 0; // Negatif çıkmasını önle
+        
+        // İstatistikleri güncelle
+        stats.cleanedLinks += 1;
+        stats.savedSeconds += savedThisTime;
+        await chrome.storage.local.set({ lincleStats: stats });
+
+        // 3. Loglama ayarı açıksa konsola bilgi bas (Debugging Priority 1.1)
+        if (options.enableLogging) {
+            console.log(`[Lincle] Atlatıldı. İşlem süresi: ${executionTimeSec.toFixed(3)}s | Kazandırılan: ${savedThisTime.toFixed(2)}s`);
+        }
+
+    } catch (e) {
+        console.error("Lincle Stat Motoru Hatası:", e);
     }
+
+    // Hedefe git
+    setTimeout(() => { location.href = url; }, 500); 
+}
 
     async function isDomainExcluded(host) {
         try {

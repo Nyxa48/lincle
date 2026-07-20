@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lincle - Gelişmiş Ayarlar</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #f8f9fa;
+            color: #2d3436;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: #0984e3;
+            margin-top: 0;
+        }
+
+        .stat-box {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dfe6e9;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: monospace;
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: #00b894;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #00a884;
+        }
+
+        .helper-text {
+            font-size: 0.85em;
+            color: #636e72;
+            margin-top: 6px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>⚙️ Lincle Gelişmiş Ayarlar</h2>
+
+        <div class="stat-box" id="statsDisplay">
+            ⏳ Veriler Hesaplanıyor...
+        </div>
+
+        <div class="section">
+            <h3>📊 Algoritma ve Loglama</h3>
+            <div class="toggle-row">
+                <input type="checkbox" id="loggingToggle">
+                <label for="loggingToggle" style="margin:0;">Geliştirici Konsol Loglarını Aktif Et (Debugging)</label>
+            </div>
+
+            <label for="assumedTime">Ortalama Hedef Bekleme Süresi (Saniye):</label>
+            <input type="number" id="assumedTime" min="1" max="60" value="10">
+            <span class="helper-text">Sabit (hardcode) zaman kullanmak yerine Lincle tasarruf ettiği zamanı bu değere
+                göre dinamik hesaplar.</span>
+        </div>
+
+        <div class="section">
+            <h3>🛡️ Toplu Kara Liste Yönetimi</h3>
+            <label for="domainList">Engellenen/Atlanan Domainler (Her satıra bir domain girin):</label>
+            <textarea id="domainList" placeholder="ornek.com&#10;kisalt.co"></textarea>
+        </div>
+
+        <button id="saveBtn">Ayarları Kaydet</button>
+        <span id="saveStatus" style="color: #00b894; margin-left: 15px; font-weight: bold; display: none;">✓
+            Kaydedildi!</span>
+    </div>
+    <script src="options.js"></script>
+</body>
+
+</html>

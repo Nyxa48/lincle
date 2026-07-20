@@ -15,19 +15,32 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initUI() {
-    const mainView = document.getElementById('mainView');
-    const settingsView = document.getElementById('settingsView');
     const btnOpenSettings = document.getElementById('btnOpenSettings');
-    const btnCloseSettings = document.getElementById('btnCloseSettings');
 
-    btnOpenSettings.addEventListener('click', () => {
-        mainView.style.display = 'none';
-        settingsView.style.display = 'block';
-    });
+    // 1. Ayarlar Butonu Düzeltmesi: Tıklandığında GERÇEK options.html sayfasını yeni sekmede açar
+    if (btnOpenSettings) {
+        btnOpenSettings.addEventListener('click', () => {
+            if (chrome.runtime.openOptionsPage) {
+                chrome.runtime.openOptionsPage(); // Chrome'un yerel ayarlar sayfasını tetikler
+            } else {
+                window.open(chrome.runtime.getURL('options.html')); // Alternatif açılış
+            }
+        });
+    }
 
-    btnCloseSettings.addEventListener('click', () => {
-        settingsView.style.display = 'none';
-        mainView.style.display = 'block';
+    // 2. İstatistikleri Yükle ve Ekrana Bas (Priority 1)
+    chrome.storage.local.get("lincleStats", (data) => {
+        const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
+        
+        let timeText = `${Math.floor(stats.savedSeconds)} Saniye`;
+        if (stats.savedSeconds >= 60) {
+            timeText = `${(stats.savedSeconds / 60).toFixed(1)} Dakika`;
+        }
+        
+        const statsBadge = document.getElementById('statsBadge');
+        if (statsBadge) {
+            statsBadge.textContent = `🚀 ${stats.cleanedLinks} Link Temizlendi | ⏳ ${timeText} Kazanıldı`;
+        }
     });
 }
 

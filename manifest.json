@@ -1,21 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "Lincle (Link Cleaner)",
+  "name": "Lincle",
   "version": "2.4",
-  "author": "Emir Samed (Nyxa48)",
-  "description": "Zararlı ve agresif link kısaltıcıları/reklam kapılarını otomatik algılayıp atlayarak doğrudan hedef linke ulaştırır. Domain eklemene gerek yok.",
-  "icons": {
-    "16": "icons/icon16.png",
-    "32": "icons/icon32.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+  "description": "Zararlı ve agresif link kısaltıcıları otomatik algılayıp atlayarak doğrudan hedef linke ulaştırır.",
+  "permissions": ["storage", "contextMenus"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
   },
-  "permissions": [
-    "storage"
-  ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -25,18 +18,12 @@
     }
   ],
   "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "32": "icons/icon32.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
+    "default_popup": "popup.html"
   },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "lincle@nyxa48.dev",
-      "strict_min_version": "109.0"
-    }
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }
