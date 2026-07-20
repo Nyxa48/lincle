@@ -1,6 +1,10 @@
 // Lincle - Modern UI Manager
 // Developed by: Emir Samed (Nyxa48)
 
+// Firefox/Safari 'browser' nesnesini (Promise tabanlı, native) sağlar.
+// Chrome'da MV3'te 'chrome' de callback verilmediğinde Promise döndürür.
+const ext = (typeof browser !== "undefined") ? browser : chrome;
+
 const DOMAINS_KEY = "lincleDomains";
 const EXCLUDE_KEY = "lincleExcluded";
 const SETTINGS_KEY = "lincleSettings"; // { isActive: true/false }
@@ -52,12 +56,12 @@ function updateStatusUI(isActive) {
     }
 }
 
-async function loadDomains() { const data = await chrome.storage.local.get(DOMAINS_KEY); return data[DOMAINS_KEY] || []; }
-async function saveDomains(domains) { await chrome.storage.local.set({ [DOMAINS_KEY]: domains }); }
-async function loadExcluded() { const data = await chrome.storage.local.get(EXCLUDE_KEY); return data[EXCLUDE_KEY] || []; }
-async function saveExcluded(list) { await chrome.storage.local.set({ [EXCLUDE_KEY]: list }); }
-async function loadSettings() { const data = await chrome.storage.local.get(SETTINGS_KEY); return Object.assign({ isActive: true }, data[SETTINGS_KEY] || {}); }
-async function saveSettings(settings) { await chrome.storage.local.set({ [SETTINGS_KEY]: settings }); }
+async function loadDomains() { const data = await ext.storage.local.get(DOMAINS_KEY); return data[DOMAINS_KEY] || []; }
+async function saveDomains(domains) { await ext.storage.local.set({ [DOMAINS_KEY]: domains }); }
+async function loadExcluded() { const data = await ext.storage.local.get(EXCLUDE_KEY); return data[EXCLUDE_KEY] || []; }
+async function saveExcluded(list) { await ext.storage.local.set({ [EXCLUDE_KEY]: list }); }
+async function loadSettings() { const data = await ext.storage.local.get(SETTINGS_KEY); return Object.assign({ isActive: true }, data[SETTINGS_KEY] || {}); }
+async function saveSettings(settings) { await ext.storage.local.set({ [SETTINGS_KEY]: settings }); }
 
 async function initManager() {
     const listEl = document.getElementById('domainList');
