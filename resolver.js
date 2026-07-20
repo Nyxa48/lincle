@@ -236,17 +236,23 @@ const lincleStartTime = performance.now();
         }
     }
 
+    // Kendi başına bir değişken oluşturuyoruz
+    let CUSTOM_STATIC_REGEXES = [];
+
+    // Mevcut tryStaticExtraction fonksiyonunu bununla değiştir:
     function tryStaticExtraction() {
         const html = document.documentElement.outerHTML;
-        for (const pattern of STATIC_REGEXES) {
-            const match = html.match(pattern);
-            if (
-                match &&
-                match[1] &&
-                isSafeHttpUrl(match[1]) &&
-                !isAdOrTrackingUrl(match[1])
-            )
-                return match[1];
+
+        // Hem varsayılan hem de kullanıcının eklediği özel regexleri birleştir
+        const allRegexes = [...STATIC_REGEXES, ...CUSTOM_STATIC_REGEXES];
+
+        for (const pattern of allRegexes) {
+            try {
+                const match = html.match(pattern);
+                if (match && match[1] && isSafeHttpUrl(match[1]) && !isAdOrTrackingUrl(match[1])) {
+                    return match[1];
+                }
+            } catch (e) { continue; } // Geçersiz regex girildiyse sistemi çökertme
         }
         return null;
     }
@@ -464,6 +470,14 @@ const lincleStartTime = performance.now();
     }
 
     async function init() {
+
+        // Özel Regexleri Yükle (Dinamik Regex Dönüşümü)
+        const customRegexData = await chrome.storage.local.get("lincleCustomRegex");
+        const customStrs = customRegexData.lincleCustomRegex || [];
+        CUSTOM_STATIC_REGEXES = customStrs.map(str => {
+            try { return new RegExp(str, 'i'); }
+            catch (e) { return null; }
+        }).filter(r => r !== null);
         // EN ÖNEMLİ KISIM: Kalkan Kapalıysa Lincle hiçbir kod çalıştırmadan direkt çıkar.
         const isLincleActive = await getMasterKillSwitchSetting();
         if (!isLincleActive) return;

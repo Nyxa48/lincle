@@ -3,7 +3,12 @@
   "name": "Lincle",
   "version": "2.4",
   "description": "Zararlı ve agresif link kısaltıcıları otomatik algılayıp atlayarak doğrudan hedef linke ulaştırır.",
-  "permissions": ["storage", "contextMenus"],
+  "permissions": [
+    "storage", 
+    "contextMenus",
+    "clipboardRead",
+    "clipboardWrite"
+  ],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"

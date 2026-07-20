@@ -42,6 +42,49 @@ function initUI() {
             statsBadge.textContent = `🚀 ${stats.cleanedLinks} Link Temizlendi | ⏳ ${timeText} Kazanıldı`;
         }
     });
+
+    // Explicit Opt-In Clipboard Cleaner
+    const btnCleanClipboard = document.getElementById('btnCleanClipboard');
+    const clipboardStatus = document.getElementById('clipboardStatus');
+
+    if (btnCleanClipboard) {
+        btnCleanClipboard.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (!text.startsWith('http')) {
+                    clipboardStatus.style.color = "var(--danger)";
+                    clipboardStatus.textContent = "Panoda geçerli bir link bulunamadı.";
+                    clipboardStatus.style.display = "block";
+                    return;
+                }
+
+                clipboardStatus.style.color = "#0984e3";
+                clipboardStatus.textContent = "⏳ Hedef link arka planda aranıyor...";
+                clipboardStatus.style.display = "block";
+
+                // Arka planda Layer 0 taraması yap
+                const response = await fetch(text.trim());
+                const html = await response.text();
+                
+                // Hızlı basit Regex kontrolü
+                const match = html.match(/(?:var\s+url\s*=\s*|url=)['"]([^'"]+)['"]/i);
+                
+                if (match && match[1] && match[1].startsWith('http')) {
+                    // Temiz linki panoya geri yaz!
+                    await navigator.clipboard.writeText(match[1]);
+                    clipboardStatus.style.color = "var(--success)";
+                    clipboardStatus.textContent = "✅ Hedef link bulundu ve panonuza kopyalandı!";
+                } else {
+                    clipboardStatus.style.color = "var(--danger)";
+                    clipboardStatus.textContent = "❌ Statik bir hedef bulunamadı.";
+                }
+            } catch (err) {
+                clipboardStatus.style.color = "var(--danger)";
+                clipboardStatus.textContent = "Pano okuma izni reddedildi.";
+                clipboardStatus.style.display = "block";
+            }
+        });
+    }
 }
 
 // Arayüz Rengini ve Yazısını Değiştiren Animasyonlu Fonksiyon
