@@ -24,7 +24,8 @@ const lincleDict = {
         btnSave: "Tüm Ayarları Kaydet", saveStatus: "Kaydedildi!",
         popShield: "Koruma Kalkanı", popCleaned: "Temizlenen", popSaved: "Tasarruf",
         btnCleanClip: "Panodaki Bağlantıyı Temizle", btnAdvSet: "Gelişmiş Ayarlar",
-        clipNoLink: "Panoda geçerli bir bağlantı bulunamadı.", clipSearch: "Bağlantı arka planda çözümleniyor...", clipFound: "Hedef bulundu ve panoya kopyalandı.", clipFail: "Statik bir hedef bulunamadı."
+        clipNoLink: "Panoda geçerli bir bağlantı bulunamadı.", clipSearch: "Bağlantı arka planda çözümleniyor...", clipFound: "Hedef bulundu ve panoya kopyalandı.", clipFail: "Statik bir hedef bulunamadı.",
+        popupShield: "Açılır Pencere Kalkanını Aktif Et (Popup, bildirim isteği ve overlay engelleme)",
     },
     en: {
         themeDark: "Dark Mode", themeLight: "Light Mode",
@@ -44,7 +45,8 @@ const lincleDict = {
         btnSave: "Save All Settings", saveStatus: "Saved!",
         popShield: "Protection Shield", popCleaned: "Cleaned", popSaved: "Saved",
         btnCleanClip: "Clean Link from Clipboard", btnAdvSet: "Advanced Settings",
-        clipNoLink: "No valid link found in clipboard.", clipSearch: "Resolving link in background...", clipFound: "Target found & copied to clipboard.", clipFail: "No static target found."
+        clipNoLink: "No valid link found in clipboard.", clipSearch: "Resolving link in background...", clipFound: "Target found & copied to clipboard.", clipFail: "No static target found.",
+        popupShield: "Enable Popup Shield (Blocks ad popups, notification prompts & overlays)",
     },
     de: {
         themeDark: "Dunkelmodus", themeLight: "Heller Modus",
@@ -64,7 +66,8 @@ const lincleDict = {
         btnSave: "Alle Einstellungen speichern", saveStatus: "Gespeichert!",
         popShield: "Schutzschild", popCleaned: "Gereinigt", popSaved: "Gespart",
         btnCleanClip: "Link aus Zwischenablage bereinigen", btnAdvSet: "Erweiterte Einstellungen",
-        clipNoLink: "Kein gültiger Link in der Zwischenablage.", clipSearch: "Link wird im Hintergrund aufgelöst...", clipFound: "Ziel gefunden & in Zwischenablage kopiert.", clipFail: "Kein statisches Ziel gefunden."
+        clipNoLink: "Kein gültiger Link in der Zwischenablage.", clipSearch: "Link wird im Hintergrund aufgelöst...", clipFound: "Ziel gefunden & in Zwischenablage kopiert.", clipFail: "Kein statisches Ziel gefunden.",
+        popupShield: "Popup-Schutz aktivieren (Blockiert Werbepopups, Benachrichtigungsanfragen & Overlays)",
     },
     fr: {
         themeDark: "Mode Sombre", themeLight: "Mode Clair",
@@ -84,7 +87,8 @@ const lincleDict = {
         btnSave: "Enregistrer les paramètres", saveStatus: "Enregistré!",
         popShield: "Bouclier de protection", popCleaned: "Nettoyé", popSaved: "Économisé",
         btnCleanClip: "Nettoyer le lien du presse-papiers", btnAdvSet: "Paramètres avancés",
-        clipNoLink: "Aucun lien valide dans le presse-papiers.", clipSearch: "Résolution du lien en arrière-plan...", clipFound: "Cible trouvée & copiée dans le presse-papiers.", clipFail: "Aucune cible statique trouvée."
+        clipNoLink: "Aucun lien valide dans le presse-papiers.", clipSearch: "Résolution du lien en arrière-plan...", clipFound: "Cible trouvée & copiée dans le presse-papiers.", clipFail: "Aucune cible statique trouvée.",
+        popupShield: "Activer le bouclier popup (Bloque les popups publicitaires, les demandes de notifications et les overlays)",
     },
     es: {
         themeDark: "Modo Oscuro", themeLight: "Modo Claro",
@@ -104,7 +108,8 @@ const lincleDict = {
         btnSave: "Guardar toda la configuración", saveStatus: "¡Guardado!",
         popShield: "Escudo de protección", popCleaned: "Limpiado", popSaved: "Ahorrado",
         btnCleanClip: "Limpiar enlace del portapapeles", btnAdvSet: "Configuración avanzada",
-        clipNoLink: "No se encontró un enlace válido en el portapapeles.", clipSearch: "Resolviendo enlace en segundo plano...", clipFound: "¡Destino encontrado y copiado al portapapeles!", clipFail: "No se encontró un destino estático."
+        clipNoLink: "No se encontró un enlace válido en el portapapeles.", clipSearch: "Resolviendo enlace en segundo plano...", clipFound: "¡Destino encontrado y copiado al portapapeles!", clipFail: "No se encontró un destino estático.",
+        popupShield: "Activar escudo de popups (Bloquea popups de anuncios, solicitudes de notificación y overlays)",
     },
     pt: {
         themeDark: "Modo Escuro", themeLight: "Modo Claro",
@@ -124,7 +129,8 @@ const lincleDict = {
         btnSave: "Salvar todas as configurações", saveStatus: "Salvo!",
         popShield: "Escudo de proteção", popCleaned: "Limpo", popSaved: "Economizado",
         btnCleanClip: "Limpar link da área de transferência", btnAdvSet: "Configurações avançadas",
-        clipNoLink: "Nenhum link válido encontrado na área de transferência.", clipSearch: "Resolvendo link em segundo plano...", clipFound: "Destino encontrado e copiado para a área de transferência.", clipFail: "Nenhum destino estático encontrado."
+        clipNoLink: "Nenhum link válido encontrado na área de transferência.", clipSearch: "Resolvendo link em segundo plano...", clipFound: "Destino encontrado e copiado para a área de transferência.", clipFail: "Nenhum destino estático encontrado.",
+        popupShield: "Ativar escudo de popups (Bloqueia popups de anúncios, pedidos de notificação e overlays)",
     },
     it: {
         themeDark: "Modalità Scura", themeLight: "Modalità Chiara",
@@ -144,7 +150,8 @@ const lincleDict = {
         btnSave: "Salva tutte le impostazioni", saveStatus: "Salvato!",
         popShield: "Scudo di protezione", popCleaned: "Ripulito", popSaved: "Risparmiato",
         btnCleanClip: "Pulisci link dagli appunti", btnAdvSet: "Impostazioni avanzate",
-        clipNoLink: "Nessun link valido trovato negli appunti.", clipSearch: "Risoluzione del link in background...", clipFound: "Destinazione trovata e copiata negli appunti.", clipFail: "Nessuna destinazione statica trovata."
+        clipNoLink: "Nessun link valido trovato negli appunti.", clipSearch: "Risoluzione del link in background...", clipFound: "Destinazione trovata e copiata negli appunti.", clipFail: "Nessuna destinazione statica trovata.",
+        popupShield: "Attiva scudo popup (Blocca popup pubblicitari, richieste di notifica e overlay)",
     },
     ru: {
         themeDark: "Тёмный режим", themeLight: "Светлый режим",
@@ -164,7 +171,8 @@ const lincleDict = {
         btnSave: "Сохранить все настройки", saveStatus: "Сохранено!",
         popShield: "Защитный щит", popCleaned: "Очищено", popSaved: "Сэкономлено",
         btnCleanClip: "Очистить ссылку из буфера обмена", btnAdvSet: "Расширенные настройки",
-        clipNoLink: "В буфере обмена не найдена допустимая ссылка.", clipSearch: "Ссылка разрешается в фоновом режиме...", clipFound: "Цель найдена и скопирована в буфер обмена.", clipFail: "Статическая цель не найдена."
+        clipNoLink: "В буфере обмена не найдена допустимая ссылка.", clipSearch: "Ссылка разрешается в фоновом режиме...", clipFound: "Цель найдена и скопирована в буфер обмена.", clipFail: "Статическая цель не найдена.",
+        popupShield: "Включить щит от всплывающих окон (Блокирует рекламные попапы, запросы уведомлений и оверлеи)",
     },
     da: {
         themeDark: "Mørkt tema", themeLight: "Lyst tema",
@@ -184,7 +192,8 @@ const lincleDict = {
         btnSave: "Gem alle indstillinger", saveStatus: "Gemt!",
         popShield: "Beskyttelsesskim", popCleaned: "Renset", popSaved: "Sparet",
         btnCleanClip: "Rens link fra udklipsholder", btnAdvSet: "Avancerede indstillinger",
-        clipNoLink: "Intet gyldigt link fundet i udklipsholderen.", clipSearch: "Løser link i baggrunden...", clipFound: "Mål fundet og kopieret til udklipsholderen.", clipFail: "Intet statisk mål fundet."
+        clipNoLink: "Intet gyldigt link fundet i udklipsholderen.", clipSearch: "Løser link i baggrunden...", clipFound: "Mål fundet og kopieret til udklipsholderen.", clipFail: "Intet statisk mål fundet.",
+        popupShield: "Aktiver popup-skjold (Blokerer reklamepopups, notifikationsanmodninger og overlays)",
     }
 };
 

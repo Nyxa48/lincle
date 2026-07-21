@@ -120,6 +120,7 @@ async function restoreOptions() {
         if (document.getElementById('loggingToggle')) document.getElementById('loggingToggle').checked = options.enableLogging || false;
         if (document.getElementById('maxWaitTime')) document.getElementById('maxWaitTime').value = options.maxWaitTime || 20;
         if (document.getElementById('breadcrumbToggle')) document.getElementById('breadcrumbToggle').checked = options.enableBreadcrumbs || false;
+        if (document.getElementById('popupShieldToggle')) document.getElementById('popupShieldToggle').checked = options.enablePopupShield !== false; // default ON
 
         const domains = data.lincleDomains || [];
         if (document.getElementById('domainList')) document.getElementById('domainList').value = domains.map(d => d.domain).join('\n');
@@ -164,6 +165,7 @@ async function saveOptions() {
         const enableLogging = document.getElementById('loggingToggle') ? document.getElementById('loggingToggle').checked : false;
         const maxWaitTime = document.getElementById('maxWaitTime') ? (parseInt(document.getElementById('maxWaitTime').value) || 20) : 20;
         const enableBreadcrumbs = document.getElementById('breadcrumbToggle') ? document.getElementById('breadcrumbToggle').checked : false;
+        const enablePopupShield = document.getElementById('popupShieldToggle') ? document.getElementById('popupShieldToggle').checked : true;
         
         let formattedDomains = [];
         if (document.getElementById('domainList')) {
@@ -178,7 +180,7 @@ async function saveOptions() {
         }
 
         await ext.storage.local.set({
-            lincleOptions: { assumedGateTime, enableLogging, maxWaitTime, enableBreadcrumbs },
+            lincleOptions: { assumedGateTime, enableLogging, maxWaitTime, enableBreadcrumbs, enablePopupShield },
             lincleDomains: formattedDomains,
             lincleCustomRegex: customRegex
         });

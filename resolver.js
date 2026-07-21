@@ -31,6 +31,15 @@ const lincleStartTime = performance.now();
         "amazon.com",
         "netflix.com",
         "pixeldrain.com",
+        // Content/download index sites — these are NOT ad-gate pages.
+        // Lincle running here caused wrong-link redirects (steamrip bug).
+        "steamrip.com",
+        "fitgirl-repacks.site",
+        "cs.rin.ru",
+        "megadb.net",
+        "gofile.io",
+        "mediafire.com",
+        "1fichier.com",
     ];
 
     const DEFAULT_KNOWN_SHORTENERS = [
@@ -326,25 +335,89 @@ const lincleStartTime = performance.now();
         );
     }
 
-    function findOutboundLink() {
-        const anchors = Array.from(document.querySelectorAll("a[href^='http']"));
-        const candidate = anchors.find((a) => {
-            const href = a.getAttribute("href");
-            if (!isSafeHttpUrl(href) || isAdOrTrackingUrl(href)) return false;
-            try {
-                return new URL(href, location.href).hostname !== location.hostname;
-            } catch {
-                return false;
+    // Scores an <a> element by how likely it is to be THE download/destination link.
+    // Returns a number: higher = more confident. Returns -1 to exclude entirely.
+    function scoreAnchor(a) {
+        const href = a.getAttribute("href");
+        if (!href || !isSafeHttpUrl(href) || isAdOrTrackingUrl(href)) return -1;
+        try {
+            if (new URL(href, location.href).hostname === location.hostname) return -1;
+        } catch { return -1; }
+
+        let score = 0;
+
+        // Penalise links inside navigation/header/footer/sidebar — these are almost
+        // never the download target but are often the *first* external link in the DOM.
+        const badParents = ["nav", "header", "footer", "aside"];
+        let node = a.parentElement;
+        while (node) {
+            const tag = node.tagName ? node.tagName.toLowerCase() : "";
+            const cls = (node.className || "").toString().toLowerCase();
+            const id  = (node.id || "").toLowerCase();
+            if (badParents.includes(tag)) { score -= 20; break; }
+            if (/\b(nav|menu|sidebar|widget|related|recommend|sponsor|ad[-_]|advertisement)\b/.test(cls + id)) {
+                score -= 15; break;
             }
-        });
-        return candidate ? candidate.href : null;
+            node = node.parentElement;
+        }
+
+        // Reward links inside content / article / main
+        node = a.parentElement;
+        while (node) {
+            const tag = node.tagName ? node.tagName.toLowerCase() : "";
+            const cls = (node.className || "").toString().toLowerCase();
+            const id  = (node.id || "").toLowerCase();
+            if (["main", "article", "section"].includes(tag)) { score += 10; break; }
+            if (/\b(content|post|entry|download[-_]?(?:area|box|section|wrap)?|link[-_]?(?:box|area|wrap)?)\b/.test(cls + id)) {
+                score += 10; break;
+            }
+            node = node.parentElement;
+        }
+
+        // Reward anchor text / attributes that signal "this is the download link"
+        const text = (a.innerText || a.textContent || "").trim().toLowerCase();
+        const cls  = (a.className || "").toString().toLowerCase();
+        const id   = (a.id || "").toLowerCase();
+        const combined = text + " " + cls + " " + id;
+        if (/\b(download|get\s*link|mega|pixeldrain|gofile|mediafire|filehost|direct\s*link|mirror)\b/.test(combined)) score += 15;
+        if (/\b(wfl[_-]?button|btn[-_]?download|download[-_]?btn|dl[-_]?btn)\b/.test(cls + id)) score += 20;
+
+        // Penalise obvious non-targets
+        if (/\b(comment|share|tweet|facebook|pinterest|whatsapp|telegram|discord|reddit|instagram)\b/.test(combined)) score -= 25;
+        if (/\b(privacy|terms|cookie|about|contact|faq|support|advertis)\b/.test(text)) score -= 20;
+
+        // Reward if the link's hostname looks like a known file host
+        try {
+            const host = new URL(href, location.href).hostname;
+            if (/megadb|pixeldrain|gofile|mediafire|1fichier|rapidgator|uploaded|filecrypt|mixdrop|ddownload|usersdrive/.test(host)) score += 25;
+        } catch { /* ignore */ }
+
+        return score;
+    }
+
+    function findOutboundLink() {
+        const anchors = Array.from(document.querySelectorAll("a[href^='http'], a[href^='https']"));
+        let best = null;
+        let bestScore = -1; // must beat this to be a candidate
+
+        for (const a of anchors) {
+            const s = scoreAnchor(a);
+            if (s > bestScore) { bestScore = s; best = a; }
+        }
+
+        // Require a minimum positive confidence score to avoid grabbing random nav links
+        return (best && bestScore >= 0) ? best.href : null;
     }
 
     function looksLikeGatePage(bodyText) {
-        return (
-            COUNTDOWN_TEXT_PATTERNS.some((r) => r.test(bodyText)) ||
-            GATE_TEXT_PATTERNS.some((r) => r.test(bodyText))
-        );
+        // A countdown timer is a very strong standalone signal
+        if (COUNTDOWN_TEXT_PATTERNS.some(r => r.test(bodyText))) return true;
+
+        // Gate phrases alone aren't enough — require at least 2 distinct matches
+        // to avoid false-positives on normal content pages (e.g. steamrip) that
+        // have "download" in buttons but are not ad-gate pages.
+        const matchCount = GATE_TEXT_PATTERNS.filter(r => r.test(bodyText)).length;
+        return matchCount >= 2;
     }
 
     function showBanner(text) {

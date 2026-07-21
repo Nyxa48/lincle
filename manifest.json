@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Lincle",
-  "version": "2.5",
+  "version": "2.6",
   "description": "Zararlı ve agresif link kısaltıcıları otomatik algılayıp atlayarak doğrudan hedef linke ulaştırır.",
   "permissions": [
     "storage", 
@@ -16,6 +16,12 @@
   },
   "options_page": "options.html",
   "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["popup-shield.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
     {
       "matches": ["<all_urls>"],
       "js": ["resolver.js"],
