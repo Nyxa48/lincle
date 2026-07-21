@@ -1,30 +1,33 @@
-// Lincle Background Service - Context Menu
+// Lincle Background Service v2.5 - Cross-Browser Fix
 // Developed by: Emir Samed (Nyxa48)
 
-chrome.runtime.onInstalled.addListener(() => {
-    chrome.contextMenus.create({
+// Cross-browser shim
+const ext = (typeof browser !== "undefined") ? browser : chrome;
+
+ext.runtime.onInstalled.addListener(() => {
+    ext.contextMenus.create({
         id: "lincle-bypass",
         title: "🛡️ Lincle ile Temizle ve Git",
         contexts: ["link"]
     });
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+ext.contextMenus.onClicked.addListener((info, tab) => {
     // Sadece dinamik olarak tıklanan hedefe yönlendirir, hardcode içermez.
     if (info.menuItemId === "lincle-bypass" && info.linkUrl) {
-        chrome.tabs.create({ url: info.linkUrl });
+        ext.tabs.create({ url: info.linkUrl });
     }
 });
 
 // Aşama 2: Dinamik Klavye Kısayolu Dinleyicisi
-chrome.commands.onCommand.addListener((command) => {
+ext.commands.onCommand.addListener((command) => {
     if (command === "trigger-lincle") {
-        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        // Bug fix v2.5: callback style → async/await for cross-browser compat
+        ext.tabs.query({active: true, currentWindow: true}).then(tabs => {
             if (tabs[0]) {
-                // Mevcut sekmeye 'zorla çalıştır' emri gönder
-                chrome.tabs.sendMessage(tabs[0].id, { action: "manualBypass" });
+                ext.tabs.sendMessage(tabs[0].id, { action: "manualBypass" });
             }
-        });
+        }).catch(() => {});
     }
 });
 
@@ -33,17 +36,17 @@ let breadcrumbsEnabled = false;
 let tabBreadcrumbs = {};
 
 // Ayarları dinle ve izleyiciyi sadece rıza varsa aç
-chrome.storage.local.get("lincleOptions", (data) => {
+ext.storage.local.get("lincleOptions", (data) => {
     breadcrumbsEnabled = data.lincleOptions?.enableBreadcrumbs || false;
 });
-chrome.storage.onChanged.addListener((changes) => {
+ext.storage.onChanged.addListener((changes) => {
     if (changes.lincleOptions) {
         breadcrumbsEnabled = changes.lincleOptions.newValue.enableBreadcrumbs || false;
     }
 });
 
 // Sekme hareketlerini (Görünmez HTTP yönlendirmeleri dahil) kaydet
-chrome.webNavigation.onCommitted.addListener((details) => {
+ext.webNavigation.onCommitted.addListener((details) => {
     if (!breadcrumbsEnabled || details.frameId !== 0) return; // Sadece ana sayfayı ve izin varsa kaydet
 
     if (!tabBreadcrumbs[details.tabId]) tabBreadcrumbs[details.tabId] = [];
@@ -61,13 +64,13 @@ chrome.webNavigation.onCommitted.addListener((details) => {
     if (tabBreadcrumbs[details.tabId].length > 10) tabBreadcrumbs[details.tabId].shift();
 
     // Veritabanına yaz ki Options sayfasından okunabilsin
-    chrome.storage.local.set({ lincleBreadcrumbs: tabBreadcrumbs });
+    ext.storage.local.set({ lincleBreadcrumbs: tabBreadcrumbs });
 });
 
 // Sekme kapatıldığında izleri sil (Garbage Collection)
-chrome.tabs.onRemoved.addListener((tabId) => {
+ext.tabs.onRemoved.addListener((tabId) => {
     if (tabBreadcrumbs[tabId]) {
         delete tabBreadcrumbs[tabId];
-        chrome.storage.local.set({ lincleBreadcrumbs: tabBreadcrumbs });
+        ext.storage.local.set({ lincleBreadcrumbs: tabBreadcrumbs });
     }
 });

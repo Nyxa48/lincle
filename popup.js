@@ -1,5 +1,8 @@
-// Lincle Popup UI Engine (Fully Localized & Fail-Safe)
+// Lincle Popup UI Engine (Fully Localized & Fail-Safe) v2.5
 // Developed by: Emir Samed (Nyxa48)
+
+// Cross-browser shim
+const ext = (typeof browser !== "undefined") ? browser : chrome;
 
 document.addEventListener('DOMContentLoaded', initUI);
 
@@ -11,7 +14,7 @@ async function initUI() {
         if (typeof applyTranslations === "function") {
             await applyTranslations();
         }
-        const langData = await chrome.storage.local.get("lincleLang");
+        const langData = await ext.storage.local.get("lincleLang");
         currentLang = langData.lincleLang || 'en'; 
     } catch (e) {
         console.error("[Lincle] Çeviri yüklenme hatası:", e);
@@ -19,7 +22,10 @@ async function initUI() {
 
     // 2. TEMA YÖNETİMİ
     const themeToggle = document.getElementById('themeToggle');
-    const currentTheme = localStorage.getItem('lincleTheme') || 'light';
+    // Bug fix v2.5: localStorage is unreliable in extension popups across browsers.
+    // Load theme from ext.storage.local instead.
+    const themeData = await ext.storage.local.get("lincleTheme");
+    const currentTheme = themeData.lincleTheme || 'light';
     document.documentElement.setAttribute('data-theme', currentTheme);
     updateThemeBtn(currentTheme);
 
@@ -28,7 +34,7 @@ async function initUI() {
             let theme = document.documentElement.getAttribute('data-theme');
             theme = theme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('lincleTheme', theme);
+            ext.storage.local.set({lincleTheme: theme});
             updateThemeBtn(theme);
         });
     }
@@ -44,18 +50,18 @@ async function initUI() {
     // 3. KALKAN KONTROLÜ
     const masterToggle = document.getElementById('masterToggle');
     if (masterToggle) {
-        chrome.storage.local.get("lincleSettings", (data) => {
+        ext.storage.local.get("lincleSettings", (data) => {
             const settings = data.lincleSettings || {};
             masterToggle.checked = settings.isActive !== false;
         });
 
         masterToggle.addEventListener('change', (e) => {
-            chrome.storage.local.set({ lincleSettings: { isActive: e.target.checked } });
+            ext.storage.local.set({ lincleSettings: { isActive: e.target.checked } });
         });
     }
 
     // 4. İSTATİSTİKLERİ YÜKLE (Dinamik Birim Desteği)
-    chrome.storage.local.get("lincleStats", (data) => {
+    ext.storage.local.get("lincleStats", (data) => {
         const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
         
         let timeText = "";
@@ -78,10 +84,10 @@ async function initUI() {
     const btnOpenSettings = document.getElementById('btnOpenSettings');
     if (btnOpenSettings) {
         btnOpenSettings.addEventListener('click', () => {
-            if (chrome.runtime.openOptionsPage) {
-                chrome.runtime.openOptionsPage();
+            if (ext.runtime.openOptionsPage) {
+                ext.runtime.openOptionsPage();
             } else {
-                window.open(chrome.runtime.getURL('options.html'));
+                window.open(ext.runtime.getURL('options.html'));
             }
         });
     }

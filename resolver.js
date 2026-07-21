@@ -1,8 +1,12 @@
-// Lincle Resolver v2.3 - Master Kill Switch & Global Heuristic
+// Lincle Resolver v2.5 - Cross-Browser, Multi-Language, Hardened
 // Developed by: Emir Samed (Nyxa48)
 const lincleStartTime = performance.now();
 
 (function () {
+    // Cross-browser shim: Firefox/Safari expose 'browser' (Promise-based).
+    // Chrome MV3 'chrome' also returns Promises when no callback is given.
+    const ext = (typeof browser !== "undefined") ? browser : chrome;
+
     const STORAGE_KEY = "lincleDomains";
     const EXCLUDE_KEY = "lincleExcluded";
     const SETTINGS_KEY = "lincleSettings";
@@ -164,11 +168,27 @@ const lincleStartTime = performance.now();
         "متابعة",
         "احصل على الرابط",
         "تحميل",
+        // Hindi
         "छोड़ें",
         "विज्ञापन छोड़ें",
         "जारी रखें",
         "लिंक प्राप्त करें",
         "डाउनलोड",
+        // Spanish (already partially present above, extended here)
+        "omitir", "omitir anuncio", "ir al enlace", "ir al link", "obtener link",
+        "acceder", "continua", "ir a descarga",
+        // Portuguese
+        "pular", "pular anúncio", "obter link", "ir para o link", "acessar",
+        "baixar", "próximo", "continuar", "ir para download",
+        // Italian
+        "salta", "salta annuncio", "ottieni link", "vai al link", "accedi",
+        "scarica", "avanti", "continua", "vai al download",
+        // Russian
+        "пропустить", "пропустить рекламу", "получить ссылку", "перейти",
+        "скачать", "далее", "продолжить", "к загрузке",
+        // Danish
+        "spring over", "spring reklame over", "hent link", "gå til link",
+        "download", "næste", "fortsæt", "gå til download", "få link",
     ];
 
     const GATE_TEXT_PATTERNS = [
@@ -205,10 +225,26 @@ const lincleStartTime = performance.now();
         /请稍候/i,
         /الرجاء\s*الانتظار/i,
         /कृपया\s*प्रतीक्षा\s*करें/i,
+        // Spanish
+        /por\s*favor\s*espere/i, /tu\s*enlace\s*est[aá]\s*listo/i,
+        /generando\s*enlace/i, /enlace\s*de\s*destino/i, /verificando/i,
+        // Portuguese
+        /seu\s*link\s*est[aá]\s*pronto/i, /aguarde\s*por\s*favor/i,
+        /gerando\s*link/i, /link\s*de\s*destino/i, /verificando/i,
+        // Italian
+        /il\s*tuo\s*link\s*[eè]\s*pronto/i, /si\s*prega\s*di\s*attendere/i,
+        /generazione\s*link/i, /link\s*di\s*destinazione/i, /verifica\s*in\s*corso/i,
+        // Russian
+        /пожалуйста,?\s*подождите/i, /ссылка\s*готова/i,
+        /генерация\s*ссылки/i, /проверка/i, /пропустить\s*рекламу/i,
+        // Danish
+        /vent\s*venligst/i, /dit\s*link\s*er\s*klar/i,
+        /genererer\s*link/i, /bekræfter/i, /spring\s*reklame\s*over/i,
     ];
 
     const COUNTDOWN_TEXT_PATTERNS = [
-        /(?:\b|\s)([0-9]|1[0-9]|2[0-9])\s*(saniye|second|sec|sn|segundos|секунд|sekunden|secondes|secondi|detik|sekund|giây|วินาที|秒|ثانية|सेकंड)/i,
+        // Added: DA=sekunder, ES=segundos, PT=segundos, IT=secondi, RU=секунд(ы)
+        /(?:\b|\s)([0-9]|1[0-9]|2[0-9])\s*(saniye|second|seconds|sec|sn|segundos|segundo|секунд|секунды|sekunden|secondes|secondi|detik|sekund|sekunder|giây|วินาที|秒|ثانية|सेकंड)/i,
     ];
 
     const STATIC_REGEXES = [
@@ -236,8 +272,17 @@ const lincleStartTime = performance.now();
         }
     }
 
-    // Kendi başına bir değişken oluşturuyoruz
+    // Bug fix v2.5: was always [] — now populated from storage before resolver runs.
     let CUSTOM_STATIC_REGEXES = [];
+    async function loadCustomRegexes() {
+        try {
+            const data = await ext.storage.local.get("lincleCustomRegex");
+            const raw = data.lincleCustomRegex || [];
+            CUSTOM_STATIC_REGEXES = raw
+                .map(r => { try { return new RegExp(r, "i"); } catch { return null; } })
+                .filter(Boolean);
+        } catch { /* non-fatal — keep empty */ }
+    }
 
     // Mevcut tryStaticExtraction fonksiyonunu bununla değiştir:
     function tryStaticExtraction() {
@@ -324,7 +369,7 @@ const lincleStartTime = performance.now();
 
         try {
             // Veritabanından her şeyi TEK SEFERDE çek (Performans)
-            const data = await chrome.storage.local.get(["lincleStats", "lincleOptions", "lincleHistory"]);
+            const data = await ext.storage.local.get(["lincleStats", "lincleOptions", "lincleHistory"]);
 
             // --- İSTATİSTİK HESAPLAMA ---
             const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
@@ -348,7 +393,7 @@ const lincleStartTime = performance.now();
             if (history.length > 15) history.pop();
 
             // İkisini TEK SEFERDE veritabanına yaz (Best Practice)
-            await chrome.storage.local.set({
+            await ext.storage.local.set({
                 lincleStats: stats,
                 lincleHistory: history
             });
@@ -371,7 +416,7 @@ const lincleStartTime = performance.now();
         try {
             if (GLOBAL_EXCLUDE_LIST.some((d) => host === d || host.endsWith("." + d)))
                 return true;
-            const data = await chrome.storage.local.get(EXCLUDE_KEY);
+            const data = await ext.storage.local.get(EXCLUDE_KEY);
             const list = data[EXCLUDE_KEY] || [];
             return list.some((d) => host === d || host.endsWith("." + d));
         } catch {
@@ -387,7 +432,7 @@ const lincleStartTime = performance.now();
                 )
             )
                 return { domain: host };
-            const data = await chrome.storage.local.get(STORAGE_KEY);
+            const data = await ext.storage.local.get(STORAGE_KEY);
             const list = data[STORAGE_KEY] || [];
             return (
                 list.find((d) => host === d.domain || host.endsWith("." + d.domain)) ||
@@ -401,7 +446,7 @@ const lincleStartTime = performance.now();
     // YENİ: Kalkanın durumunu soran (Ana Şalter Kontrolü) fonksiyon
     async function getMasterKillSwitchSetting() {
         try {
-            const data = await chrome.storage.local.get(SETTINGS_KEY);
+            const data = await ext.storage.local.get(SETTINGS_KEY);
             return (data[SETTINGS_KEY] || {}).isActive !== false; // Varsayılanı true (açık)
         } catch {
             return true;
@@ -415,7 +460,7 @@ const lincleStartTime = performance.now();
         let observer = null;
         let throttleTimer = null;
 
-        const data = await chrome.storage.local.get("lincleOptions");
+        const data = await ext.storage.local.get("lincleOptions");
         const maxWaitMs = (data.lincleOptions?.maxWaitTime || 20) * 1000;
 
         function evaluateDOM() {
@@ -443,10 +488,10 @@ const lincleStartTime = performance.now();
                         };
 
                         // Yalnızca YEREL depolamaya kaydet (Privacy)
-                        const repData = await chrome.storage.local.get("lincleFailures");
+                        const repData = await ext.storage.local.get("lincleFailures");
                         const failures = repData.lincleFailures || [];
                         failures.push(report);
-                        await chrome.storage.local.set({ lincleFailures: failures });
+                        await ext.storage.local.set({ lincleFailures: failures });
 
                         el.innerHTML = "✅ Rapor yerel olarak kaydedildi. Lütfen Ayarlar'dan geliştiriciye iletin.";
                         setTimeout(() => el.remove(), 4000);
@@ -502,6 +547,9 @@ const lincleStartTime = performance.now();
     }
 
     async function init() {
+        // Load custom regexes from storage FIRST (bug fix: was never called before)
+        await loadCustomRegexes();
+
         // EN ÖNEMLİ KISIM: Kalkan Kapalıysa Lincle hiçbir kod çalıştırmadan direkt çıkar.
         const isLincleActive = await getMasterKillSwitchSetting();
         if (!isLincleActive) return;
@@ -537,7 +585,7 @@ const lincleStartTime = performance.now();
     }
 
     // Kısayol (Keyboard Shortcut) ile manuel tetikleme emrini dinle
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    ext.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.action === "manualBypass") {
             console.log("[Lincle] Kısayol ile manuel tarama zorla tetiklendi!");
             // Güvenlik kontrollerini (Beyaz liste, kapı metni vs.) umursamadan, 

@@ -1,25 +1,34 @@
+// Lincle Options v2.5 - Cross-Browser Fix
+const ext = (typeof browser !== 'undefined') ? browser : chrome;
+
 // Lincle Gelişmiş Ayarlar Motoru (Theme, i18n & Fail-Safe)
 // Developed by: Emir Samed (Nyxa48)
 
 // TEMA YÖNETİMİ (Açık/Koyu Mod)
 const themeToggle = document.getElementById('themeToggle');
-const currentTheme = localStorage.getItem('lincleTheme') || 'light';
-document.documentElement.setAttribute('data-theme', currentTheme);
-updateThemeButton(currentTheme);
+// Theme is loaded async from storage (localStorage fix for cross-browser compat)
+let currentTheme = 'light';
+ext.storage.local.get("lincleTheme").then(d => {
+    currentTheme = d.lincleTheme || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    updateThemeButton(currentTheme);
+}).catch(() => {
+    document.documentElement.setAttribute('data-theme', 'light');
+});
 
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
         let theme = document.documentElement.getAttribute('data-theme');
         theme = theme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('lincleTheme', theme);
+        ext.storage.local.set({lincleTheme: theme});
         updateThemeButton(theme);
     });
 }
 
 function updateThemeButton(theme) {
     if (typeof lincleDict !== "undefined") {
-        chrome.storage.local.get("lincleLang", (data) => {
+        ext.storage.local.get("lincleLang", (data) => {
             const lang = data.lincleLang || 'en';
             if (themeToggle) themeToggle.textContent = theme === 'dark' ? lincleDict[lang].themeLight : lincleDict[lang].themeDark;
         });
@@ -35,7 +44,7 @@ const langSelect = document.getElementById('langSelect');
 if (langSelect) {
     langSelect.addEventListener('change', async (e) => {
         const selectedLang = e.target.value;
-        await chrome.storage.local.set({ lincleLang: selectedLang });
+        await ext.storage.local.set({ lincleLang: selectedLang });
         
         // Verinin veritabanına %100 yazıldığından emin olmak için ufak bir bekleme (Fail-Safe)
         setTimeout(() => {
@@ -49,17 +58,17 @@ const btnSave = document.getElementById('saveBtn');
 if (btnSave) btnSave.addEventListener('click', saveOptions);
 
 const btnShortcuts = document.getElementById('btnShortcuts');
-if (btnShortcuts) btnShortcuts.addEventListener('click', () => chrome.tabs.create({ url: "chrome://extensions/shortcuts" }));
+if (btnShortcuts) btnShortcuts.addEventListener('click', () => ext.tabs.create({ url: "chrome://extensions/shortcuts" }));
 
 const btnClearChain = document.getElementById('btnClearChain');
 if (btnClearChain) btnClearChain.addEventListener('click', async () => {
-    await chrome.storage.local.set({ lincleHistory: [] });
+    await ext.storage.local.set({ lincleHistory: [] });
     restoreOptions();
 });
 
 const btnClearFailures = document.getElementById('btnClearFailures');
 if (btnClearFailures) btnClearFailures.addEventListener('click', async () => {
-    await chrome.storage.local.set({ lincleFailures: [] });
+    await ext.storage.local.set({ lincleFailures: [] });
     restoreOptions();
 });
 
@@ -79,14 +88,14 @@ async function restoreOptions() {
         }
         
         // 🚨 HATA BURADAYDI: Bu iki satır silinmişti, geri ekledik!
-        const langData = await chrome.storage.local.get("lincleLang");
+        const langData = await ext.storage.local.get("lincleLang");
         const currentLang = langData.lincleLang || 'en'; 
         
         if (document.getElementById('langSelect')) {
             document.getElementById('langSelect').value = currentLang;
         }
 
-        const data = await chrome.storage.local.get([
+        const data = await ext.storage.local.get([
             "lincleStats", "lincleOptions", "lincleDomains", 
             "lincleHistory", "lincleCustomRegex", "lincleFailures"
         ]);
@@ -168,7 +177,7 @@ async function saveOptions() {
             customRegex = regexText.split('\n').map(r => r.trim()).filter(r => r !== "");
         }
 
-        await chrome.storage.local.set({
+        await ext.storage.local.set({
             lincleOptions: { assumedGateTime, enableLogging, maxWaitTime, enableBreadcrumbs },
             lincleDomains: formattedDomains,
             lincleCustomRegex: customRegex
@@ -241,7 +250,7 @@ async function runBulkResolver() {
 
 // GELİŞTİRİCİYE MAİL GÖNDERME
 async function sendEmailToDev() {
-    const fData = await chrome.storage.local.get("lincleFailures");
+    const fData = await ext.storage.local.get("lincleFailures");
     const failures = fData.lincleFailures || [];
     
     if (failures.length === 0) return;
