@@ -23,17 +23,31 @@ if (themeToggle) {
         document.documentElement.setAttribute('data-theme', theme);
         ext.storage.local.set({lincleTheme: theme});
         updateThemeButton(theme);
+        // Swap the moon/sun SVG path inside the button
+        const iconEl = document.getElementById('optThemeIcon');
+        if (iconEl) {
+            const moonPath = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+            const sunPath  = '<circle cx="12" cy="12" r="5"/>' +
+                '<line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>' +
+                '<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>' +
+                '<line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>' +
+                '<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+            iconEl.innerHTML = theme === 'dark' ? moonPath : sunPath;
+        }
     });
 }
 
 function updateThemeButton(theme) {
     if (typeof lincleDict !== "undefined") {
-        ext.storage.local.get("lincleLang", (data) => {
+        // Bug fix v2.7: was callback style — broke Firefox
+        ext.storage.local.get("lincleLang").then(data => {
             const lang = data.lincleLang || 'en';
             if (themeToggle) themeToggle.textContent = theme === 'dark' ? lincleDict[lang].themeLight : lincleDict[lang].themeDark;
+        }).catch(() => {
+            if (themeToggle) themeToggle.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
         });
     } else {
-        if (themeToggle) themeToggle.textContent = theme === 'dark' ? 'Açık Mod' : 'Koyu Mod';
+        if (themeToggle) themeToggle.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
     }
 }
 
@@ -100,18 +114,19 @@ async function restoreOptions() {
             "lincleHistory", "lincleCustomRegex", "lincleFailures"
         ]);
         
-        // İstatistikleri Dinamik Yazdır (Dil destekli)
-        const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
-        const timeText = stats.savedSeconds > 60 ? `${(stats.savedSeconds / 60).toFixed(1)}` : `${Math.floor(stats.savedSeconds)}`;
-        const statsDisplay = document.getElementById('statsDisplay');
-        if (statsDisplay) {
-            if (typeof lincleDict !== "undefined") {
-                const dict = lincleDict[currentLang]; // Sistem 'currentLang' bulamadığı için burada çöküyordu
-                statsDisplay.textContent = `${stats.cleanedLinks} ${dict.popCleaned} | ${timeText} ${stats.savedSeconds > 60 ? 'min' : 'sec'} ${dict.popSaved}`;
-            } else {
-                statsDisplay.textContent = `${stats.cleanedLinks} Link Temizlendi | ${timeText} ${stats.savedSeconds > 60 ? 'Dakika' : 'Saniye'} Tasarruf Edildi`;
-            }
-        }
+        // Populate the 4-column stats grid
+        const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0, blockedPopups: 0 };
+        const sec = stats.savedSeconds || 0;
+        const timeText = sec >= 3600
+            ? `${(sec/3600).toFixed(1)}h`
+            : sec >= 60 ? `${(sec/60).toFixed(1)}m` : `${Math.floor(sec)}s`;
+        const trustedDomains = (data.lincleDomains || []).length;
+
+        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        setEl('optValLinks',   (stats.cleanedLinks || 0).toLocaleString());
+        setEl('optValTime',    timeText);
+        setEl('optValPopups',  (stats.blockedPopups || 0).toLocaleString());
+        setEl('optValDomains', trustedDomains.toLocaleString());
 
         // Seçenekleri Doldur
         const options = data.lincleOptions || { assumedGateTime: 10, maxWaitTime: 20, enableLogging: false, enableBreadcrumbs: false };

@@ -1,166 +1,150 @@
-// Lincle Popup UI Engine (Fully Localized & Fail-Safe) v2.5
+// Lincle Popup UI v2.7
 // Developed by: Emir Samed (Nyxa48)
-
-// Cross-browser shim
 const ext = (typeof browser !== "undefined") ? browser : chrome;
 
 document.addEventListener('DOMContentLoaded', initUI);
 
 async function initUI() {
-    let currentLang = 'en';
+    // ── Language ───────────────────────────────────────────────────────────
+    const langData = await ext.storage.local.get("lincleLang");
+    const currentLang = langData.lincleLang || 'en';
+    await applyTranslations();
 
-    // 1. ÇEVİRİ MOTORUNU ÇALIŞTIR
-    try {
-        if (typeof applyTranslations === "function") {
-            await applyTranslations();
-        }
-        const langData = await ext.storage.local.get("lincleLang");
-        currentLang = langData.lincleLang || 'en'; 
-    } catch (e) {
-        console.error("[Lincle] Çeviri yüklenme hatası:", e);
-    }
-
-    // 2. TEMA YÖNETİMİ
-    const themeToggle = document.getElementById('themeToggle');
-    // Bug fix v2.5: localStorage is unreliable in extension popups across browsers.
-    // Load theme from ext.storage.local instead.
+    // ── Theme ──────────────────────────────────────────────────────────────
     const themeData = await ext.storage.local.get("lincleTheme");
-    const currentTheme = themeData.lincleTheme || 'light';
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    updateThemeBtn(currentTheme);
+    let theme = themeData.lincleTheme || 'dark';
+    applyTheme(theme);
 
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            let theme = document.documentElement.getAttribute('data-theme');
-            theme = theme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', theme);
-            ext.storage.local.set({lincleTheme: theme});
-            updateThemeBtn(theme);
-        });
-    }
-
-    function updateThemeBtn(theme) {
-        if (typeof lincleDict !== "undefined") {
-            themeToggle.textContent = theme === 'dark' ? lincleDict[currentLang].themeLight : lincleDict[currentLang].themeDark;
-        } else {
-            themeToggle.textContent = theme === 'dark' ? 'Açık Mod' : 'Koyu Mod';
-        }
-    }
-
-    // 3. KALKAN KONTROLÜ
-    const masterToggle = document.getElementById('masterToggle');
-    if (masterToggle) {
-        ext.storage.local.get("lincleSettings", (data) => {
-            const settings = data.lincleSettings || {};
-            masterToggle.checked = settings.isActive !== false;
-        });
-
-        masterToggle.addEventListener('change', (e) => {
-            ext.storage.local.set({ lincleSettings: { isActive: e.target.checked } });
-        });
-    }
-
-    // 4. İSTATİSTİKLERİ YÜKLE (Dinamik Birim Desteği)
-    ext.storage.local.get("lincleStats", (data) => {
-        const stats = data.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
-        
-        let timeText = "";
-        const isTr = (currentLang === 'tr');
-        
-        if (stats.savedSeconds >= 60) {
-            timeText = `${(stats.savedSeconds / 60).toFixed(1)} ${isTr ? 'dk' : 'min'}`;
-        } else {
-            timeText = `${Math.floor(stats.savedSeconds)} ${isTr ? 'sn' : 'sec'}`;
-        }
-        
-        const valLinks = document.getElementById('valLinks');
-        const valTime = document.getElementById('valTime');
-        
-        if (valLinks) valLinks.textContent = stats.cleanedLinks;
-        if (valTime) valTime.textContent = timeText;
+    document.getElementById('themeToggleBtn').addEventListener('click', async () => {
+        theme = theme === 'dark' ? 'light' : 'dark';
+        await ext.storage.local.set({ lincleTheme: theme });
+        applyTheme(theme);
     });
 
-    // 5. GELİŞMİŞ AYARLAR BUTONU
-    const btnOpenSettings = document.getElementById('btnOpenSettings');
-    if (btnOpenSettings) {
-        btnOpenSettings.addEventListener('click', () => {
-            if (ext.runtime.openOptionsPage) {
-                ext.runtime.openOptionsPage();
+    // ── Master toggle ──────────────────────────────────────────────────────
+    const masterToggle  = document.getElementById('masterToggle');
+    const settingsData  = await ext.storage.local.get("lincleSettings");
+    const isActive      = (settingsData.lincleSettings || {}).isActive !== false;
+    masterToggle.checked = isActive;
+    updateShieldUI(isActive, currentLang);
+
+    masterToggle.addEventListener('change', async (e) => {
+        const active = e.target.checked;
+        await ext.storage.local.set({ lincleSettings: { isActive: active } });
+        updateShieldUI(active, currentLang);
+    });
+
+    // ── Stats ──────────────────────────────────────────────────────────────
+    const statsData = await ext.storage.local.get("lincleStats");
+    const stats     = statsData.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
+    const isTr      = currentLang === 'tr';
+    const sec       = stats.savedSeconds || 0;
+    const timeText  = sec >= 3600 ? `${(sec/3600).toFixed(1)}${isTr?'sa':'h'}`
+                    : sec >= 60   ? `${(sec/60).toFixed(1)}${isTr?'dk':'m'}`
+                                  : `${Math.floor(sec)}${isTr?'sn':'s'}`;
+    setEl('valLinks', (stats.cleanedLinks || 0).toLocaleString());
+    setEl('valTime',  timeText);
+
+    // ── Version line ───────────────────────────────────────────────────────
+    try {
+        const v = ext.runtime.getManifest().version;
+        setEl('shieldVersion', `v${v} · Lincle`);
+    } catch { /* non-fatal */ }
+
+    // ── Clipboard cleaner ──────────────────────────────────────────────────
+    const dict          = getLangDict(currentLang);
+    const cleanClipBtn  = document.getElementById('cleanClipBtn');
+    const clipResult    = document.getElementById('clipResult');
+
+    function showToast(text, type /* success|error|info|'' */) {
+        clipResult.textContent  = text;
+        clipResult.className    = 'show ' + type;
+        clearTimeout(clipResult._timer);
+        clipResult._timer = setTimeout(() => { clipResult.className = ''; }, 4500);
+    }
+
+    cleanClipBtn.addEventListener('click', async () => {
+        let clipText = '';
+        try { clipText = await navigator.clipboard.readText(); }
+        catch { showToast(dict.clipNoLink || 'No clipboard access.', 'error'); return; }
+
+        const urlMatch = clipText.match(/https?:\/\/[^\s"'<>]+/);
+        if (!urlMatch) { showToast(dict.clipNoLink || 'No valid link found.', 'error'); return; }
+
+        showToast(dict.clipSearch || 'Resolving…', 'info');
+
+        try {
+            const ctrl = new AbortController();
+            setTimeout(() => ctrl.abort(), 8000);
+            const res  = await fetch(urlMatch[0], { credentials:'omit', redirect:'follow', signal:ctrl.signal });
+            if (!res.ok) throw new Error('fetch failed');
+            const html = await res.text();
+            const patterns = [
+                /var\s+url\s*=\s*['"]([^'"]+)['"]/,
+                /var\s+target_url\s*=\s*['"]([^'"]+)['"]/,
+                /window\.location\.href\s*=\s*['"]([^'"]+)['"]/,
+            ];
+            let found = null;
+            for (const p of patterns) {
+                const m = html.match(p);
+                if (m?.[1] && /^https?:\/\//.test(m[1])) { found = m[1]; break; }
+            }
+            if (found) {
+                await navigator.clipboard.writeText(found);
+                showToast(`✓ ${found}`, 'success');
             } else {
-                window.open(ext.runtime.getURL('options.html'));
+                showToast(dict.clipFail || 'No static target found.', 'error');
             }
-        });
+        } catch { showToast(dict.clipFail || 'Could not resolve.', 'error'); }
+    });
+
+    // ── Open options ───────────────────────────────────────────────────────
+    const openOpts = () => ext.runtime.openOptionsPage
+        ? ext.runtime.openOptionsPage()
+        : ext.tabs.create({ url: ext.runtime.getURL('options.html') });
+    document.getElementById('openOptions').addEventListener('click', openOpts);
+    document.getElementById('openOptions2').addEventListener('click', openOpts);
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const use = document.querySelector('#themeIcon use');
+    if (use) use.setAttribute('href', theme === 'dark' ? '#ic-sun' : '#ic-moon');
+}
+
+function updateShieldUI(active, lang) {
+    const card       = document.getElementById('shieldCard');
+    const iconWrap   = document.getElementById('shieldIconWrap');
+    const shieldSvg  = document.getElementById('shieldSvg');
+    const statusEl   = document.getElementById('shieldStatus');
+    const statusText = document.getElementById('shieldStatusText');
+    const dot        = document.getElementById('statusDot');
+    const hint       = document.getElementById('powerHint');
+    const dict       = getLangDict(lang);
+
+    if (card)      card.className      = 'shield-card' + (active ? '' : ' off');
+    if (iconWrap)  iconWrap.className  = 'shield-icon-wrap' + (active ? '' : ' off');
+    if (shieldSvg) {
+        const use = shieldSvg.querySelector('use');
+        if (use) use.setAttribute('href', active ? '#ic-shield-check' : '#ic-shield-off');
     }
+    if (statusEl)   statusEl.className  = 'shield-status' + (active ? '' : ' off');
+    if (statusText) statusText.textContent = active
+        ? (lang === 'tr' ? 'Aktif — izleyiciler engellendi' : 'Active — blocking trackers')
+        : (lang === 'tr' ? 'Devre Dışı' : 'Disabled');
+    if (dot)  dot.className  = 'status-dot' + (active ? '' : ' off');
+    if (hint) hint.textContent = active
+        ? (lang === 'tr' ? 'Devre dışı bırakmak için tıkla' : 'Tap to disable')
+        : (lang === 'tr' ? 'Etkinleştirmek için tıkla'       : 'Tap to enable');
+}
 
-    // 6. PANO TEMİZLEYİCİ
-    const btnCleanClipboard = document.getElementById('btnCleanClipboard');
-    const clipboardStatus = document.getElementById('clipboardStatus');
+function getLangDict(lang) {
+    return (typeof lincleDict !== 'undefined' && lincleDict[lang]) ? lincleDict[lang]
+         : (typeof lincleDict !== 'undefined' && lincleDict['en']) ? lincleDict['en']
+         : {};
+}
 
-    if (btnCleanClipboard) {
-        btnCleanClipboard.addEventListener('click', async () => {
-            let msgs = {
-                noLink: "Panoda geçerli bir bağlantı bulunamadı.",
-                search: "Bağlantı çözümleniyor...",
-                found: "Hedef bulundu ve panoya kopyalandı.",
-                fail: "Statik bir hedef bulunamadı."
-            };
-            
-            if (typeof lincleDict !== "undefined") {
-                msgs = {
-                    noLink: lincleDict[currentLang].clipNoLink,
-                    search: lincleDict[currentLang].clipSearch,
-                    found: lincleDict[currentLang].clipFound,
-                    fail: lincleDict[currentLang].clipFail
-                };
-            }
-
-            try {
-                const text = await navigator.clipboard.readText();
-                if (!text.startsWith('http')) {
-                    showStatus(msgs.noLink, "var(--danger)");
-                    return;
-                }
-
-                showStatus(msgs.search, "var(--primary)");
-
-                const response = await fetch(text.trim());
-                const html = await response.text();
-                
-                // Güçlendirilmiş Statik Motor (Options ile aynı güce sahip)
-                const STATIC_PATTERNS = [
-                    /(?:var\s+url\s*=\s*|url=)['"]([^'"]+)['"]/i,
-                    /window\.location\.href\s*=\s*['"]([^'"]+)['"]/i,
-                    /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]+;\s*url=([^"']+)["']/i,
-                    /<a[^>]+class=["'][^"']*(?:wfl_button|button|btn)[^"']*["'][^>]*href=["'](http[^"']+)["']/i,
-                    /<a[^>]+href=["'](http[^"']+)["'][^>]*class=["'][^"']*(?:wfl_button|button|btn)[^"']*["']/i
-                ];
-
-                let foundUrl = null;
-                for (const pattern of STATIC_PATTERNS) {
-                    const match = html.match(pattern);
-                    if (match && match[1] && match[1].startsWith('http')) {
-                        foundUrl = match[1];
-                        break;
-                    }
-                }
-                
-                if (foundUrl) {
-                    await navigator.clipboard.writeText(foundUrl);
-                    showStatus(msgs.found, "var(--success)");
-                } else {
-                    showStatus(msgs.fail, "var(--danger)");
-                }
-            } catch (err) {
-                showStatus(msgs.noLink, "var(--danger)");
-            }
-        });
-    }
-
-    function showStatus(msg, color) {
-        if (clipboardStatus) {
-            clipboardStatus.style.color = color;
-            clipboardStatus.textContent = msg;
-            clipboardStatus.style.display = "block";
-        }
-    }
+function setEl(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
 }

@@ -179,20 +179,160 @@
             }
         });
 
-        // Restore body scroll if it was locked
+        // ── Scroll restoration: covers body AND html AND common wrapper divs ──
+        // Bug: obilet (and many booking/travel sites) lock BOTH <html> and <body>,
+        // AND re-apply the lock via event listeners after the modal element is gone.
+        // Fix: restore all three targets every time we remove an overlay, AND
+        // intercept setProperty/style assignment to block re-locking attempts.
+        restoreScroll();
+    }
+
+    // Restores scroll on every element that might be locked — called after
+    // every overlay removal and also independently watched.
+    function restoreScroll() {
+        const targets = [
+            document.documentElement,  // <html> — missed by old code
+            document.body,
+        ];
+
+        // Also catch common wrapper/container divs used as scroll hosts
+        document.querySelectorAll('#__next, #root, .app, .app-root, [id*="wrapper"], [class*="scroll-lock"], [class*="no-scroll"], [class*="modal-open"]').forEach(el => {
+            targets.push(el);
+        });
+
+        targets.forEach(el => {
+            if (!el) return;
+            const cs = window.getComputedStyle(el);
+            if (cs.overflow === 'hidden' || cs.overflowY === 'hidden' ||
+                el.style.overflow === 'hidden' || el.style.overflowY === 'hidden') {
+                el.style.setProperty('overflow', '', 'important');
+                el.style.setProperty('overflow-y', '', 'important');
+                el.style.setProperty('overflow-x', '', 'important');
+                el.style.removeProperty('overflow');
+                el.style.removeProperty('overflow-y');
+                el.style.removeProperty('overflow-x');
+            }
+            // Also remove common lock-classes added by JS modal libraries
+            el.classList.remove('modal-open', 'no-scroll', 'scroll-locked',
+                'overflow-hidden', 'noscroll', 'is-modal-open', 'ReactModal__Body--open');
+        });
+
+        // Restore any inline top/position shift tricks (some sites do
+        // `body { position: fixed; top: -${scrollY}px }` to fake scroll lock)
         if (document.body) {
-            const bodyStyle = window.getComputedStyle(document.body);
-            if (bodyStyle.overflow === 'hidden' || bodyStyle.overflowY === 'hidden') {
-                document.body.style.overflow = '';
-                document.body.style.overflowY = '';
-                console.debug('[Lincle Shield] Restored body scroll.');
+            const bodyTop = document.body.style.top;
+            if (document.body.style.position === 'fixed' && bodyTop) {
+                const scrollY = Math.abs(parseInt(bodyTop, 10)) || 0;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.left = '';
+                document.body.style.right = '';
+                document.body.style.width = '';
+                if (scrollY) window.scrollTo(0, scrollY);  // restore scroll position
             }
         }
+    }
+
+    // ── Intercept style.overflow being re-set after we clear it ──────────────
+    // Some sites (like obilet) use scroll/resize event listeners that
+    // continuously re-apply `document.body.style.overflow = 'hidden'`.
+    // We trap the CSSStyleDeclaration.setProperty and the overflow setter
+    // on both body and html to block attempts while no overlay is visible.
+    let overflowGuardActive = false;
+
+    function activateOverflowGuard() {
+        if (overflowGuardActive) return;
+        overflowGuardActive = true;
+
+        function isOverlayVisible() {
+            // Only allow re-locking if a real covering overlay is actually on screen
+            return OVERLAY_SELECTORS.some(sel => {
+                try {
+                    return Array.from(document.querySelectorAll(sel)).some(isCoveringOverlay);
+                } catch { return false; }
+            });
+        }
+
+        function guardOverflow(el) {
+            try {
+                const proto = Object.getPrototypeOf(el.style);
+                const descriptor = Object.getOwnPropertyDescriptor(proto, 'overflow') ||
+                    Object.getOwnPropertyDescriptor(CSSStyleDeclaration.prototype, 'overflow');
+                if (!descriptor) return;
+
+                ['overflow', 'overflowY', 'overflowX'].forEach(prop => {
+                    const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
+                    const orig = descriptor.set;
+                    if (!orig) return;
+                    try {
+                        Object.defineProperty(el.style, prop, {
+                            set(val) {
+                                if (shieldActive && val === 'hidden' && !isOverlayVisible()) {
+                                    console.debug(`[Lincle Shield] Blocked ${cssProp}:hidden re-lock on`, el.tagName);
+                                    return; // swallow the lock attempt
+                                }
+                                orig.call(this, val);
+                            },
+                            get: descriptor.get,
+                            configurable: true,
+                        });
+                    } catch { /* non-configurable — skip */ }
+                });
+            } catch { /* ignore any security errors */ }
+        }
+
+        // Guard both html and body — obilet uses both
+        if (document.documentElement) guardOverflow(document.documentElement);
+        if (document.body) guardOverflow(document.body);
+    }
+
+    function removeOverlays() {
+        if (!shieldActive) return;
+        let removed = 0;
+
+        // Selector-based removal (fast path)
+        OVERLAY_SELECTORS.forEach(sel => {
+            try {
+                document.querySelectorAll(sel).forEach(el => {
+                    if (isCoveringOverlay(el)) {
+                        el.remove();
+                        removed++;
+                        console.debug('[Lincle Shield] Removed overlay:', el.className || el.id);
+                    }
+                });
+            } catch { /* invalid selector — skip */ }
+        });
+
+        // Heuristic scan: any large fixed/absolute high-z element not in our
+        // selector list (catches dynamically generated classname overlays)
+        document.querySelectorAll('body > *, body > * > *').forEach(el => {
+            if (isCoveringOverlay(el) && !el.closest('#lincle-banner')) {
+                const textLen = (el.innerText || '').length;
+                if (textLen < 600) {
+                    el.remove();
+                    removed++;
+                    console.debug('[Lincle Shield] Heuristic overlay removed:', el.tagName, el.className);
+                }
+            }
+        });
 
         if (removed > 0) {
-            console.debug(`[Lincle Shield] Removed ${removed} overlay element(s).`);
+            restoreScroll();
+            activateOverflowGuard();
+            console.debug(`[Lincle Shield] Removed ${removed} overlay(s), scroll restored.`);
+            // Track popup blocks in stats
+            try {
+                ext.storage.local.get("lincleStats").then(d => {
+                    const s = d.lincleStats || {};
+                    s.blockedPopups = (s.blockedPopups || 0) + removed;
+                    ext.storage.local.set({ lincleStats: s });
+                });
+            } catch { /* non-fatal */ }
         }
     }
+
+    // Dummy closing brace — pairs with the restoreScroll() call above
+    void 0;
 
     // Run once when DOM is interactive, then watch for dynamically injected overlays
     function startOverlayWatcher() {
