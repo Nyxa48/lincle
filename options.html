@@ -44,12 +44,40 @@
     .header-logo svg { color: #fff; }
     .header-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
     .header-right { display: flex; gap: 8px; align-items: center; }
-    .header-right select {
-      padding: 7px 12px; border-radius: 8px;
-      border: 1px solid var(--border); background: var(--surface);
-      color: var(--text); font-size: 13px; cursor: pointer;
+    .lang-selector-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0 28px 0 34px;
+      height: 36px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
-    .header-right select:focus { outline: none; border-color: var(--primary); }
+    .lang-selector-wrap:hover {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-dim);
+    }
+    .lang-icon {
+      position: absolute; left: 10px; color: var(--primary); pointer-events: none;
+    }
+    .lang-arrow {
+      position: absolute; right: 10px; color: var(--text-dim); pointer-events: none;
+    }
+    .lang-select {
+      appearance: none; -webkit-appearance: none;
+      background: transparent !important; border: none !important;
+      color: var(--text) !important; font-size: 13px !important; font-weight: 600 !important;
+      cursor: pointer; padding: 0 !important; margin: 0 !important;
+      height: 100%; width: 100%; outline: none !important;
+    }
+    .lang-select option {
+      background: var(--surface2) !important;
+      color: var(--text) !important;
+      padding: 10px;
+    }
 
     /* ── Stats Bar ── */
     .stats-bar {
@@ -309,20 +337,35 @@
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
           </svg>
         </div>
-        <h2 class="header-title" data-i18n="optTitle">Lincle Ayarlari</h2>
+        <h2 class="header-title" data-i18n="optTitle">Lincle Ayarları</h2>
       </div>
       <div class="header-right">
-        <select id="langSelect">
-          <option value="tr">Turkce</option>
-          <option value="en">English</option>
-          <option value="de">Deutsch</option>
-          <option value="fr">Francais</option>
-          <option value="es">Espanol</option>
-          <option value="pt">Portugues</option>
-          <option value="it">Italiano</option>
-          <option value="ru">Russkiy</option>
-          <option value="da">Dansk</option>
-        </select>
+        <div class="lang-selector-wrap">
+          <svg class="lang-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <select id="langSelect" class="lang-select">
+            <option value="en">🇬🇧 English</option>
+            <option value="tr">🇹🇷 Türkçe</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="pt">🇵🇹 Português</option>
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="ru">🇷🇺 Русский</option>
+            <option value="da">🇩🇰 Dansk</option>
+            <option value="ja">🇯🇵 日本語</option>
+            <option value="zh">🇨🇳 简体中文</option>
+            <option value="ko">🇰🇷 한국어</option>
+            <option value="ar">🇸🇦 العربية</option>
+            <option value="pl">🇵🇱 Polski</option>
+          </select>
+          <svg class="lang-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -350,11 +393,11 @@
     <div class="card open" data-card>
       <div class="card-header" data-toggle>
         <svg width="16" height="16"><use href="#ic-palette"/></svg>
-        <span class="card-header-title" data-i18n="themeTitle">Tema & Gorunum</span>
+        <span class="card-header-title" data-i18n="themeTitle">Tema & Görünüm</span>
         <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
-        <label style="font-weight:700;margin-bottom:8px" data-i18n="themePresetTitle">Hazir Temalar (Presets)</label>
+        <label style="font-weight:700;margin-bottom:8px" data-i18n="themePresetTitle">Hazır Temalar (Presets)</label>
         <div class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
           <button class="preset-btn active" data-preset="dark">
             <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00caf5"></span>
@@ -384,24 +427,24 @@
 
         <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-            <label style="font-weight:700;margin:0" data-i18n="themeCustomTitle">Ozel Tema Kutuphanesi & Duzenleyici</label>
+            <label style="font-weight:700;margin:0" data-i18n="themeCustomTitle">Özel Tema Kütüphanesi & Düzenleyici</label>
             <button class="btn" id="btnToggleCustom" style="padding:4px 10px;font-size:11px;">
               <svg width="12" height="12"><use href="#ic-palette"/></svg>
-              <span data-i18n="themeEditorBtn">Renk Duzenleyici</span>
+              <span data-i18n="themeEditorBtn">Renk Düzenleyici</span>
             </button>
           </div>
 
           <div id="savedThemesWrapper" style="margin-bottom:12px;display:flex;gap:8px;">
             <select id="savedThemesSelect" style="flex:1;">
-              <option value="" data-i18n="themeSavedSelect">-- Kayitli Ozel Temalarim --</option>
+              <option value="" data-i18n="themeSavedSelect">-- Kayıtlı Özel Temalarım --</option>
             </select>
-            <button class="btn btn-danger" id="btnDeleteCustomTheme" title="Secili Temayi Sil" style="padding:8px 12px;display:none;">
+            <button class="btn btn-danger" id="btnDeleteCustomTheme" title="Seçili Temayı Sil" style="padding:8px 12px;display:none;">
               <svg width="14" height="14"><use href="#ic-trash"/></svg>
             </button>
           </div>
 
           <div id="customColorSection" style="display:none;background:var(--surface2);border:1px solid var(--border);padding:14px;border-radius:10px;margin-bottom:14px;">
-            <label for="themeNameInput" style="font-size:12px;font-weight:600;" data-i18n="themeNameLabel">Tema Ismi:</label>
+            <label for="themeNameInput" style="font-size:12px;font-weight:600;" data-i18n="themeNameLabel">Tema İsmi:</label>
             <input type="text" id="themeNameInput" value="Neo Custom" data-i18n-ph="themeNameDefault" placeholder="Theme Name..." style="margin-bottom:12px;">
 
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -417,18 +460,18 @@
 
             <button class="btn btn-primary" id="btnSaveCustomTheme" style="width:100%;">
               <svg width="14" height="14"><use href="#ic-save"/></svg>
-              <span data-i18n="themeSaveBtn">Temayi Kutuphaneye Kaydet</span>
+              <span data-i18n="themeSaveBtn">Temayı Kütüphaneye Kaydet</span>
             </button>
           </div>
 
           <div class="btn-group">
             <button class="btn" id="btnExportTheme">
               <svg width="14" height="14"><use href="#ic-download"/></svg>
-              <span data-i18n="themeExportBtn">Temayi Disari Aktar (JSON)</span>
+              <span data-i18n="themeExportBtn">Temayı Dışa Aktar (JSON)</span>
             </button>
             <button class="btn" id="btnImportTheme">
               <svg width="14" height="14"><use href="#ic-upload"/></svg>
-              <span data-i18n="themeImportBtn">Tema Ice Aktar (JSON)</span>
+              <span data-i18n="themeImportBtn">Tema İçe Aktar (JSON)</span>
             </button>
           </div>
         </div>
@@ -445,25 +488,25 @@
       <div class="card-body">
         <div class="check-row">
           <input type="checkbox" id="popupShieldToggle" checked>
-          <label for="popupShieldToggle" data-i18n="popupShield">Popup Kalkanini Aktif Et</label>
+          <label for="popupShieldToggle" data-i18n="popupShield">Popup Kalkanını Aktif Et</label>
         </div>
         <div class="check-row">
           <input type="checkbox" id="loggingToggle">
-          <label for="loggingToggle" data-i18n="debugOpt">Gelistirici Loglarini Aktif Et</label>
+          <label for="loggingToggle" data-i18n="debugOpt">Geliştirici Loglarını Aktif Et</label>
         </div>
 
         <div class="sep"></div>
-        <label for="assumedTime" data-i18n="avgWait">Ortalama Bekleme Suresi (Saniye):</label>
+        <label for="assumedTime" data-i18n="avgWait">Ortalama Bekleme Süresi (Saniye):</label>
         <input type="number" id="assumedTime" min="1" max="60" value="10">
-        <div class="helper" data-i18n="avgWaitHelp">Tasarruf hesaplamasi icin kullanilir.</div>
+        <div class="helper" data-i18n="avgWaitHelp">Tasarruf hesaplaması için kullanılır.</div>
 
-        <label for="maxWaitTime" data-i18n="timeoutOpt">Zaman Asimi Suresi (Saniye):</label>
+        <label for="maxWaitTime" data-i18n="timeoutOpt">Zaman Aşımı Süresi (Saniye):</label>
         <input type="number" id="maxWaitTime" min="5" max="60" value="20">
 
         <div class="danger-box">
           <div class="check-row">
             <input type="checkbox" id="breadcrumbToggle">
-            <label for="breadcrumbToggle" data-i18n="breadcrumb">Yonlendirme Zinciri Izleyiciyi Aktif Et</label>
+            <label for="breadcrumbToggle" data-i18n="breadcrumb">Yönlendirme Zinciri İzleyiciyi Aktif Et</label>
           </div>
         </div>
       </div>
@@ -473,7 +516,7 @@
     <div class="card" data-card>
       <div class="card-header" data-toggle>
         <svg width="16" height="16"><use href="#ic-database"/></svg>
-        <span class="card-header-title" data-i18n="wlTitle">Domain Listesi ve Kisayollar</span>
+        <span class="card-header-title" data-i18n="wlTitle">Domain Listesi ve Kısayollar</span>
         <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
@@ -481,11 +524,11 @@
         <textarea id="domainList" data-i18n="domainPlh" placeholder="ornek.com&#10;kisalt.co"></textarea>
 
         <div class="sep"></div>
-        <label data-i18n="shortcutOpt">Klavye Kisayolu:</label>
-        <div class="helper" data-i18n="shortcutHelp">Tarayici ayarlarindan degistirebilirsiniz.</div>
+        <label data-i18n="shortcutOpt">Klavye Kısayolu:</label>
+        <div class="helper" data-i18n="shortcutHelp">Tarayıcı ayarlarından değiştirebilirsiniz.</div>
         <button class="btn" id="btnShortcuts">
           <svg width="14" height="14"><use href="#ic-key"/></svg>
-          <span data-i18n="btnShortcut">Kisayollari Duzenle</span>
+          <span data-i18n="btnShortcut">Kısayolları Düzenle</span>
         </button>
       </div>
     </div>
@@ -494,15 +537,15 @@
     <div class="card" data-card>
       <div class="card-header" data-toggle>
         <svg width="16" height="16"><use href="#ic-zap"/></svg>
-        <span class="card-header-title" data-i18n="bulkTitle">Arastirmaci: Toplu Cozumleyici</span>
+        <span class="card-header-title" data-i18n="bulkTitle">Araştırmacı: Toplu Çözümleyici</span>
         <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
-        <div class="helper" data-i18n="bulkHelp">Arka planda toplu link cozer.</div>
+        <div class="helper" data-i18n="bulkHelp">Arka planda toplu link çözer.</div>
         <textarea id="bulkInput" placeholder="..."></textarea>
         <button class="btn btn-primary" id="btnBulkResolve" style="width:100%;margin-top:10px">
           <svg width="14" height="14"><use href="#ic-zap"/></svg>
-          <span data-i18n="btnBulk">Toplu Cozumle</span>
+          <span data-i18n="btnBulk">Toplu Çözümle</span>
         </button>
         <textarea id="bulkOutput" placeholder="..." style="margin-top:10px" readonly></textarea>
       </div>
@@ -512,11 +555,11 @@
     <div class="card" data-card>
       <div class="card-header" data-toggle>
         <svg width="16" height="16"><use href="#ic-terminal"/></svg>
-        <span class="card-header-title" data-i18n="regexTitle">Arastirmaci: Ozel Regex Kurallari</span>
+        <span class="card-header-title" data-i18n="regexTitle">Araştırmacı: Özel Regex Kuralları</span>
         <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
-        <div class="helper" data-i18n="regexHelp">Layer 0 URL ayiklama kurallarinizi ekleyin.</div>
+        <div class="helper" data-i18n="regexHelp">Layer 0 URL ayıklama kurallarınızı ekleyin.</div>
         <textarea id="customRegexList" placeholder="url=([^&]+)"></textarea>
       </div>
     </div>
@@ -525,11 +568,11 @@
     <div class="card" data-card>
       <div class="card-header" data-toggle>
         <svg width="16" height="16"><use href="#ic-file"/></svg>
-        <span class="card-header-title" data-i18n="logTitle">Sistem Loglari</span>
+        <span class="card-header-title" data-i18n="logTitle">Sistem Logları</span>
         <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
-        <label data-i18n="chainOpt">Yonlendirme Zinciri</label>
+        <label data-i18n="chainOpt">Yönlendirme Zinciri</label>
         <div id="chainContainer" class="terminal-box" style="margin-bottom:10px">--</div>
         <button class="btn" id="btnClearChain">
           <svg width="14" height="14"><use href="#ic-trash"/></svg>
@@ -537,16 +580,16 @@
         </button>
 
         <div class="sep"></div>
-        <label data-i18n="failOpt">Basarisizlik Raporlari</label>
+        <label data-i18n="failOpt">Başarısızlık Raporları</label>
         <textarea id="failureList" class="terminal-box" style="margin-bottom:10px;color:var(--red)" readonly></textarea>
         <div class="btn-group">
           <button class="btn" id="btnEmailDev">
             <svg width="14" height="14"><use href="#ic-mail"/></svg>
-            <span data-i18n="btnEmail">Gelistiriciye Raporla</span>
+            <span data-i18n="btnEmail">Geliştiriciye Raporla</span>
           </button>
           <button class="btn btn-danger" id="btnClearFailures">
             <svg width="14" height="14"><use href="#ic-trash"/></svg>
-            <span data-i18n="btnClearFail">Raporlari Temizle</span>
+            <span data-i18n="btnClearFail">Raporları Temizle</span>
           </button>
         </div>
       </div>
@@ -556,7 +599,7 @@
     <div class="save-area">
       <button class="btn btn-primary" id="saveBtn">
         <svg width="16" height="16"><use href="#ic-save"/></svg>
-        <span data-i18n="btnSave">Tum Ayarlari Kaydet</span>
+        <span data-i18n="btnSave">Tüm Ayarları Kaydet</span>
       </button>
       <div id="saveStatus" data-i18n="saveStatus">Kaydedildi!</div>
     </div>
