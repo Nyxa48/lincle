@@ -21,9 +21,10 @@ const lincleDict = {
         themeExportBtn: "Temayı Dışa Aktar (JSON)",
         themeImportBtn: "Tema İçe Aktar (JSON)",
         themeExport: "Temayı Dışa Aktar", themeImport: "Tema İçe Aktar",
-        themeBg: "Arkaplan", themeSurface: "Yüzey", themePrimary: "Vurgu Rengi",
+        themeBg: "Arkaplan", themeSurface: "Kartlar", themeSurface2: "Butonlar & Paneller", themePrimary: "Vurgu Rengi",
         themeGreen: "Başarı", themeRed: "Hata", themeText: "Metin",
         themeTextDim: "Soluk Metin", themeBorder: "Kenarlık",
+        themeAutoHarmonize: "Otomatik Tonlama",
 
         // Popup
         popShield: "Koruma Kalkanı", popCleaned: "Temizlenen", popSaved: "Tasarruf",
@@ -78,10 +79,10 @@ const lincleDict = {
         themeSaveBtn: "Save Theme to Library",
         themeExportBtn: "Export Theme (JSON)",
         themeImportBtn: "Import Theme (JSON)",
-        themeExport: "Export Theme", themeImport: "Import Theme",
-        themeBg: "Background", themeSurface: "Surface", themePrimary: "Accent",
+        themeBg: "Background", themeSurface: "Cards", themeSurface2: "Buttons & Panels", themePrimary: "Accent",
         themeGreen: "Success", themeRed: "Error", themeText: "Text",
         themeTextDim: "Muted Text", themeBorder: "Border",
+        themeAutoHarmonize: "Auto-Harmonize",
 
         popShield: "Protection Shield", popCleaned: "Cleaned", popSaved: "Saved",
         popMaster: "Master Protection", popShieldToggle: "Popup & Modal Shield",

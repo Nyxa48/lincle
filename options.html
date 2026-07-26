@@ -142,23 +142,51 @@
     .btn-danger:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); }
     .btn-group { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 
-    /* ── Color Picker Grid ── */
+    /* ── Color Picker Grid & HEX inputs ── */
     .color-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
       margin: 14px 0;
+    }
+    @media (max-width: 680px) {
+      .color-grid { grid-template-columns: 1fr 1fr; }
     }
     .color-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 8px 10px; background: var(--surface2);
-      border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 10px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 9px;
+      transition: border-color .15s, box-shadow .15s;
     }
-    .color-item input[type="color"] {
-      width: 32px; height: 32px; border: none; cursor: pointer;
-      background: none; border-radius: 6px; padding: 0;
+    .color-item:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-dim);
     }
-    .color-item input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-    .color-item input[type="color"]::-webkit-color-swatch { border-radius: 6px; border: 1px solid var(--border); }
-    .color-item-label { font-size: 12px; font-weight: 600; color: var(--text-dim); }
+    .color-swatch-wrap {
+      width: 32px; height: 32px; border-radius: 7px; flex-shrink: 0;
+      overflow: hidden; border: 1px solid var(--border);
+      position: relative; cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+    }
+    .color-swatch-wrap input[type="color"] {
+      position: absolute; top: -10px; left: -10px;
+      width: 55px; height: 55px; border: none; cursor: pointer;
+      background: none; padding: 0; opacity: 0;
+    }
+    .color-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .color-item-label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hex-input-wrap {
+      display: flex; align-items: center; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 5px;
+      padding: 2px 6px; height: 24px; width: 100%;
+    }
+    .hex-hash { font-size: 11px; font-weight: 700; color: var(--text-dim); margin-right: 2px; }
+    .hex-input {
+      border: none !important; background: transparent !important;
+      padding: 0 !important; height: 100% !important; width: 100% !important;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace !important;
+      font-size: 11px !important; font-weight: 700 !important;
+      color: var(--text) !important; text-transform: uppercase;
+    }
+    .hex-input:focus { outline: none !important; }
 
     /* ── Preset Segment ── */
     .preset-seg {
@@ -376,8 +404,14 @@
             <label for="themeNameInput" style="font-size:12px;font-weight:600;" data-i18n="themeNameLabel">Tema Ismi:</label>
             <input type="text" id="themeNameInput" value="Neo Custom" data-i18n-ph="themeNameDefault" placeholder="Theme Name..." style="margin-bottom:12px;">
 
-            <label style="font-size:12px;font-weight:600;margin-bottom:6px;" data-i18n="themePaletteLabel">Renk Paleti:</label>
-            <div class="color-grid" id="colorGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <label style="font-size:12px;font-weight:600;margin:0;" data-i18n="themePaletteLabel">Renk Paleti:</label>
+              <button class="btn" id="btnAutoHarmonize" type="button" style="padding:3px 8px;font-size:11px;" title="Auto-calculate matching cards and buttons from background">
+                <svg width="12" height="12"><use href="#ic-zap"/></svg>
+                <span data-i18n="themeAutoHarmonize">Otomatik Tonlama</span>
+              </button>
+            </div>
+            <div class="color-grid" id="colorGrid">
               <!-- Populated by JS -->
             </div>
 

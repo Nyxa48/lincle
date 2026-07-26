@@ -4,14 +4,15 @@ const ext = (typeof browser !== 'undefined') ? browser : chrome;
 
 // ─── Color Picker Config ────────────────────────────────────────────────────
 const COLOR_KEYS = [
-    { key: 'bg',      label: 'Background',   i18n: 'themeBg' },
-    { key: 'surface', label: 'Surface',       i18n: 'themeSurface' },
-    { key: 'primary', label: 'Accent',        i18n: 'themePrimary' },
-    { key: 'green',   label: 'Success',       i18n: 'themeGreen' },
-    { key: 'red',     label: 'Error',         i18n: 'themeRed' },
-    { key: 'text',    label: 'Text',          i18n: 'themeText' },
-    { key: 'textDim', label: 'Muted Text',    i18n: 'themeTextDim' },
-    { key: 'border',  label: 'Border',        i18n: 'themeBorder' },
+    { key: 'bg',       label: 'Background',       i18n: 'themeBg' },
+    { key: 'surface',  label: 'Cards',            i18n: 'themeSurface' },
+    { key: 'surface2', label: 'Buttons & Panels', i18n: 'themeSurface2' },
+    { key: 'primary',  label: 'Accent',           i18n: 'themePrimary' },
+    { key: 'green',    label: 'Success',          i18n: 'themeGreen' },
+    { key: 'red',      label: 'Error',            i18n: 'themeRed' },
+    { key: 'text',     label: 'Text',             i18n: 'themeText' },
+    { key: 'textDim',  label: 'Muted Text',       i18n: 'themeTextDim' },
+    { key: 'border',   label: 'Border',           i18n: 'themeBorder' },
 ];
 
 // ─── On Load ────────────────────────────────────────────────────────────────
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const langSelect = document.getElementById('langSelect');
     const langData = await ext.storage.local.get('lincleLang');
     const currentLang = langData.lincleLang || 'en';
+    window._currentLang = currentLang;
     if (langSelect) {
         langSelect.value = currentLang;
         langSelect.addEventListener('change', async (e) => {
@@ -77,26 +79,107 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Build color picker grid
-    if (colorGrid) {
+    // Build color picker grid with HEX input fields
+    function renderColorGrid() {
+        if (!colorGrid) return;
         colorGrid.innerHTML = '';
+        const langData = window._currentLang || 'en';
+        const dict = (typeof lincleDict !== 'undefined' && lincleDict[langData]) ? lincleDict[langData] : {};
+
         COLOR_KEYS.forEach(({ key, label, i18n }) => {
+            const rawHex = (customColors[key] || '#000000').toUpperCase();
+            const cleanHex = rawHex.replace('#', '');
+            const localizedLabel = dict[i18n] || label;
+
             const item = document.createElement('div');
             item.className = 'color-item';
             item.innerHTML = `
-                <input type="color" id="color_${key}" value="${customColors[key] || '#000000'}">
-                <span class="color-item-label" data-i18n="${i18n}">${label}</span>
+                <div class="color-swatch-wrap" style="background:${rawHex}">
+                    <input type="color" id="color_${key}" value="${rawHex}">
+                </div>
+                <div class="color-item-info">
+                    <span class="color-item-label" data-i18n="${i18n}">${localizedLabel}</span>
+                    <div class="hex-input-wrap">
+                        <span class="hex-hash">#</span>
+                        <input type="text" class="hex-input" id="hex_${key}" value="${cleanHex}" maxlength="6" spellcheck="false">
+                    </div>
+                </div>
             `;
             colorGrid.appendChild(item);
 
-            const input = item.querySelector('input');
-            input.addEventListener('input', (e) => {
-                customColors[key] = e.target.value;
+            const colorPicker = item.querySelector(`#color_${key}`);
+            const hexInput    = item.querySelector(`#hex_${key}`);
+            const swatchWrap  = item.querySelector('.color-swatch-wrap');
+
+            colorPicker.addEventListener('input', (e) => {
+                const val = e.target.value.toUpperCase();
+                customColors[key] = val;
+                hexInput.value = val.replace('#', '');
+                swatchWrap.style.background = val;
+
                 const themeName = (nameInput ? nameInput.value.trim() : '') || 'Custom Theme';
                 const previewTheme = { preset: 'custom', name: themeName, colors: { ...customColors } };
                 lincleApplyTheme(previewTheme);
             });
+
+            hexInput.addEventListener('input', (e) => {
+                let txt = e.target.value.trim().toUpperCase().replace(/[^0-9A-F]/g, '');
+                e.target.value = txt;
+
+                let fullHex = txt;
+                if (txt.length === 3) {
+                    fullHex = txt.split('').map(c => c + c).join('');
+                }
+
+                if (fullHex.length === 6) {
+                    const validHex = '#' + fullHex;
+                    customColors[key] = validHex;
+                    colorPicker.value = validHex;
+                    swatchWrap.style.background = validHex;
+
+                    const themeName = (nameInput ? nameInput.value.trim() : '') || 'Custom Theme';
+                    const previewTheme = { preset: 'custom', name: themeName, colors: { ...customColors } };
+                    lincleApplyTheme(previewTheme);
+                }
+            });
         });
+    }
+
+    renderColorGrid();
+
+    // Auto-Harmonize colors helper
+    const btnAutoHarmonize = document.getElementById('btnAutoHarmonize');
+    if (btnAutoHarmonize) {
+        btnAutoHarmonize.addEventListener('click', () => {
+            const bgHex = customColors.bg || '#11111a';
+            autoHarmonizeFromBg(bgHex);
+        });
+    }
+
+    function autoHarmonizeFromBg(bgHex) {
+        const rgb = hexToRgb(bgHex);
+        if (!rgb) return;
+
+        const isDark = (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) < 128;
+
+        if (isDark) {
+            customColors.surface  = adjustColorLightness(bgHex, 0.08);
+            customColors.surface2 = adjustColorLightness(bgHex, 0.16);
+            customColors.border   = adjustColorLightness(bgHex, 0.26);
+            customColors.text     = '#ededf8';
+            customColors.textDim  = '#8080b0';
+        } else {
+            customColors.surface  = adjustColorLightness(bgHex, -0.06);
+            customColors.surface2 = adjustColorLightness(bgHex, -0.12);
+            customColors.border   = adjustColorLightness(bgHex, -0.20);
+            customColors.text     = '#15152a';
+            customColors.textDim  = '#656595';
+        }
+
+        renderColorGrid();
+        const themeName = (nameInput ? nameInput.value.trim() : '') || 'Custom Theme';
+        const previewTheme = { preset: 'custom', name: themeName, colors: { ...customColors } };
+        lincleApplyTheme(previewTheme);
     }
 
     // Populate saved custom themes library dropdown
@@ -467,4 +550,27 @@ async function sendEmailToDev() {
     const subject = encodeURIComponent('Lincle - Hata Raporu');
     const body = encodeURIComponent(`Merhaba Emir,\n\nAsagidaki baglantilar Lincle tarafindan atlanamaadi. Analiz icin gonderiyorum:\n\n${reportText}`);
     window.open(`mailto:${email}?subject=${subject}&body=${body}`);
+}
+
+// ─── Color Helper Utilities ──────────────────────────────────────────────────
+function hexToRgb(hex) {
+    if (!hex) return null;
+    let clean = hex.replace('#', '');
+    if (clean.length === 3) clean = clean.split('').map(c => c + c).join('');
+    if (clean.length !== 6) return null;
+    const num = parseInt(clean, 16);
+    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+}
+
+function rgbToHex(r, g, b) {
+    const clamp = x => Math.max(0, Math.min(255, Math.round(x)));
+    return '#' + [r, g, b].map(x => clamp(x).toString(16).padStart(2, '0')).join('');
+}
+
+function adjustColorLightness(hex, percent) {
+    const rgb = hexToRgb(hex);
+    if (!rgb) return hex;
+    const factor = 1 + percent;
+    const delta = percent * 160;
+    return rgbToHex(rgb.r * factor + delta, rgb.g * factor + delta, rgb.b * factor + delta);
 }
