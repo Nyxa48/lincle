@@ -1,109 +1,86 @@
 # Lincle
 
-![Version](https://img.shields.io/badge/version-3.5-00caf5.svg?style=for-the-badge&labelColor=11111a)
+![Version](https://img.shields.io/badge/version-2.8-00caf5.svg?style=for-the-badge&labelColor=11111a)
 ![Manifest](https://img.shields.io/badge/manifest-V3-10b981.svg?style=for-the-badge&labelColor=11111a)
 ![Languages](https://img.shields.io/badge/languages-14_Supported-bd93f9.svg?style=for-the-badge&labelColor=11111a)
 ![Privacy](https://img.shields.io/badge/privacy-100%25_Local-2ecc71.svg?style=for-the-badge&labelColor=11111a)
-![License](https://img.shields.io/badge/license-MIT-f59e0b.svg?style=for-the-badge&labelColor=11111a)
 
 [ English ](#english) &nbsp;&middot;&nbsp; [ Türkçe ](#turkce)
 
 ---
 
-<h2 id="english">English Overview</h2>
+<h2 id="english">English</h2>
 
-**Lincle** is a lightweight, privacy-first browser extension engineered to automatically bypass URL shorteners, redirect countdown gates, tracking links, and intrusive popup overlays.
+Lincle is a clean, lightweight browser extension built for Chromium (Chrome, Brave, Edge, Opera), Mozilla Firefox, and Apple Safari to make browsing faster and less annoying. It automatically bypasses link shorteners, skips redirect countdown timers, and unlocks scroll-locked pages or invisible popup overlays without collecting any user data.
 
-Unlike typical ad blockers or URL tools, Lincle operates at the lowest interception layer (Layer 0). It resolves intermediate targets silently in the background, frees your browser scroll from overlay locks, and gives you total aesthetic control over its user interface.
+Everything runs 100% locally inside your browser—no external servers, no background tracking, and no wait times.
 
----
+### What Lincle Does
 
-### Core Highlights
-
-#### 1. Silent Link & Gate Resolution
-Skip countdown timers, intermediate redirect gates, and ad-filled landing pages. Lincle inspects DOM scripts and network redirects in real time to fetch the true destination URL before you even land on the page.
-
-#### 2. Popup & Modal Shield
-Breaks aggressive page overlays and modal freezes. When booking sites, hotel aggregators, or ad networks lock your page scroll or block interaction with invisible backdrop divs, Lincle's 3-layer event interceptor restores scroll capabilities and triggers native close routines without breaking site functionality.
-
-#### 3. Custom Theme Engine & HEX Color Editor
-Make Lincle look exactly the way you want. Choose from 6 carefully crafted design presets (Cyberpunk Dark, Clean Light, Nordic Slate, Emerald Matrix, Sunset Amber, Dracula Violet) or create your own custom themes using the interactive color palette. Features include direct HEX color inputs, 1-click Auto-Harmonize palette generation, saved theme libraries, and JSON export/import.
-
-#### 4. Native 14-Language i18n Architecture
-Fully localized for users worldwide with crisp SVG vector flags. Supported languages include English, Turkish, German, French, Spanish, Portuguese, Italian, Russian, Danish, Japanese, Simplified Chinese, Korean, Arabic, and Polish.
-
-#### 5. Bulk Link Resolver
-Process dozens of shortened links at once. Simply paste your link batch into the researcher console, and Lincle resolves all destination targets simultaneously in the background without opening a single new tab.
-
-#### 6. Redirect Chain Tracker (Breadcrumbs)
-Inspect the exact route a link takes before arriving at its final URL. Essential for security research, phishing detection, and debugging multi-hop shortener chains.
-
-#### 7. Absolute Privacy & Local Execution
-Your browsing habits belong to you. Lincle works 100% locally on your machine with zero remote server dependency, zero telemetry, and no data tracking whatsoever.
-
----
+- **Bypasses Link Shorteners & Redirect Gates**: Analyzes short links in the background and takes you straight to the real destination URL.
+- **Unlocks Page Scroll & Popup Overlays**: Automatically removes backdrop overlays and fixes frozen page scrolling on booking, hotel, or ad-heavy sites.
+- **Custom Theme Engine**: Personalize the extension popup and settings interface with 6 built-in color presets or create your own custom palette using direct HEX inputs and a 1-click auto-harmonize button.
+- **Bulk Link Resolver**: Paste a list of shortened links and resolve all of them at once in the background without opening dozens of tabs.
+- **Redirect Chain Tracker**: View the step-by-step route a link takes from the initial short URL to its final destination.
+- **14 Built-in Languages**: Native translation support for 14 languages with custom SVG vector flags.
+- **Privacy First**: Zero telemetry, zero analytics, and zero external network calls.
 
 ### Installation Guide
 
 #### Chromium Browsers (Chrome, Brave, Edge, Opera)
-1. Open `chrome://extensions/` in your address bar.
+1. Open `chrome://extensions/` in your browser.
 2. Enable **Developer mode** in the top right corner.
-3. Click **Load unpacked** and select the root `lincle` folder.
+3. Click **Load unpacked** and select the `lincle` directory.
 
 #### Mozilla Firefox
-1. Open `about:debugging#/runtime/this-firefox` in your address bar.
+1. Open `about:debugging#/runtime/this-firefox` in your browser.
 2. Click **Load Temporary Add-on...**.
 3. Select the `manifest.json` file inside the `lincle` directory.
+
+#### Apple Safari (macOS)
+1. Open Safari Settings -> **Advanced** tab.
+2. Check **Show Develop menu in menu bar**.
+3. In the **Develop** menu, select **Allow Unsigned Extensions**.
+4. Select the `lincle` directory to load the extension.
 
 ---
 
 <br>
 
-<h2 id="turkce">Türkçe Açıklama</h2>
+<h2 id="turkce">Türkçe</h2>
 
-**Lincle**, URL kısaltıcıları, bekleme süreli yönlendirme sayfalarını, izleme bağlantılarını ve rahatsız edici açılır ekran (popup/modal) engellerini otomatik olarak atlayan, gizlilik odaklı ve yüksek performanslı bir tarayıcı eklentisidir.
+Lincle, Chromium (Chrome, Brave, Edge, Opera), Mozilla Firefox ve Apple Safari tarayıcılarında internette gezinirken karşılaştığınız sinir bozucu engelleri ortadan kaldırmak için geliştirilmiş hafif ve kullanıcı dostu bir eklentidir. Kısaltılmış linkleri, bekleme süreli yönlendirme sayfalarını ve reklam sitelerindeki popup engellerini siz daha sayfayı görmeden arka planda temizler.
 
-Lincle, sıradan reklam engelleyicilerden farklı olarak en alt katman olan Katman 0 (Layer 0) seviyesinde çalışır. Sekme trafiğini yormadan arka planda hedef bağlantıyı doğrudan ayıklar, sayfa kaydırma kilitlerini açar ve tamamen özelleştirilebilir modern bir arayüz sunar.
+Tüm işlemler %100 yerel olarak tarayıcınızın içinde gerçekleşir. Hiçbir veriniz dışarı aktarılmaz veya uzak sunuculara gönderilmez.
 
----
+### Lincle Ne Yapar?
 
-### Öne Çıkan Özellikler
-
-#### 1. Arka Planda Sessiz Link Çözümleme
-Geri sayım sayaçlarını, geçiş reklamlarını ve aracı kapı sayfalarını otomatik olarak atlayın. Lincle, sayfa komut dizilerini ve ağ yönlendirmelerini anlık analiz ederek henüz siz sayfaya girmeden asıl hedef adresi bulur ve yönlendirir.
-
-#### 2. Popup & Modal Kalkanı
-Otel, konaklama ve reklam sitelerindeki agresif açılır pencereleri ve kaydırma (scroll) kilitlerini kırar. Görünmez katmanlar veya modal pencereler nedeniyle sayfa kilitlendiğinde, 3 aşamalı kalkan mekanizması sayfa fonksiyonlarını bozmadan kaydırma özgürlüğünüzü geri verir.
-
-#### 3. Özel Tema Motoru ve HEX Kod Düzenleyici
-Lincle arayüzünü kendi tarzınıza göre renklendirin. 6 hazır tema konseptinden (Cyberpunk Dark, Clean Light, Nordic Slate, Emerald Matrix, Sunset Amber, Dracula Violet) birini seçebilir veya HEX kod girdili gelişmiş renk paletiyle kendi temalarınızı oluşturabilirsiniz. Tek tıkla "Otomatik Tonlama" yaparak uyumlu renkler üretebilir, temalarınızı kütüphaneye kaydedebilir ve JSON olarak dışa/içe aktarabilirsiniz.
-
-#### 4. Vektörel SVG Bayraklı 14 Dil Desteği
-İşletim sistemi kısıtlamalarından bağımsız, tüm platformlarda sorunsuz görünen SVG vektör bayraklarıyla 14 dünya dili desteklenmektedir: İngilizce, Türkçe, Almanca, Fransızca, İspanyolca, Portekizce, İtalyanca, Rusça, Danimarkaca, Japonca, Çince, Korece, Arapça ve Lehçe.
-
-#### 5. Toplu Link Çözümleyici (Bulk Resolver)
-Onlarca kısaltılmış bağlantıyı tek seferde temizleyin. Bağlantı listenizi yapıştırın; Lincle tek bir yeni sekme bile açmadan tüm hedefleri arka planda eşzamanlı olarak çözümler.
-
-#### 6. Yönlendirme Zinciri İzleyici (Breadcrumb)
-Bir bağlantının nihai hedefe ulaşmadan önce geçtiği tüm ara sunucu ve yönlendirme adımlarını haritalandırır. Güvenlik analizleri ve şüpheli bağlantı tespiti için idealdir.
-
-#### 7. Tam Gizlilik ve Yerel Çalışma
-İnternet gezinti verileriniz tamamen size aittir. Lincle %100 yerel depolama üzerinde çalışır. Çözümleme işlemlerinin hiçbir aşamasında harici sunucu, bulut işleme veya telemetri takibi yapılmaz.
-
----
+- **Kısaltılmış Linkleri ve Bekleme Sayfalarını Atlar**: Arka planda çalışarak sizi aracı reklam sayfalarında bekletmeden doğrudan asıl hedef adrese ulaştırır.
+- **Açılır Pencere ve Sayfa Kilitlerini Kaldırır**: Otel, rezervasyon veya haber sitelerinde ekranı kaplayan görünmez katmanları temizler ve kilitlenen sayfa kaydırmasını (scroll) otomatik olarak açar.
+- **Özel Tema Düzenleyici**: Eklenti arayüzünü 6 farklı hazır tema ile kullanabilir ya da HEX renk girdileri ve tek tıkla otomatik tonlama mekanizmasını kullanarak kendi özel temanızı tasarlayabilirsiniz.
+- **Toplu Link Çözümleyici**: Birden fazla kısaltılmış bağlantıyı tek seferde yapıştırıp sekmelerle boğuşmadan arka planda toplu olarak temizleyebilirsiniz.
+- **Yönlendirme Zinciri İzleyici**: Bir linkin son adrese ulaşana kadar hangi ara sunuculardan ve yönlendirmelerden geçtiğini adım adım görüntüleyebilirsiniz.
+- **14 Farklı Dil Desteği**: SVG vektör bayraklarıyla desteklenen 14 farklı dilde tam yerelleştirme sunar.
+- **%100 Yerel ve Gizli**: Telemetri takibi yok, veri toplama yok, harici sunucu bağımlılığı yok.
 
 ### Kurulum Rehberi
 
 #### Chromium Tarayıcılar (Chrome, Brave, Edge, Opera)
-1. Adres çubuğuna `chrome://extensions/` yazın.
-2. Sağ üstteki **Geliştirici modu** anahtarını açın.
+1. Tarayıcınızda `chrome://extensions/` adresine gidin.
+2. Sağ üstteki **Geliştirici modu** seçeneğini açın.
 3. **Paketlenmemiş öğe yükle** butonuna tıklayarak `lincle` klasörünü seçin.
 
 #### Mozilla Firefox
-1. Adres çubuğuna `about:debugging#/runtime/this-firefox` yazın.
+1. Tarayıcınızda `about:debugging#/runtime/this-firefox` adresine gidin.
 2. **Geçici Eklenti Yükle...** butonuna tıklayın.
 3. `lincle` klasöründeki `manifest.json` dosyasını seçin.
 
+#### Apple Safari (macOS)
+1. Safari Ayarlarını açıp **İleri Düzey** sekmesine gidin.
+2. **Geliştirme menüsünü menü çubuğunda göster** seçeneğini işaretleyin.
+3. **Geliştirme** menüsünden **İmzasız Eklentilere İzin Ver** seçeneğini aktifleştirin.
+4. `lincle` klasörünü yükleyin.
+
 ---
 
-**Developed by** [Emir Samed (Nyxa48)](https://github.com/Nyxa48)
+Created by **[Emir Samed (Nyxa48)](https://github.com/Nyxa48)** &middot; Contact: [nyxa4807@gmail.com](mailto:nyxa4807@gmail.com)
