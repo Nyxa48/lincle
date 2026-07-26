@@ -1,4 +1,4 @@
-// Lincle Resolver v2.5 - Cross-Browser, Multi-Language, Hardened
+// Lincle Resolver v3.5 - Cross-Browser, Multi-Language, Hardened
 // Developed by: Emir Samed (Nyxa48)
 const lincleStartTime = performance.now();
 

@@ -1,4 +1,4 @@
-// Lincle Background Service Worker v3.0
+// Lincle Background Service Worker v3.5
 // Developed by: Emir Samed (Nyxa48)
 //
 // This background script runs in the extension context. It manages:
