@@ -326,7 +326,7 @@
         <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
-        <label style="font-weight:700;margin-bottom:8px">Hazir Temalar (Presets)</label>
+        <label style="font-weight:700;margin-bottom:8px" data-i18n="themePresetTitle">Hazir Temalar (Presets)</label>
         <div class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
           <button class="preset-btn active" data-preset="dark">
             <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00caf5"></span>
@@ -356,16 +356,16 @@
 
         <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-            <label style="font-weight:700;margin:0">Ozel Tema Kutuphanesi & Duzenleyici</label>
+            <label style="font-weight:700;margin:0" data-i18n="themeCustomTitle">Ozel Tema Kutuphanesi & Duzenleyici</label>
             <button class="btn" id="btnToggleCustom" style="padding:4px 10px;font-size:11px;">
               <svg width="12" height="12"><use href="#ic-palette"/></svg>
-              <span>Renk Duzenleyici</span>
+              <span data-i18n="themeEditorBtn">Renk Duzenleyici</span>
             </button>
           </div>
 
           <div id="savedThemesWrapper" style="margin-bottom:12px;display:flex;gap:8px;">
             <select id="savedThemesSelect" style="flex:1;">
-              <option value="">-- Kayitli Ozel Temalarim --</option>
+              <option value="" data-i18n="themeSavedSelect">-- Kayitli Ozel Temalarim --</option>
             </select>
             <button class="btn btn-danger" id="btnDeleteCustomTheme" title="Secili Temayi Sil" style="padding:8px 12px;display:none;">
               <svg width="14" height="14"><use href="#ic-trash"/></svg>
@@ -373,28 +373,28 @@
           </div>
 
           <div id="customColorSection" style="display:none;background:var(--surface2);border:1px solid var(--border);padding:14px;border-radius:10px;margin-bottom:14px;">
-            <label for="themeNameInput" style="font-size:12px;font-weight:600;">Tema Ismi:</label>
-            <input type="text" id="themeNameInput" value="Benim Ozel Temam" placeholder="Tema Ismi..." style="margin-bottom:12px;">
+            <label for="themeNameInput" style="font-size:12px;font-weight:600;" data-i18n="themeNameLabel">Tema Ismi:</label>
+            <input type="text" id="themeNameInput" value="Neo Custom" data-i18n-ph="themeNameDefault" placeholder="Theme Name..." style="margin-bottom:12px;">
 
-            <label style="font-size:12px;font-weight:600;margin-bottom:6px;">Renk Paleti:</label>
+            <label style="font-size:12px;font-weight:600;margin-bottom:6px;" data-i18n="themePaletteLabel">Renk Paleti:</label>
             <div class="color-grid" id="colorGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
               <!-- Populated by JS -->
             </div>
 
             <button class="btn btn-primary" id="btnSaveCustomTheme" style="width:100%;">
               <svg width="14" height="14"><use href="#ic-save"/></svg>
-              <span>Temayi Kutuphaneye Kaydet</span>
+              <span data-i18n="themeSaveBtn">Temayi Kutuphaneye Kaydet</span>
             </button>
           </div>
 
           <div class="btn-group">
             <button class="btn" id="btnExportTheme">
               <svg width="14" height="14"><use href="#ic-download"/></svg>
-              <span data-i18n="themeExport">Temayi Disari Aktar (JSON)</span>
+              <span data-i18n="themeExportBtn">Temayi Disari Aktar (JSON)</span>
             </button>
             <button class="btn" id="btnImportTheme">
               <svg width="14" height="14"><use href="#ic-upload"/></svg>
-              <span data-i18n="themeImport">Tema Ice Aktar (JSON)</span>
+              <span data-i18n="themeImportBtn">Tema Ice Aktar (JSON)</span>
             </button>
           </div>
         </div>

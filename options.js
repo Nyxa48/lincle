@@ -103,7 +103,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function populateSavedThemes() {
         const savedList = await lincleGetSavedThemes();
         if (!savedSelect) return;
-        savedSelect.innerHTML = '<option value="">-- My Saved Custom Themes --</option>';
+        const langData = await ext.storage.local.get("lincleLang");
+        const lang = langData.lincleLang || 'en';
+        const dict = (typeof lincleDict !== 'undefined' && lincleDict[lang]) ? lincleDict[lang] : (lincleDict['en'] || {});
+        const defaultLabel = dict.themeSavedSelect || '-- My Saved Custom Themes --';
+
+        savedSelect.innerHTML = `<option value="" data-i18n="themeSavedSelect">${defaultLabel}</option>`;
         savedList.forEach(t => {
             const opt = document.createElement('option');
             opt.value = t.id;
