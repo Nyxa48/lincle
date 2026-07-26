@@ -545,7 +545,7 @@ const lincleStartTime = performance.now();
                 let el = document.getElementById("lincle-banner");
                 if (el) {
                     el.innerHTML = `Lincle: Otomatik atlanamadı. 
-            <button id="lincle-report-btn" style="background:#d63031;color:white;border:none;border-radius:4px;padding:4px 8px;margin-left:10px;cursor:pointer;font-weight:bold;">🐞 Bunu Raporla</button>`;
+            <button id="lincle-report-btn" style="background:#d63031;color:white;border:none;border-radius:4px;padding:4px 8px;margin-left:10px;cursor:pointer;font-weight:bold;">Bunu Raporla</button>`;
 
                     document.getElementById('lincle-report-btn').addEventListener('click', async () => {
                         // Sitedeki hangi kelimeler bizim listemizle eşleşti?
@@ -566,7 +566,7 @@ const lincleStartTime = performance.now();
                         failures.push(report);
                         await ext.storage.local.set({ lincleFailures: failures });
 
-                        el.innerHTML = "✅ Rapor yerel olarak kaydedildi. Lütfen Ayarlar'dan geliştiriciye iletin.";
+                        el.innerHTML = "Rapor yerel olarak kaydedildi. Lütfen Ayarlar'dan geliştiriciye iletin.";
                         setTimeout(() => el.remove(), 4000);
                     });
                 }

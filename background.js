@@ -45,14 +45,16 @@ ext.storage.onChanged.addListener((changes) => {
     }
 });
 
-// Sekme hareketlerini (Görünmez HTTP yönlendirmeleri dahil) kaydet
-ext.webNavigation.onCommitted.addListener((details) => {
-    if (!breadcrumbsEnabled || details.frameId !== 0) return; // Sadece ana sayfayı ve izin varsa kaydet
+// ─── Breadcrumb Tracker ──────────────────────────────────────────────────
+ext.webNavigation.onBeforeNavigate.addListener(async (details) => {
+    if (details.frameId !== 0) return; // Only top-level frame
+    const opts = (await ext.storage.local.get("lincleOptions")).lincleOptions || {};
+    if (!opts.enableBreadcrumbs) return;
 
     if (!tabBreadcrumbs[details.tabId]) tabBreadcrumbs[details.tabId] = [];
     
     // Geçiş tipi (Örn: server_redirect, client_redirect, link)
-    const transition = (details.transitionQualifiers || []).includes("server_redirect") ? "⚡ Sunucu Yönlendirmesi" : "🖱️ Sayfa Yüklemesi";
+    const transition = (details.transitionQualifiers || []).includes("server_redirect") ? "Sunucu Yonlendirmesi" : "Sayfa Yuklemesi";
 
     tabBreadcrumbs[details.tabId].push({
         time: new Date().toLocaleTimeString('tr-TR'),

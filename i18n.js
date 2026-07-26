@@ -8,8 +8,17 @@ const lincleDict = {
     tr: {
         // Genel
         themeDark: "Koyu Mod", themeLight: "Açık Mod",
+        // Tema
+        themeTitle: "Tema & Görünüm",
+        themePresetDark: "Koyu", themePresetLight: "Açık", themePresetCustom: "Özel",
+        themeExport: "Temayı Dışa Aktar", themeImport: "Tema İçe Aktar",
+        themeBg: "Arkaplan", themeSurface: "Yüzey", themePrimary: "Vurgu Rengi",
+        themeGreen: "Başarı", themeRed: "Hata", themeText: "Metin",
+        themeTextDim: "Soluk Metin", themeBorder: "Kenarlık",
         // Popup
         popShield: "Koruma Kalkanı", popCleaned: "Temizlenen", popSaved: "Tasarruf",
+        popMaster: "Genel Lincle Koruması", popShieldToggle: "Popup & Modal Kalkanı",
+        popMasterHint: "Tüm sistemi aç/kapat", popShieldHint: "Görünmez engelleri kırar",
         btnCleanClip: "Panoyu Temizle", btnAdvSet: "Gelişmiş Ayarlar",
         clipNoLink: "Panoda geçerli bir bağlantı bulunamadı.",
         clipSearch: "Bağlantı arka planda çözümleniyor...",
@@ -51,7 +60,15 @@ const lincleDict = {
     },
     en: {
         themeDark: "Dark Mode", themeLight: "Light Mode",
+        themeTitle: "Theme & Appearance",
+        themePresetDark: "Dark", themePresetLight: "Light", themePresetCustom: "Custom",
+        themeExport: "Export Theme", themeImport: "Import Theme",
+        themeBg: "Background", themeSurface: "Surface", themePrimary: "Accent",
+        themeGreen: "Success", themeRed: "Error", themeText: "Text",
+        themeTextDim: "Muted Text", themeBorder: "Border",
         popShield: "Protection Shield", popCleaned: "Cleaned", popSaved: "Saved",
+        popMaster: "Master Protection", popShieldToggle: "Popup & Modal Shield",
+        popMasterHint: "Toggle entire engine", popShieldHint: "Bypasses overlays & scroll locks",
         btnCleanClip: "Clean Clipboard", btnAdvSet: "Advanced Settings",
         clipNoLink: "No valid link found in clipboard.",
         clipSearch: "Resolving link in background...",

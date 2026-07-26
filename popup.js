@@ -1,40 +1,58 @@
-// Lincle Popup UI v2.7
+// Lincle Popup UI v3.0
 // Developed by: Emir Samed (Nyxa48)
 const ext = (typeof browser !== "undefined") ? browser : chrome;
 
 document.addEventListener('DOMContentLoaded', initUI);
 
 async function initUI() {
-    // ── Language ───────────────────────────────────────────────────────────
+    // ── Language ─────────────────────────────────────────────────────────
     const langData = await ext.storage.local.get("lincleLang");
     const currentLang = langData.lincleLang || 'en';
     await applyTranslations();
 
-    // ── Theme ──────────────────────────────────────────────────────────────
-    const themeData = await ext.storage.local.get("lincleTheme");
-    let theme = themeData.lincleTheme || 'dark';
-    applyTheme(theme);
+    // ── Theme (via theme-engine.js) ─────────────────────────────────────
+    let currentTheme = await lincleLoadTheme();
+    updateThemeIcon(currentTheme);
 
     document.getElementById('themeToggleBtn').addEventListener('click', async () => {
-        theme = theme === 'dark' ? 'light' : 'dark';
-        await ext.storage.local.set({ lincleTheme: theme });
-        applyTheme(theme);
+        currentTheme = await lincleCycleTheme();
+        updateThemeIcon(currentTheme);
     });
 
-    // ── Master toggle ──────────────────────────────────────────────────────
+    // ── Master toggle & Shield toggle ───────────────────────────────────
     const masterToggle  = document.getElementById('masterToggle');
+    const shieldToggle  = document.getElementById('shieldToggle');
     const settingsData  = await ext.storage.local.get("lincleSettings");
-    const isActive      = (settingsData.lincleSettings || {}).isActive !== false;
-    masterToggle.checked = isActive;
-    updateShieldUI(isActive, currentLang);
+    const optionsData   = await ext.storage.local.get("lincleOptions");
 
-    masterToggle.addEventListener('change', async (e) => {
-        const active = e.target.checked;
-        await ext.storage.local.set({ lincleSettings: { isActive: active } });
-        updateShieldUI(active, currentLang);
-    });
+    const isActive       = (settingsData.lincleSettings || {}).isActive !== false;
+    const isShieldActive = (optionsData.lincleOptions || {}).enablePopupShield !== false;
 
-    // ── Stats ──────────────────────────────────────────────────────────────
+    if (masterToggle) masterToggle.checked = isActive;
+    if (shieldToggle) shieldToggle.checked = isShieldActive;
+    updateShieldUI(isActive && isShieldActive, currentLang);
+
+    if (masterToggle) {
+        masterToggle.addEventListener('change', async (e) => {
+            const active = e.target.checked;
+            await ext.storage.local.set({ lincleSettings: { isActive: active } });
+            const curOpts = (await ext.storage.local.get("lincleOptions")).lincleOptions || {};
+            updateShieldUI(active && (curOpts.enablePopupShield !== false), currentLang);
+        });
+    }
+
+    if (shieldToggle) {
+        shieldToggle.addEventListener('change', async (e) => {
+            const on = e.target.checked;
+            const curOpts = (await ext.storage.local.get("lincleOptions")).lincleOptions || {};
+            curOpts.enablePopupShield = on;
+            await ext.storage.local.set({ lincleOptions: curOpts });
+            const curSettings = (await ext.storage.local.get("lincleSettings")).lincleSettings || {};
+            updateShieldUI((curSettings.isActive !== false) && on, currentLang);
+        });
+    }
+
+    // ── Stats ────────────────────────────────────────────────────────────
     const statsData = await ext.storage.local.get("lincleStats");
     const stats     = statsData.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
     const isTr      = currentLang === 'tr';
@@ -45,18 +63,18 @@ async function initUI() {
     setEl('valLinks', (stats.cleanedLinks || 0).toLocaleString());
     setEl('valTime',  timeText);
 
-    // ── Version line ───────────────────────────────────────────────────────
+    // ── Version ──────────────────────────────────────────────────────────
     try {
         const v = ext.runtime.getManifest().version;
-        setEl('shieldVersion', `v${v} · Lincle`);
+        setEl('shieldVersion', `v${v}`);
     } catch { /* non-fatal */ }
 
-    // ── Clipboard cleaner ──────────────────────────────────────────────────
+    // ── Clipboard cleaner ────────────────────────────────────────────────
     const dict          = getLangDict(currentLang);
     const cleanClipBtn  = document.getElementById('cleanClipBtn');
     const clipResult    = document.getElementById('clipResult');
 
-    function showToast(text, type /* success|error|info|'' */) {
+    function showToast(text, type) {
         clipResult.textContent  = text;
         clipResult.className    = 'show ' + type;
         clearTimeout(clipResult._timer);
@@ -71,7 +89,7 @@ async function initUI() {
         const urlMatch = clipText.match(/https?:\/\/[^\s"'<>]+/);
         if (!urlMatch) { showToast(dict.clipNoLink || 'No valid link found.', 'error'); return; }
 
-        showToast(dict.clipSearch || 'Resolving…', 'info');
+        showToast(dict.clipSearch || 'Resolving...', 'info');
 
         try {
             const ctrl = new AbortController();
@@ -91,27 +109,32 @@ async function initUI() {
             }
             if (found) {
                 await navigator.clipboard.writeText(found);
-                showToast(`✓ ${found}`, 'success');
+                showToast(`${found}`, 'success');
             } else {
                 showToast(dict.clipFail || 'No static target found.', 'error');
             }
         } catch { showToast(dict.clipFail || 'Could not resolve.', 'error'); }
     });
 
-    // ── Open options ───────────────────────────────────────────────────────
+    // ── Open options ─────────────────────────────────────────────────────
     const openOpts = () => ext.runtime.openOptionsPage
         ? ext.runtime.openOptionsPage()
         : ext.tabs.create({ url: ext.runtime.getURL('options.html') });
-    document.getElementById('openOptions').addEventListener('click', openOpts);
-    document.getElementById('openOptions2').addEventListener('click', openOpts);
+    const btnOpt = document.getElementById('openOptions');
+    if (btnOpt) btnOpt.addEventListener('click', openOpts);
 }
 
-function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
+// ── Theme Icon Updater ──────────────────────────────────────────────────
+function updateThemeIcon(themeObj) {
     const use = document.querySelector('#themeIcon use');
-    if (use) use.setAttribute('href', theme === 'dark' ? '#ic-sun' : '#ic-moon');
+    if (!use) return;
+    const preset = lincleGetPresetName(themeObj);
+    if (preset === 'dark')        use.setAttribute('href', '#ic-moon');
+    else if (preset === 'light')  use.setAttribute('href', '#ic-sun');
+    else                          use.setAttribute('href', '#ic-palette');
 }
 
+// ── Shield UI Updater ───────────────────────────────────────────────────
 function updateShieldUI(active, lang) {
     const card       = document.getElementById('shieldCard');
     const iconWrap   = document.getElementById('shieldIconWrap');
@@ -119,8 +142,6 @@ function updateShieldUI(active, lang) {
     const statusEl   = document.getElementById('shieldStatus');
     const statusText = document.getElementById('shieldStatusText');
     const dot        = document.getElementById('statusDot');
-    const hint       = document.getElementById('powerHint');
-    const dict       = getLangDict(lang);
 
     if (card)      card.className      = 'shield-card' + (active ? '' : ' off');
     if (iconWrap)  iconWrap.className  = 'shield-icon-wrap' + (active ? '' : ' off');
@@ -130,12 +151,9 @@ function updateShieldUI(active, lang) {
     }
     if (statusEl)   statusEl.className  = 'shield-status' + (active ? '' : ' off');
     if (statusText) statusText.textContent = active
-        ? (lang === 'tr' ? 'Aktif — izleyiciler engellendi' : 'Active — blocking trackers')
-        : (lang === 'tr' ? 'Devre Dışı' : 'Disabled');
+        ? (lang === 'tr' ? 'Aktif' : 'Active')
+        : (lang === 'tr' ? 'Devre Disi' : 'Disabled');
     if (dot)  dot.className  = 'status-dot' + (active ? '' : ' off');
-    if (hint) hint.textContent = active
-        ? (lang === 'tr' ? 'Devre dışı bırakmak için tıkla' : 'Tap to disable')
-        : (lang === 'tr' ? 'Etkinleştirmek için tıkla'       : 'Tap to enable');
 }
 
 function getLangDict(lang) {

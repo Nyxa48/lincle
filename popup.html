@@ -4,67 +4,61 @@
   <meta charset="UTF-8">
   <style>
     :root {
-      --bg:          #13131c;
-      --surface:     #1c1c2a;
-      --surface2:    #252538;
-      --border:      #2e2e48;
+      --bg:          #11111a;
+      --surface:     #1a1a28;
+      --surface2:    #232336;
+      --border:      #2e2e46;
       --primary:     #00caf5;
-      --primary-dim: rgba(0,202,245,0.10);
-      --primary-glow:rgba(0,202,245,0.25);
+      --primary-dim: rgba(0,202,245,0.12);
+      --primary-glow:rgba(0,202,245,0.30);
       --green:       #2ecc71;
-      --green-dim:   rgba(46,204,113,0.10);
+      --green-dim:   rgba(46,204,113,0.12);
       --red:         #e74c3c;
-      --red-dim:     rgba(231,76,60,0.10);
-      --amber:       #f39c12;
-      --text:        #e4e4f0;
-      --text-dim:    #7070a0;
-      --radius:      12px;
-      --radius-sm:   8px;
-    }
-    [data-theme="light"] {
-      --bg:          #f2f2fc;
-      --surface:     #ffffff;
-      --surface2:    #eaeaf8;
-      --border:      #d4d4ee;
-      --primary-dim: rgba(0,150,210,0.08);
-      --text:        #18182e;
-      --text-dim:    #6060a0;
+      --red-dim:     rgba(231,76,60,0.12);
+      --text:        #ededf8;
+      --text-dim:    #8080b0;
+      --radius:      14px;
+      --radius-sm:   10px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 340px;
-      font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+      width: 360px;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       font-size: 13px;
       background: var(--bg);
       color: var(--text);
-      padding: 14px;
+      padding: 18px;
       user-select: none;
     }
-
-    /* ── SVG icon helper ── */
-    .ic {
-      display: inline-flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .ic svg { display: block; }
 
     /* ── Header ── */
     .header {
       display: flex; align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
-    .logo { display: flex; align-items: center; gap: 9px; }
+    .logo { display: flex; align-items: center; gap: 10px; }
     .logo-icon {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: linear-gradient(135deg, #00caf5 0%, #0074c2 100%);
+      width: 34px; height: 34px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--primary) 0%, #0074c2 100%);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 10px rgba(0,202,245,0.30);
+      box-shadow: 0 3px 12px var(--primary-glow);
     }
     .logo-icon svg { color: #fff; }
-    .logo-text { font-size: 16px; font-weight: 800; color: var(--primary); letter-spacing: -0.3px; }
-    .logo-sub   { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
-    .header-actions { display: flex; gap: 5px; align-items: center; }
+    .logo-text { font-size: 17px; font-weight: 800; color: var(--primary); letter-spacing: -0.4px; }
+    .logo-sub  { font-size: 10px; color: var(--text-dim); margin-top: 1px; letter-spacing: 0.2px; }
+    .header-actions { display: flex; gap: 5px; }
+
+    /* ── Icon button ── */
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text-dim); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .icon-btn:hover { background: var(--primary-dim); color: var(--primary); border-color: var(--primary); }
+    .icon-btn:active { transform: scale(0.93); }
 
     /* ── Toggle switch ── */
     .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
@@ -77,174 +71,155 @@
       content: ''; position: absolute;
       width: 16px; height: 16px; border-radius: 50%;
       background: #fff; top: 3px; left: 3px; transition: transform .2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,.3);
+      box-shadow: 0 1px 4px rgba(0,0,0,.35);
     }
     input:checked + .slider { background: var(--green); }
     input:checked + .slider::before { transform: translateX(18px); }
 
-    /* ── Icon button ── */
-    .icon-btn {
-      width: 30px; height: 30px; border-radius: var(--radius-sm);
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text-dim); cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background .15s, color .15s, border-color .15s;
-    }
-    .icon-btn:hover {
-      background: var(--primary-dim); color: var(--primary);
-      border-color: var(--primary);
-    }
-
-    /* ── Shield status card ── */
+    /* ── Shield card ── */
     .shield-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 11px 14px;
-      margin-bottom: 10px;
-      display: flex; align-items: center; gap: 12px;
+      padding: 14px 15px;
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 13px;
       position: relative; overflow: hidden;
     }
     .shield-card::before {
       content: '';
       position: absolute; top: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, var(--primary), transparent);
-      border-radius: var(--radius) var(--radius) 0 0;
-      transition: background .3s;
     }
     .shield-card.off::before { background: linear-gradient(90deg, var(--red), transparent); }
     .shield-icon-wrap {
-      width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+      width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0;
       background: var(--primary-dim); border: 1px solid var(--primary-glow);
       display: flex; align-items: center; justify-content: center;
-      color: var(--primary); transition: all .3s;
+      color: var(--primary); transition: all .25s;
     }
-    .shield-icon-wrap.off {
-      background: var(--red-dim); border-color: rgba(231,76,60,.25);
-      color: var(--red);
-    }
+    .shield-icon-wrap.off { background: var(--red-dim); border-color: rgba(231,76,60,.30); color: var(--red); }
     .shield-info { flex: 1; min-width: 0; }
-    .shield-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .6px; }
+    .shield-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .6px; font-weight: 600; }
     .shield-status {
-      font-size: 15px; font-weight: 700; color: var(--green);
-      margin: 1px 0; display: flex; align-items: center; gap: 5px;
+      font-size: 14px; font-weight: 700; color: var(--green);
+      margin: 2px 0; display: flex; align-items: center; gap: 6px;
     }
     .shield-status.off { color: var(--red); }
     .status-dot {
       width: 7px; height: 7px; border-radius: 50%;
       background: var(--green); flex-shrink: 0;
-      box-shadow: 0 0 6px var(--green);
+      box-shadow: 0 0 7px var(--green);
       animation: pulse 2s infinite;
     }
-    .status-dot.off { background: var(--red); box-shadow: 0 0 6px var(--red); animation: none; }
+    .status-dot.off { background: var(--red); box-shadow: 0 0 7px var(--red); animation: none; }
     @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(0.85)} }
-    .shield-version { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+    .shield-version { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
 
-    /* ── Stats grid ── */
-    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 10px; }
-    .stat-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 10px 11px;
+    /* ── Toggle rows ── */
+    .toggles { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .toggle-row {
       display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: var(--radius-sm);
+      background: var(--surface2); border: 1px solid var(--border);
+      cursor: pointer; transition: border-color .15s;
     }
-    .stat-icon {
-      width: 34px; height: 34px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+    .toggle-row:hover { border-color: var(--primary-glow); }
+    .toggle-row svg { color: var(--text-dim); flex-shrink: 0; }
+    .toggle-info { flex: 1; min-width: 0; }
+    .toggle-label { font-size: 12.5px; font-weight: 600; }
+    .toggle-hint  { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+
+    /* ── Stats ── */
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 11px 13px;
+      display: flex; align-items: center; gap: 11px;
     }
-    .stat-icon.blue  { background: var(--primary-dim); color: var(--primary); }
-    .stat-icon.green { background: var(--green-dim);   color: var(--green);   }
-    .stat-text { min-width: 0; }
-    .stat-value { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1.1; }
-    .stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .4px; margin-top: 1px; white-space: nowrap; }
+    .stat-ic {
+      width: 36px; height: 36px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .stat-ic.blue  { background: var(--primary-dim); color: var(--primary); }
+    .stat-ic.green { background: var(--green-dim);   color: var(--green); }
+    .stat-val { font-size: 19px; font-weight: 800; line-height: 1.1; }
+    .stat-lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .4px; font-weight: 600; margin-top: 1px; }
 
-    /* ── Divider ── */
-    .divider { height: 1px; background: var(--border); margin: 10px 0; }
-
-    /* ── Action buttons ── */
-    .actions { display: flex; gap: 7px; }
-    .btn {
-      flex: 1; padding: 9px 10px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); background: var(--surface);
-      color: var(--text); font-size: 12px; font-weight: 600;
+    /* ── Action button ── */
+    .action-btn {
+      width: 100%; padding: 11px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--primary); background: var(--primary);
+      color: #0a0a14; font-size: 13px; font-weight: 700;
       cursor: pointer; display: flex; align-items: center;
-      justify-content: center; gap: 6px;
-      transition: background .15s, border-color .15s, color .15s;
-      white-space: nowrap;
+      justify-content: center; gap: 7px;
+      transition: all .15s; box-shadow: 0 3px 10px var(--primary-glow);
     }
-    .btn:hover { background: var(--primary-dim); border-color: var(--primary); color: var(--primary); }
-    .btn.primary { background: var(--primary); color: #0a0a14; border-color: var(--primary); font-weight: 700; }
-    .btn.primary:hover { background: #00b5dc; border-color: #00b5dc; color: #0a0a14; }
+    .action-btn:hover { background: #00b5dc; border-color: #00b5dc; transform: translateY(-1px); }
+    .action-btn:active { transform: translateY(0); }
 
-    /* ── Toast / result ── */
+    /* ── Toast ── */
     #clipResult {
       margin-top: 8px; padding: 9px 11px;
-      border-radius: var(--radius-sm); font-size: 11px;
+      border-radius: var(--radius-sm); font-size: 11.5px; font-weight: 600;
       display: none; border: 1px solid var(--border);
       background: var(--surface2); color: var(--text-dim);
       word-break: break-all; line-height: 1.5;
-      display: none;
     }
     #clipResult.show { display: block; }
     #clipResult.success { border-color: var(--green); color: var(--green); background: var(--green-dim); }
-    #clipResult.error   { border-color: var(--red);   color: var(--red);   background: var(--red-dim);  }
+    #clipResult.error   { border-color: var(--red);   color: var(--red);   background: var(--red-dim); }
     #clipResult.info    { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
-
-    /* ── Toggle label (power row) ── */
-    .power-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 7px 10px; border-radius: var(--radius-sm);
-      background: var(--surface2); border: 1px solid var(--border);
-      margin-bottom: 10px; cursor: pointer;
-    }
-    .power-row-label { flex: 1; font-size: 12px; font-weight: 600; }
-    .power-row-hint  { font-size: 10px; color: var(--text-dim); }
   </style>
 </head>
 <body>
+
   <!-- SVG sprite -->
   <div style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
-    <svg xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <symbol id="ic-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
-        </symbol>
-        <symbol id="ic-shield-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>
-        </symbol>
-        <symbol id="ic-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-        </symbol>
-        <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </symbol>
-        <symbol id="ic-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-          <rect x="8" y="2" width="8" height="4" rx="1"/>
-        </symbol>
-        <symbol id="ic-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </symbol>
-        <symbol id="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </symbol>
-        <symbol id="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </symbol>
-        <symbol id="ic-power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>
-        </symbol>
-        <symbol id="ic-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-        </symbol>
-      </defs>
-    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg"><defs>
+      <symbol id="ic-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
+      </symbol>
+      <symbol id="ic-shield-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>
+      </symbol>
+      <symbol id="ic-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      </symbol>
+      <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </symbol>
+      <symbol id="ic-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+        <rect x="8" y="2" width="8" height="4" rx="1"/>
+      </symbol>
+      <symbol id="ic-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </symbol>
+      <symbol id="ic-power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>
+      </symbol>
+      <!-- Theme icons -->
+      <symbol id="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </symbol>
+      <symbol id="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </symbol>
+      <symbol id="ic-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+        <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/>
+        <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/>
+        <circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/>
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.52-4.48-9.96-10-9.94z"/>
+      </symbol>
+    </defs></svg>
   </div>
 
   <!-- ── Header ── -->
@@ -255,20 +230,20 @@
       </div>
       <div>
         <div class="logo-text">Lincle</div>
-        <div class="logo-sub">Link Cleaner &amp; Ad Bypass</div>
+        <div class="logo-sub">Link Cleaner & Ad Bypass</div>
       </div>
     </div>
     <div class="header-actions">
-      <button class="icon-btn" id="themeToggleBtn" title="Switch theme">
+      <button class="icon-btn" id="themeToggleBtn" title="Theme">
         <svg width="15" height="15" id="themeIcon"><use href="#ic-moon"/></svg>
       </button>
-      <button class="icon-btn" id="openOptions" title="Open Settings">
+      <button class="icon-btn" id="openOptions" title="Settings">
         <svg width="15" height="15"><use href="#ic-settings"/></svg>
       </button>
     </div>
   </div>
 
-  <!-- ── Shield Status Card ── -->
+  <!-- ── Shield Card ── -->
   <div class="shield-card" id="shieldCard">
     <div class="shield-icon-wrap" id="shieldIconWrap">
       <svg width="22" height="22" id="shieldSvg"><use href="#ic-shield-check"/></svg>
@@ -277,63 +252,66 @@
       <div class="shield-label" data-i18n="popShield">Protection Shield</div>
       <div class="shield-status" id="shieldStatus">
         <span class="status-dot" id="statusDot"></span>
-        <span id="shieldStatusText">Active — blocking trackers</span>
+        <span id="shieldStatusText">Active</span>
       </div>
       <div class="shield-version" id="shieldVersion"></div>
     </div>
   </div>
 
-  <!-- ── Master On/Off ── -->
-  <label class="power-row" for="masterToggle">
-    <svg width="16" height="16" style="color:var(--text-dim);flex-shrink:0"><use href="#ic-power"/></svg>
-    <span class="power-row-label">Lincle Protection</span>
-    <span class="power-row-hint" id="powerHint">Tap to disable</span>
-    <label class="switch" style="pointer-events:none">
-      <input type="checkbox" id="masterToggle" checked>
-      <span class="slider"></span>
+  <!-- ── Toggles ── -->
+  <div class="toggles">
+    <label class="toggle-row" for="masterToggle">
+      <svg width="16" height="16"><use href="#ic-power"/></svg>
+      <div class="toggle-info">
+        <div class="toggle-label" data-i18n="popMaster">Master Protection</div>
+        <div class="toggle-hint" id="powerHint" data-i18n="popMasterHint">Toggle entire engine</div>
+      </div>
+      <label class="switch" style="pointer-events:none">
+        <input type="checkbox" id="masterToggle" checked>
+        <span class="slider"></span>
+      </label>
     </label>
-  </label>
+    <label class="toggle-row" for="shieldToggle">
+      <svg width="16" height="16" style="color:var(--primary)"><use href="#ic-shield-check"/></svg>
+      <div class="toggle-info">
+        <div class="toggle-label" data-i18n="popShieldToggle">Popup Shield</div>
+        <div class="toggle-hint" data-i18n="popShieldHint">Bypasses overlays</div>
+      </div>
+      <label class="switch" style="pointer-events:none">
+        <input type="checkbox" id="shieldToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </label>
+  </div>
 
   <!-- ── Stats ── -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-icon blue">
-        <svg width="17" height="17"><use href="#ic-link"/></svg>
-      </div>
-      <div class="stat-text">
-        <div class="stat-value" id="valLinks">0</div>
-        <div class="stat-label" data-i18n="popCleaned">Links Cleaned</div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-ic blue"><svg width="18" height="18"><use href="#ic-link"/></svg></div>
+      <div>
+        <div class="stat-val" id="valLinks">0</div>
+        <div class="stat-lbl" data-i18n="popCleaned">Cleaned</div>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon green">
-        <svg width="17" height="17"><use href="#ic-clock"/></svg>
-      </div>
-      <div class="stat-text">
-        <div class="stat-value" id="valTime">0s</div>
-        <div class="stat-label" data-i18n="popSaved">Time Saved</div>
+    <div class="stat">
+      <div class="stat-ic green"><svg width="18" height="18"><use href="#ic-clock"/></svg></div>
+      <div>
+        <div class="stat-val" id="valTime">0s</div>
+        <div class="stat-lbl" data-i18n="popSaved">Saved</div>
       </div>
     </div>
   </div>
 
-  <div class="divider"></div>
+  <!-- ── Action ── -->
+  <button class="action-btn" id="cleanClipBtn">
+    <svg width="15" height="15"><use href="#ic-clipboard"/></svg>
+    <span data-i18n="btnCleanClip">Clean Clipboard</span>
+  </button>
 
-  <!-- ── Actions ── -->
-  <div class="actions">
-    <button class="btn primary" id="cleanClipBtn">
-      <svg width="14" height="14"><use href="#ic-clipboard"/></svg>
-      <span data-i18n="btnCleanClip">Clean Clipboard Link</span>
-    </button>
-    <button class="btn" id="openOptions2">
-      <svg width="14" height="14"><use href="#ic-settings"/></svg>
-      <span data-i18n="btnAdvSet">Settings</span>
-    </button>
-  </div>
-
-  <!-- Result toast -->
   <div id="clipResult"></div>
 
   <script src="i18n.js"></script>
+  <script src="theme-engine.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
