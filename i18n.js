@@ -1,8 +1,26 @@
-// Lincle i18n Engine v3.5 - 14 Languages with Flags & Proper Script Support
+// Lincle i18n Engine v4.0 - SVG Flags & 14 Languages
 // Developed by: Emir Samed (Nyxa48)
 // Languages: EN (Default), TR, DE, FR, ES, PT, IT, RU, DA, JA, ZH, KO, AR, PL
 
 const _ext = (typeof browser !== "undefined") ? browser : chrome;
+
+// Crisp SVG Vector Flags for 14 Countries (Flawless rendering on Windows, Mac & Mobile)
+const LINCLE_FLAGS = {
+    en: `<svg width="18" height="13" viewBox="0 0 60 30" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="4"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>`,
+    tr: `<svg width="18" height="13" viewBox="0 0 60 40" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="60" height="40" fill="#E30A17"/><circle cx="21" cy="20" r="10" fill="#fff"/><circle cx="23.5" cy="20" r="8" fill="#E30A17"/><polygon points="34,20 27,22.3 29.7,15.5 24.3,19.7 31.7,19.7" fill="#fff"/></svg>`,
+    de: `<svg width="18" height="13" viewBox="0 0 5 3" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#DD0000"/><rect y="2" width="5" height="1" fill="#FFCE00"/></svg>`,
+    fr: `<svg width="18" height="13" viewBox="0 0 3 2" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="1" height="2" fill="#002395"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg>`,
+    es: `<svg width="18" height="13" viewBox="0 0 750 500" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="750" height="500" fill="#c60b1e"/><rect y="125" width="750" height="250" fill="#ffc400"/></svg>`,
+    pt: `<svg width="18" height="13" viewBox="0 0 600 400" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="240" height="400" fill="#046a38"/><rect x="240" width="360" height="400" fill="#da291c"/></svg>`,
+    it: `<svg width="18" height="13" viewBox="0 0 3 2" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="1" height="2" fill="#009246"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ce2b37"/></svg>`,
+    ru: `<svg width="18" height="13" viewBox="0 0 9 6" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="9" height="2" fill="#fff"/><rect y="2" width="9" height="2" fill="#0039a6"/><rect y="4" width="9" height="2" fill="#d52b1e"/></svg>`,
+    da: `<svg width="18" height="13" viewBox="0 0 37 28" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="37" height="28" fill="#c8102e"/><rect x="12" width="4" height="28" fill="#fff"/><rect y="12" width="37" height="4" fill="#fff"/></svg>`,
+    ja: `<svg width="18" height="13" viewBox="0 0 900 600" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="900" height="600" fill="#fff"/><circle cx="450" cy="300" r="180" fill="#bc002d"/></svg>`,
+    zh: `<svg width="18" height="13" viewBox="0 0 30 20" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="30" height="20" fill="#de2910"/><polygon points="5,3 6,6 3,4 7,4 4,6" fill="#ffde00"/></svg>`,
+    ko: `<svg width="18" height="13" viewBox="0 0 3 2" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="3" height="2" fill="#fff"/><circle cx="1.5" cy="1" r="0.5" fill="#cd2e3a"/><path d="M1 1a.5.5 0 0 0 1 0" fill="#0047a0"/></svg>`,
+    ar: `<svg width="18" height="13" viewBox="0 0 3 2" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="3" height="2" fill="#006c35"/><rect x="0.5" y="1.2" width="2" height="0.15" fill="#fff"/></svg>`,
+    pl: `<svg width="18" height="13" viewBox="0 0 16 10" style="border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);flex-shrink:0"><rect width="16" height="5" fill="#fff"/><rect y="5" width="16" height="5" fill="#dc143c"/></svg>`,
+};
 
 const lincleDict = {
     tr: {
@@ -30,6 +48,7 @@ const lincleDict = {
         popShield: "Koruma Kalkanı", popCleaned: "Temizlenen", popSaved: "Tasarruf",
         popMaster: "Genel Lincle Koruması", popShieldToggle: "Popup & Modal Kalkanı",
         popMasterHint: "Tüm sistemi aç/kapat", popShieldHint: "Görünmez engelleri kırar",
+        popActive: "Aktif", popDisabled: "Devre Dışı",
         btnCleanClip: "Panoyu Temizle", btnAdvSet: "Gelişmiş Ayarlar",
         clipNoLink: "Panoda geçerli bir bağlantı bulunamadı.",
         clipSearch: "Bağlantı arka planda çözümleniyor...",
@@ -88,6 +107,7 @@ const lincleDict = {
         popShield: "Protection Shield", popCleaned: "Cleaned", popSaved: "Saved",
         popMaster: "Master Protection", popShieldToggle: "Popup & Modal Shield",
         popMasterHint: "Toggle entire engine", popShieldHint: "Bypasses overlays & scroll locks",
+        popActive: "Active", popDisabled: "Disabled",
         btnCleanClip: "Clean Clipboard", btnAdvSet: "Advanced Settings",
         clipNoLink: "No valid link found in clipboard.",
         clipSearch: "Resolving link in background...",
@@ -145,6 +165,7 @@ const lincleDict = {
         popShield: "Schutzschild", popCleaned: "Gereinigt", popSaved: "Gespart",
         popMaster: "Hauptschutz", popShieldToggle: "Popup-Schutzschild",
         popMasterHint: "Gesamtes System umschalten", popShieldHint: "Umggeht Overlays",
+        popActive: "Aktiv", popDisabled: "Deaktiviert",
         btnCleanClip: "Zwischenablage bereinigen", btnAdvSet: "Erweiterte Einstellungen",
         clipNoLink: "Kein gültiger Link in der Zwischenablage.",
         clipSearch: "Link wird im Hintergrund aufgelöst...",
@@ -202,6 +223,7 @@ const lincleDict = {
         popShield: "Bouclier de protection", popCleaned: "Nettoyé", popSaved: "Économisé",
         popMaster: "Protection Principale", popShieldToggle: "Bouclier Popup",
         popMasterHint: "Basculer tout le système", popShieldHint: "Contourne les overlays",
+        popActive: "Actif", popDisabled: "Désactivé",
         btnCleanClip: "Nettoyer le presse-papiers", btnAdvSet: "Paramètres avancés",
         clipNoLink: "Aucun lien valide.", clipSearch: "Résolution en cours...",
         clipFound: "Cible trouvée & copiée.", clipFail: "Aucune cible statique trouvée.",
@@ -245,6 +267,7 @@ const lincleDict = {
         popShield: "Escudo de protección", popCleaned: "Limpiado", popSaved: "Ahorrado",
         popMaster: "Protección Principal", popShieldToggle: "Escudo Popup",
         popMasterHint: "Alternar todo el sistema", popShieldHint: "Evita superposiciones",
+        popActive: "Activo", popDisabled: "Desactivado",
         btnCleanClip: "Limpiar portapapeles", btnAdvSet: "Configuración avanzada",
         clipNoLink: "Enlace no válido.", clipSearch: "Resolviendo en segundo plano...",
         clipFound: "Destino copiado.", clipFail: "No se encontró destino.",
@@ -288,6 +311,7 @@ const lincleDict = {
         popShield: "Escudo de Proteção", popCleaned: "Limpado", popSaved: "Salvo",
         popMaster: "Proteção Principal", popShieldToggle: "Escudo de Popups",
         popMasterHint: "Alternar todo o sistema", popShieldHint: "Ignora overlays",
+        popActive: "Ativo", popDisabled: "Desativado",
         btnCleanClip: "Limpar Área de Transferência", btnAdvSet: "Configurações Avançadas",
         clipNoLink: "Nenhum link válido.", clipSearch: "Resolvendo em segundo plano...",
         clipFound: "Destino copiado.", clipFail: "Nenhum destino encontrado.",
@@ -331,6 +355,7 @@ const lincleDict = {
         popShield: "Scudo di Protezione", popCleaned: "Pulito", popSaved: "Risparmiato",
         popMaster: "Protezione Principale", popShieldToggle: "Scudo Popup",
         popMasterHint: "Attiva/disattiva sistema", popShieldHint: "Bypassa overlay",
+        popActive: "Attivo", popDisabled: "Disattivato",
         btnCleanClip: "Pulisci Appunti", btnAdvSet: "Impostazioni Avanzate",
         clipNoLink: "Nessun link valido.", clipSearch: "Risoluzione in corso...",
         clipFound: "Destinazione copiata.", clipFail: "Nessuna destinazione trovata.",
@@ -374,6 +399,7 @@ const lincleDict = {
         popShield: "Защитный Щит", popCleaned: "Очищено", popSaved: "Сэкономлено",
         popMaster: "Главная Защита", popShieldToggle: "Щит Всплывающих Окон",
         popMasterHint: "Переключить всю систему", popShieldHint: "Обходит оверлеи",
+        popActive: "Активен", popDisabled: "Отключен",
         btnCleanClip: "Очистить Буфер", btnAdvSet: "Расширенные Настройки",
         clipNoLink: "Ссылка не найдена.", clipSearch: "Обработка ссылки...",
         clipFound: "Цель скопирована.", clipFail: "Цель не найдена.",
@@ -417,6 +443,7 @@ const lincleDict = {
         popShield: "Beskyttelsesskjold", popCleaned: "Renset", popSaved: "Sparet",
         popMaster: "Hovedbeskyttelse", popShieldToggle: "Popup-skjold",
         popMasterHint: "Slå hele systemet til/fra", popShieldHint: "Omgår overlays",
+        popActive: "Aktiv", popDisabled: "Deaktiveret",
         btnCleanClip: "Rens udklipsholder", btnAdvSet: "Avancerede indstillinger",
         clipNoLink: "Intet gyldigt link.", clipSearch: "Løser link i baggrunden...",
         clipFound: "Mål kopieret.", clipFail: "Intet statisk mål fundet.",
@@ -460,6 +487,7 @@ const lincleDict = {
         popShield: "保護シールド", popCleaned: "クリーン数", popSaved: "節約時間",
         popMaster: "マスター保護", popShieldToggle: "ポップアップシールド",
         popMasterHint: "全機能を切り替え", popShieldHint: "広告オーバーレイを回避",
+        popActive: "有効", popDisabled: "無効",
         btnCleanClip: "クリップボードをクリア", btnAdvSet: "詳細設定",
         clipNoLink: "有効なリンクが見つかりません。", clipSearch: "バックグラウンドで解析中...",
         clipFound: "ターゲットがコピーされました。", clipFail: "ターゲットが見つかりません。",
@@ -504,6 +532,7 @@ const lincleDict = {
         popShield: "保护防护罩", popCleaned: "已清理", popSaved: "已节省",
         popMaster: "主保护", popShieldToggle: "弹窗防护罩",
         popMasterHint: "切换整个引擎", popShieldHint: "绕过弹窗与覆盖层",
+        popActive: "已启用", popDisabled: "已禁用",
         btnCleanClip: "清理剪贴板", btnAdvSet: "高级设置",
         clipNoLink: "剪贴板中未找到有效链接。", clipSearch: "正在后台解析...",
         clipFound: "已找到目标并复制。", clipFail: "未找到静态目标。",
@@ -548,6 +577,7 @@ const lincleDict = {
         popShield: "보호 실드", popCleaned: "정리됨", popSaved: "절약됨",
         popMaster: "마스터 보호", popShieldToggle: "팝업 실드",
         popMasterHint: "전체 엔진 전환", popShieldHint: "팝업 및 오버레이 우회",
+        popActive: "활성", popDisabled: "비활성",
         btnCleanClip: "클립보드 정리", btnAdvSet: "고급 설정",
         clipNoLink: "유효한 링크가 없습니다.", clipSearch: "백그라운드 해석 중...",
         clipFound: "대상 복사됨.", clipFail: "대상을 찾을 수 없습니다.",
@@ -592,6 +622,7 @@ const lincleDict = {
         popShield: "درع الحماية", popCleaned: "تم تنظيفه", popSaved: "الوقت الموفر",
         popMaster: "الحماية الرئيسية", popShieldToggle: "درع النوافذ المنبثقة",
         popMasterHint: "تبديل المحرك بالكامل", popShieldHint: "يتجاوز النوافذ المنبثقة",
+        popActive: "نشط", popDisabled: "معطل",
         btnCleanClip: "تنظيف الحافظة", btnAdvSet: "الإعدادات المتقدمة",
         clipNoLink: "لم يتم العثور على رابط صالح.", clipSearch: "جاري المعالجة...",
         clipFound: "تم نسخ الهدف.", clipFail: "لم يتم العثور على هدف.",
@@ -602,7 +633,7 @@ const lincleDict = {
         popupShield: "تفعيل درع النوافذ المنبثقة", debugOpt: "تفعيل سجلات التطوير",
         avgWait: "وقت الانتظار المتوقع (ثواني):", avgWaitHelp: "يستخدم لحساب الوقت الموفر.",
         timeoutOpt: "مهلة الانتظار (ثواني):", breadcrumb: "تتبع سلسلة إعادة التوجيه",
-        wlTitle: "قائمة النطاقات والاختصارات", domainOpt: "النطاقات المحظورة:",
+        wlTitle: "قائمة النطاقات والااختصارات", domainOpt: "النطاقات المحظورة:",
         domainPlh: "example.com\nshort.co", shortcutOpt: "اختصار الكيبورد:",
         shortcutHelp: "يمكنك تغيير الاختصارات من إعدادات المتصفح.", btnShortcut: "تعديل الاختصارات",
         bulkTitle: "الباحث: معالج الدفعات", bulkHelp: "يعالج الروابط في الخلفية بدون فتح تبويبات.",
@@ -635,6 +666,7 @@ const lincleDict = {
         popShield: "Tarcza ochronna", popCleaned: "Oczyszczone", popSaved: "Zaoszczędzono",
         popMaster: "Główna ochrona", popShieldToggle: "Tarcza pop-up",
         popMasterHint: "Przełącz cały silnik", popShieldHint: "Omija nakładki",
+        popActive: "Aktywny", popDisabled: "Wyłączony",
         btnCleanClip: "Wyczyść schowek", btnAdvSet: "Zaawansowane ustawienia",
         clipNoLink: "Brak prawidłowego linku w schowku.", clipSearch: "Przetwarzanie w tle...",
         clipFound: "Cel znaleziony i skopiowany.", clipFail: "Nie znaleziono celu.",

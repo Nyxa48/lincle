@@ -154,9 +154,10 @@ function updateShieldUI(active, lang) {
         if (use) use.setAttribute('href', active ? '#ic-shield-check' : '#ic-shield-off');
     }
     if (statusEl)   statusEl.className  = 'shield-status' + (active ? '' : ' off');
+    const dict = getLangDict(lang);
     if (statusText) statusText.textContent = active
-        ? (lang === 'tr' ? 'Aktif' : 'Active')
-        : (lang === 'tr' ? 'Devre Disi' : 'Disabled');
+        ? (dict.popActive || 'Active')
+        : (dict.popDisabled || 'Disabled');
     if (dot)  dot.className  = 'status-dot' + (active ? '' : ' off');
 }
 

@@ -31,18 +31,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // ── Language Selector ───────────────────────────────────────────────
-    const langSelect = document.getElementById('langSelect');
-    const langData = await ext.storage.local.get('lincleLang');
-    const currentLang = langData.lincleLang || 'en';
+    // ── Custom SVG Flag Language Selector ──────────────────────────────
+    const LANG_OPTIONS = [
+        { code: 'en', name: 'English' },
+        { code: 'tr', name: 'Türkçe' },
+        { code: 'de', name: 'Deutsch' },
+        { code: 'fr', name: 'Français' },
+        { code: 'es', name: 'Español' },
+        { code: 'pt', name: 'Português' },
+        { code: 'it', name: 'Italiano' },
+        { code: 'ru', name: 'Русский' },
+        { code: 'da', name: 'Dansk' },
+        { code: 'ja', name: '日本語' },
+        { code: 'zh', name: '简体中文' },
+        { code: 'ko', name: '한국어' },
+        { code: 'ar', name: 'العربية' },
+        { code: 'pl', name: 'Polski' },
+    ];
+
+    const langDropdown = document.getElementById('customLangDropdown');
+    const langTrigger  = document.getElementById('customLangTrigger');
+    const langMenu     = document.getElementById('customLangMenu');
+    const currentFlag  = document.getElementById('currentLangFlag');
+    const currentName  = document.getElementById('currentLangName');
+
+    const langData    = await ext.storage.local.get('lincleLang');
+    const currentLang = langData.lincleLang || 'en'; // Defaults to English
     window._currentLang = currentLang;
-    if (langSelect) {
-        langSelect.value = currentLang;
-        langSelect.addEventListener('change', async (e) => {
-            await ext.storage.local.set({ lincleLang: e.target.value });
-            setTimeout(() => location.reload(), 50);
+
+    function renderLangSelector() {
+        if (!langMenu) return;
+        const curOpt = LANG_OPTIONS.find(o => o.code === currentLang) || LANG_OPTIONS[0];
+        if (currentFlag) currentFlag.innerHTML = LINCLE_FLAGS[curOpt.code] || '';
+        if (currentName) currentName.textContent = curOpt.name;
+
+        langMenu.innerHTML = '';
+        LANG_OPTIONS.forEach(opt => {
+            const item = document.createElement('div');
+            item.className = 'custom-lang-item' + (opt.code === currentLang ? ' selected' : '');
+            item.innerHTML = `
+                <span class="custom-lang-flag">${LINCLE_FLAGS[opt.code] || ''}</span>
+                <span>${opt.name}</span>
+            `;
+            item.addEventListener('click', async () => {
+                await ext.storage.local.set({ lincleLang: opt.code });
+                langDropdown.classList.remove('open');
+                setTimeout(() => location.reload(), 50);
+            });
+            langMenu.appendChild(item);
         });
     }
+
+    if (langTrigger && langDropdown) {
+        langTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            langDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (!langDropdown.contains(e.target)) {
+                langDropdown.classList.remove('open');
+            }
+        });
+    }
+
+    renderLangSelector();
 
     // ── Theme Preset & Library Management ──────────────────────────────
     const presetBtns       = document.querySelectorAll('[data-preset]');

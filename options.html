@@ -43,40 +43,53 @@
     }
     .header-logo svg { color: #fff; }
     .header-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-    .header-right { display: flex; gap: 8px; align-items: center; }
-    .lang-selector-wrap {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0 28px 0 34px;
-      height: 36px;
-      transition: all 0.2s ease;
+    /* ── Custom Flag Language Selector ── */
+    .custom-lang-dropdown {
+      position: relative; display: inline-block;
+    }
+    .custom-lang-trigger {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 12px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .15s;
       box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
-    .lang-selector-wrap:hover {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-dim);
+    .custom-lang-trigger:hover {
+      border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-dim);
     }
-    .lang-icon {
-      position: absolute; left: 10px; color: var(--primary); pointer-events: none;
+    .custom-lang-flag {
+      display: flex; align-items: center; flex-shrink: 0;
     }
-    .lang-arrow {
-      position: absolute; right: 10px; color: var(--text-dim); pointer-events: none;
+    .custom-lang-chevron {
+      color: var(--text-dim); transition: transform .2s; margin-left: 2px;
     }
-    .lang-select {
-      appearance: none; -webkit-appearance: none;
-      background: transparent !important; border: none !important;
-      color: var(--text) !important; font-size: 13px !important; font-weight: 600 !important;
-      cursor: pointer; padding: 0 !important; margin: 0 !important;
-      height: 100%; width: 100%; outline: none !important;
+    .custom-lang-dropdown.open .custom-lang-chevron {
+      transform: rotate(180deg);
     }
-    .lang-select option {
-      background: var(--surface2) !important;
-      color: var(--text) !important;
-      padding: 10px;
+    .custom-lang-menu {
+      position: absolute; top: calc(100% + 6px); right: 0; z-index: 1000;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 6px; width: 175px;
+      max-height: 320px; overflow-y: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      display: none; opacity: 0; transform: translateY(-6px);
+      transition: opacity .15s, transform .15s;
+    }
+    .custom-lang-dropdown.open .custom-lang-menu {
+      display: block; opacity: 1; transform: translateY(0);
+    }
+    .custom-lang-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; color: var(--text);
+      cursor: pointer; transition: background .12s, color .12s;
+    }
+    .custom-lang-item:hover {
+      background: var(--primary-dim); color: var(--primary);
+    }
+    .custom-lang-item.selected {
+      background: var(--surface2); color: var(--primary); font-weight: 700;
     }
 
     /* ── Stats Bar ── */
@@ -340,31 +353,15 @@
         <h2 class="header-title" data-i18n="optTitle">Lincle Ayarları</h2>
       </div>
       <div class="header-right">
-        <div class="lang-selector-wrap">
-          <svg class="lang-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="2" y1="12" x2="22" y2="12"></line>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-          </svg>
-          <select id="langSelect" class="lang-select">
-            <option value="en">🇬🇧 English</option>
-            <option value="tr">🇹🇷 Türkçe</option>
-            <option value="de">🇩🇪 Deutsch</option>
-            <option value="fr">🇫🇷 Français</option>
-            <option value="es">🇪🇸 Español</option>
-            <option value="pt">🇵🇹 Português</option>
-            <option value="it">🇮🇹 Italiano</option>
-            <option value="ru">🇷🇺 Русский</option>
-            <option value="da">🇩🇰 Dansk</option>
-            <option value="ja">🇯🇵 日本語</option>
-            <option value="zh">🇨🇳 简体中文</option>
-            <option value="ko">🇰🇷 한국어</option>
-            <option value="ar">🇸🇦 العربية</option>
-            <option value="pl">🇵🇱 Polski</option>
-          </select>
-          <svg class="lang-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
+        <div class="custom-lang-dropdown" id="customLangDropdown">
+          <button type="button" class="custom-lang-trigger" id="customLangTrigger">
+            <span class="custom-lang-flag" id="currentLangFlag"></span>
+            <span class="custom-lang-name" id="currentLangName">English</span>
+            <svg class="custom-lang-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="custom-lang-menu" id="customLangMenu">
+            <!-- Populated dynamically with vector SVG flags -->
+          </div>
         </div>
       </div>
     </div>
