@@ -42,30 +42,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ── Theme Preset Buttons ────────────────────────────────────────────
-    const presetBtns = document.querySelectorAll('[data-preset]');
-    const customSection = document.getElementById('customColorSection');
-    const colorGrid = document.getElementById('colorGrid');
+    // ── Theme Preset & Library Management ──────────────────────────────
+    const presetBtns       = document.querySelectorAll('[data-preset]');
+    const customSection    = document.getElementById('customColorSection');
+    const colorGrid        = document.getElementById('colorGrid');
+    const btnToggleCustom  = document.getElementById('btnToggleCustom');
+    const savedSelect      = document.getElementById('savedThemesSelect');
+    const btnSaveCustom    = document.getElementById('btnSaveCustomTheme');
+    const btnDeleteCustom  = document.getElementById('btnDeleteCustomTheme');
+    const nameInput        = document.getElementById('themeNameInput');
 
-    function setActivePreset(preset) {
-        presetBtns.forEach(b => b.classList.toggle('active', b.dataset.preset === preset));
-        if (customSection) customSection.style.display = preset === 'custom' ? 'block' : 'none';
+    function setActivePresetUI(presetName) {
+        presetBtns.forEach(b => b.classList.toggle('active', b.dataset.preset === presetName));
     }
 
-    // Initialize preset UI
-    setActivePreset(lincleGetPresetName(currentTheme));
+    setActivePresetUI(lincleGetPresetName(currentTheme));
+
+    const customColors = { ...(currentTheme.colors || LINCLE_PRESETS.dark) };
+
+    // Toggle color editor box
+    if (btnToggleCustom) {
+        btnToggleCustom.addEventListener('click', () => {
+            if (customSection) {
+                const isHidden = customSection.style.display === 'none';
+                customSection.style.display = isHidden ? 'block' : 'none';
+            }
+        });
+    }
 
     // Build color picker grid
-    const customColors = { ...LINCLE_PRESETS.dark };
-    // Load saved custom colors
-    const cd = await ext.storage.local.get('lincleCustomTheme');
-    if (cd.lincleCustomTheme && cd.lincleCustomTheme.colors) {
-        Object.assign(customColors, cd.lincleCustomTheme.colors);
-    }
-    if (currentTheme.preset === 'custom' && currentTheme.colors) {
-        Object.assign(customColors, currentTheme.colors);
-    }
-
     if (colorGrid) {
         colorGrid.innerHTML = '';
         COLOR_KEYS.forEach(({ key, label, i18n }) => {
@@ -80,28 +85,109 @@ document.addEventListener('DOMContentLoaded', async () => {
             const input = item.querySelector('input');
             input.addEventListener('input', (e) => {
                 customColors[key] = e.target.value;
-                // Live preview
-                const previewTheme = { preset: 'custom', colors: { ...customColors } };
+                const themeName = (nameInput ? nameInput.value.trim() : '') || 'Özel Tema';
+                const previewTheme = { preset: 'custom', name: themeName, colors: { ...customColors } };
                 lincleApplyTheme(previewTheme);
             });
         });
     }
 
-    // Preset button clicks
+    // Populate saved custom themes library dropdown
+    async function populateSavedThemes() {
+        const savedList = await lincleGetSavedThemes();
+        if (!savedSelect) return;
+        savedSelect.innerHTML = '<option value="">-- Kayıtlı Özel Temalarım --</option>';
+        savedList.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = t.name;
+            savedSelect.appendChild(opt);
+        });
+    }
+    await populateSavedThemes();
+
+    // Preset button clicks (Dark, Light, Nordic, Emerald, Sunset, Dracula)
     presetBtns.forEach(btn => {
         btn.addEventListener('click', async () => {
             const preset = btn.dataset.preset;
-            setActivePreset(preset);
+            setActivePresetUI(preset);
+            if (savedSelect) savedSelect.value = '';
+            if (btnDeleteCustom) btnDeleteCustom.style.display = 'none';
 
-            if (preset === 'custom') {
-                const themeObj = { preset: 'custom', colors: { ...customColors } };
-                await lincleSaveTheme(themeObj);
-                await ext.storage.local.set({ lincleCustomTheme: { colors: { ...customColors } } });
-            } else {
-                await lincleSaveTheme({ preset });
-            }
+            const themeObj = { preset, name: LINCLE_PRESETS[preset]?.name || preset };
+            await lincleSaveTheme(themeObj);
         });
     });
+
+    // Select a saved theme from dropdown
+    if (savedSelect) {
+        savedSelect.addEventListener('change', async () => {
+            const selectedId = savedSelect.value;
+            if (!selectedId) {
+                if (btnDeleteCustom) btnDeleteCustom.style.display = 'none';
+                return;
+            }
+
+            const savedList = await lincleGetSavedThemes();
+            const found = savedList.find(t => t.id === selectedId);
+            if (found) {
+                if (btnDeleteCustom) btnDeleteCustom.style.display = 'inline-flex';
+                if (nameInput) nameInput.value = found.name;
+
+                Object.assign(customColors, found.colors);
+                COLOR_KEYS.forEach(({ key }) => {
+                    const el = document.getElementById(`color_${key}`);
+                    if (el && customColors[key]) el.value = customColors[key];
+                });
+
+                const themeObj = { preset: 'custom', name: found.name, colors: { ...found.colors } };
+                setActivePresetUI('');
+                await lincleSaveTheme(themeObj);
+                await ext.storage.local.set({ lincleCustomTheme: themeObj });
+            }
+        });
+    }
+
+    // Save custom theme to library
+    if (btnSaveCustom) {
+        btnSaveCustom.addEventListener('click', async () => {
+            const name = (nameInput ? nameInput.value.trim() : '') || 'Özel Tema';
+            const saved = await lincleSaveThemeToLibrary(name, { ...customColors });
+
+            const themeObj = { preset: 'custom', name: saved.name, colors: { ...saved.colors } };
+            await lincleSaveTheme(themeObj);
+            await ext.storage.local.set({ lincleCustomTheme: themeObj });
+
+            await populateSavedThemes();
+            if (savedSelect) savedSelect.value = saved.id;
+            if (btnDeleteCustom) btnDeleteCustom.style.display = 'inline-flex';
+            setActivePresetUI('');
+
+            const status = document.getElementById('saveStatus');
+            if (status) {
+                status.textContent = `Tema "${name}" kaydedildi!`;
+                status.style.display = 'inline';
+                setTimeout(() => { status.style.display = 'none'; status.textContent = 'Kaydedildi!'; }, 2500);
+            }
+        });
+    }
+
+    // Delete custom theme from library
+    if (btnDeleteCustom) {
+        btnDeleteCustom.addEventListener('click', async () => {
+            const selectedId = savedSelect ? savedSelect.value : '';
+            if (!selectedId) return;
+
+            await lincleDeleteSavedTheme(selectedId);
+            await populateSavedThemes();
+            if (savedSelect) savedSelect.value = '';
+            btnDeleteCustom.style.display = 'none';
+
+            // Fallback to dark preset
+            setActivePresetUI('dark');
+            await lincleSaveTheme({ preset: 'dark' });
+        });
+    }
 
     // ── Export / Import ──────────────────────────────────────────────────
     const btnExport = document.getElementById('btnExportTheme');
@@ -111,6 +197,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnExport.addEventListener('click', async () => {
             const d = await ext.storage.local.get('lincleTheme');
             const theme = d.lincleTheme || { preset: 'dark' };
+            if (theme.preset === 'custom' && !theme.colors) {
+                const cd = await ext.storage.local.get('lincleCustomTheme');
+                theme.colors = cd.lincleCustomTheme?.colors;
+                theme.name   = cd.lincleCustomTheme?.name;
+            }
             lincleExportTheme(theme);
         });
     }
@@ -119,19 +210,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnImport.addEventListener('click', () => {
             lincleImportTheme(async (imported) => {
                 if (imported.colors) {
+                    const name = imported.name || 'İçe Aktarılan Tema';
                     Object.assign(customColors, imported.colors);
-                    // Update color pickers
+                    if (nameInput) nameInput.value = name;
+
                     COLOR_KEYS.forEach(({ key }) => {
                         const el = document.getElementById(`color_${key}`);
                         if (el && customColors[key]) el.value = customColors[key];
                     });
-                    const themeObj = { preset: 'custom', colors: { ...customColors } };
+
+                    const saved = await lincleSaveThemeToLibrary(name, { ...customColors });
+                    const themeObj = { preset: 'custom', name, colors: { ...customColors } };
+
                     await lincleSaveTheme(themeObj);
-                    await ext.storage.local.set({ lincleCustomTheme: { colors: { ...customColors } } });
-                    setActivePreset('custom');
+                    await ext.storage.local.set({ lincleCustomTheme: themeObj });
+
+                    await populateSavedThemes();
+                    if (savedSelect) savedSelect.value = saved.id;
+                    if (btnDeleteCustom) btnDeleteCustom.style.display = 'inline-flex';
+                    if (customSection) customSection.style.display = 'block';
+                    setActivePresetUI('');
                 } else if (imported.preset) {
                     await lincleSaveTheme(imported);
-                    setActivePreset(imported.preset);
+                    setActivePresetUI(imported.preset);
                 }
             });
         });

@@ -326,36 +326,77 @@
         <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
-        <div class="preset-seg">
+        <label style="font-weight:700;margin-bottom:8px">Hazir Temalar (Presets)</label>
+        <div class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
           <button class="preset-btn active" data-preset="dark">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            <span data-i18n="themePresetDark">Koyu</span>
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00caf5"></span>
+            <span>Cyberpunk Dark</span>
           </button>
           <button class="preset-btn" data-preset="light">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <span data-i18n="themePresetLight">Acik</span>
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0096d2"></span>
+            <span>Clean Light</span>
           </button>
-          <button class="preset-btn" data-preset="custom">
-            <svg width="14" height="14"><use href="#ic-palette"/></svg>
-            <span data-i18n="themePresetCustom">Ozel</span>
+          <button class="preset-btn" data-preset="nordic">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#88c0d0"></span>
+            <span>Nordic Slate</span>
+          </button>
+          <button class="preset-btn" data-preset="emerald">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10b981"></span>
+            <span>Emerald Matrix</span>
+          </button>
+          <button class="preset-btn" data-preset="sunset">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f59e0b"></span>
+            <span>Sunset Amber</span>
+          </button>
+          <button class="preset-btn" data-preset="dracula">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#bd93f9"></span>
+            <span>Dracula Violet</span>
           </button>
         </div>
 
-        <div id="customColorSection" style="display:none">
-          <div class="color-grid" id="colorGrid">
-            <!-- Populated by JS -->
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <label style="font-weight:700;margin:0">Ozel Tema Kutuphanesi & Duzenleyici</label>
+            <button class="btn" id="btnToggleCustom" style="padding:4px 10px;font-size:11px;">
+              <svg width="12" height="12"><use href="#ic-palette"/></svg>
+              <span>Renk Duzenleyici</span>
+            </button>
           </div>
-        </div>
 
-        <div class="btn-group">
-          <button class="btn" id="btnExportTheme">
-            <svg width="14" height="14"><use href="#ic-download"/></svg>
-            <span data-i18n="themeExport">Disari Aktar</span>
-          </button>
-          <button class="btn" id="btnImportTheme">
-            <svg width="14" height="14"><use href="#ic-upload"/></svg>
-            <span data-i18n="themeImport">Ice Aktar</span>
-          </button>
+          <div id="savedThemesWrapper" style="margin-bottom:12px;display:flex;gap:8px;">
+            <select id="savedThemesSelect" style="flex:1;">
+              <option value="">-- Kayitli Ozel Temalarim --</option>
+            </select>
+            <button class="btn btn-danger" id="btnDeleteCustomTheme" title="Secili Temayi Sil" style="padding:8px 12px;display:none;">
+              <svg width="14" height="14"><use href="#ic-trash"/></svg>
+            </button>
+          </div>
+
+          <div id="customColorSection" style="display:none;background:var(--surface2);border:1px solid var(--border);padding:14px;border-radius:10px;margin-bottom:14px;">
+            <label for="themeNameInput" style="font-size:12px;font-weight:600;">Tema Ismi:</label>
+            <input type="text" id="themeNameInput" value="Benim Ozel Temam" placeholder="Tema Ismi..." style="margin-bottom:12px;">
+
+            <label style="font-size:12px;font-weight:600;margin-bottom:6px;">Renk Paleti:</label>
+            <div class="color-grid" id="colorGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+              <!-- Populated by JS -->
+            </div>
+
+            <button class="btn btn-primary" id="btnSaveCustomTheme" style="width:100%;">
+              <svg width="14" height="14"><use href="#ic-save"/></svg>
+              <span>Temayi Kutuphaneye Kaydet</span>
+            </button>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn" id="btnExportTheme">
+              <svg width="14" height="14"><use href="#ic-download"/></svg>
+              <span data-i18n="themeExport">Temayi Disari Aktar (JSON)</span>
+            </button>
+            <button class="btn" id="btnImportTheme">
+              <svg width="14" height="14"><use href="#ic-upload"/></svg>
+              <span data-i18n="themeImport">Tema Ice Aktar (JSON)</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

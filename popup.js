@@ -126,9 +126,13 @@ async function initUI() {
 
 // ── Theme Icon Updater ──────────────────────────────────────────────────
 function updateThemeIcon(themeObj) {
+    const btn = document.getElementById('themeToggleBtn');
     const use = document.querySelector('#themeIcon use');
     if (!use) return;
     const preset = lincleGetPresetName(themeObj);
+    const themeName = themeObj.name || LINCLE_PRESETS[preset]?.name || 'Theme';
+    if (btn) btn.title = `Theme: ${themeName}`;
+
     if (preset === 'dark')        use.setAttribute('href', '#ic-moon');
     else if (preset === 'light')  use.setAttribute('href', '#ic-sun');
     else                          use.setAttribute('href', '#ic-palette');
