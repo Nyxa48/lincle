@@ -516,18 +516,18 @@ const lincleStartTime = performance.now();
         }
     }
 
-    // YENİ: Kalkanın durumunu soran (Ana Şalter Kontrolü) fonksiyon
+    // Checks master protection toggle state (Global On/Off Switch)
     async function getMasterKillSwitchSetting() {
         try {
             const data = await ext.storage.local.get(SETTINGS_KEY);
-            return (data[SETTINGS_KEY] || {}).isActive !== false; // Varsayılanı true (açık)
+            return (data[SETTINGS_KEY] || {}).isActive !== false; // Default ON (true)
         } catch {
             return true;
         }
     }
 
     async function runActiveResolver(customSelector) {
-        showBanner("Lincle: Sayfa analiz ediliyor...");
+        showBanner("Lincle: Analyzing page...");
         const startedAt = Date.now();
         let clicked = false;
         let observer = null;
@@ -537,36 +537,36 @@ const lincleStartTime = performance.now();
         const maxWaitMs = (data.lincleOptions?.maxWaitTime || 20) * 1000;
 
         function evaluateDOM() {
-            // 1. ZAMAN AŞIMI (TIMEOUT) VE HATA RAPORU
+            // 1. TIMEOUT CHECK AND FAILURE REPORTING
             if (Date.now() - startedAt > maxWaitMs) {
                 if (observer) observer.disconnect();
 
-                // Etkileşimli (İsteğe bağlı) Hata Raporu UI
+                // Interactive Failure Report UI
                 let el = document.getElementById("lincle-banner");
                 if (el) {
-                    el.innerHTML = `Lincle: Otomatik atlanamadı. 
-            <button id="lincle-report-btn" style="background:#d63031;color:white;border:none;border-radius:4px;padding:4px 8px;margin-left:10px;cursor:pointer;font-weight:bold;">Bunu Raporla</button>`;
+                    el.innerHTML = `Lincle: Could not auto-bypass. 
+            <button id="lincle-report-btn" style="background:#d63031;color:white;border:none;border-radius:4px;padding:4px 8px;margin-left:10px;cursor:pointer;font-weight:bold;">Report Issue</button>`;
 
                     document.getElementById('lincle-report-btn').addEventListener('click', async () => {
-                        // Sitedeki hangi kelimeler bizim listemizle eşleşti?
+                        // Scan page text for matched gate phrases to help debug
                         const bodyText = (document.body.innerText || "").slice(0, 3000);
                         const matchedGates = GATE_TEXT_PATTERNS.filter(p => p.test(bodyText)).map(p => p.source);
 
                         const report = {
-                            date: new Date().toLocaleString('tr-TR'),
+                            date: new Date().toLocaleString(),
                             url: location.href,
                             host: location.hostname,
-                            gatePhrases: matchedGates.length > 0 ? matchedGates : ["Kapı metni bulunamadı"],
-                            error: "Timeout (Bekleme süresi aşıldı, buton veya link bulunamadı)"
+                            gatePhrases: matchedGates.length > 0 ? matchedGates : ["No gate text matched"],
+                            error: "Timeout (Max wait time exceeded, no target link/button found)"
                         };
 
-                        // Yalnızca YEREL depolamaya kaydet (Privacy)
+                        // Store locally only (Privacy focused)
                         const repData = await ext.storage.local.get("lincleFailures");
                         const failures = repData.lincleFailures || [];
                         failures.push(report);
                         await ext.storage.local.set({ lincleFailures: failures });
 
-                        el.innerHTML = "Rapor yerel olarak kaydedildi. Lütfen Ayarlar'dan geliştiriciye iletin.";
+                        el.innerHTML = "Report saved locally. You can export/send it from Settings.";
                         setTimeout(() => el.remove(), 4000);
                     });
                 }

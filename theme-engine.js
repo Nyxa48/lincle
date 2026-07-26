@@ -155,7 +155,7 @@ async function lincleLoadTheme() {
         if (themeObj.preset === 'custom') {
             if (!themeObj.colors && d.lincleCustomTheme && d.lincleCustomTheme.colors) {
                 themeObj.colors = d.lincleCustomTheme.colors;
-                themeObj.name   = d.lincleCustomTheme.name || 'Özel Tema';
+                themeObj.name   = d.lincleCustomTheme.name || 'Custom Theme';
             }
         }
 
@@ -174,35 +174,38 @@ async function lincleSaveTheme(themeObj) {
 }
 
 // ─── Cycle Preset (for popup button) ────────────────────────────────────────
-// Cycles through: dark → light → nordic → emerald → sunset → dracula → custom (if exists) → dark
+// Strictly cycles through 3 states: dark → light → custom → dark ...
 async function lincleCycleTheme() {
-    const presetKeys = Object.keys(LINCLE_PRESETS);
     const d = await _themeExt.storage.local.get(['lincleTheme', 'lincleCustomTheme']);
     let current = d.lincleTheme || { preset: 'dark' };
     if (typeof current === 'string') current = { preset: current };
 
-    let nextPreset;
-    const curIdx = presetKeys.indexOf(current.preset);
-
-    if (curIdx !== -1 && curIdx < presetKeys.length - 1) {
-        nextPreset = { preset: presetKeys[curIdx + 1] };
-    } else if (curIdx === presetKeys.length - 1) {
-        // After built-in presets, check if a custom theme exists
+    let next;
+    if (current.preset === 'dark') {
+        next = { preset: 'light' };
+    } else if (current.preset === 'light') {
+        // Load custom / active theme saved from options
         if (d.lincleCustomTheme && d.lincleCustomTheme.colors) {
-            nextPreset = {
+            next = {
                 preset: 'custom',
-                name: d.lincleCustomTheme.name || 'Özel Tema',
+                name: d.lincleCustomTheme.name || 'Custom Theme',
                 colors: d.lincleCustomTheme.colors,
             };
         } else {
-            nextPreset = { preset: presetKeys[0] }; // wrap around to dark
+            // Fallback custom theme (Nordic Slate) if none configured yet
+            next = {
+                preset: 'custom',
+                name: 'Nordic Slate',
+                colors: LINCLE_PRESETS.nordic,
+            };
         }
     } else {
-        nextPreset = { preset: presetKeys[0] };
+        // Back to dark
+        next = { preset: 'dark' };
     }
 
-    await lincleSaveTheme(nextPreset);
-    return nextPreset;
+    await lincleSaveTheme(next);
+    return next;
 }
 
 // ─── Export Theme as JSON File ──────────────────────────────────────────────

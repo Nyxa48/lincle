@@ -52,11 +52,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnDeleteCustom  = document.getElementById('btnDeleteCustomTheme');
     const nameInput        = document.getElementById('themeNameInput');
 
-    function setActivePresetUI(presetName) {
-        presetBtns.forEach(b => b.classList.toggle('active', b.dataset.preset === presetName));
+    function setActivePresetUI(themeTarget) {
+        const presetName = typeof themeTarget === 'string' ? themeTarget : (themeTarget.preset || '');
+        const themeName  = typeof themeTarget === 'object' ? (themeTarget.name || '') : '';
+        presetBtns.forEach(b => {
+            const pKey  = b.dataset.preset;
+            const pName = LINCLE_PRESETS[pKey]?.name || '';
+            const isActive = pKey === presetName || (themeName && pName && themeName.toLowerCase() === pName.toLowerCase());
+            b.classList.toggle('active', isActive);
+        });
     }
 
-    setActivePresetUI(lincleGetPresetName(currentTheme));
+    setActivePresetUI(currentTheme);
 
     const customColors = { ...(currentTheme.colors || LINCLE_PRESETS.dark) };
 
@@ -85,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const input = item.querySelector('input');
             input.addEventListener('input', (e) => {
                 customColors[key] = e.target.value;
-                const themeName = (nameInput ? nameInput.value.trim() : '') || 'Özel Tema';
+                const themeName = (nameInput ? nameInput.value.trim() : '') || 'Custom Theme';
                 const previewTheme = { preset: 'custom', name: themeName, colors: { ...customColors } };
                 lincleApplyTheme(previewTheme);
             });
@@ -96,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function populateSavedThemes() {
         const savedList = await lincleGetSavedThemes();
         if (!savedSelect) return;
-        savedSelect.innerHTML = '<option value="">-- Kayıtlı Özel Temalarım --</option>';
+        savedSelect.innerHTML = '<option value="">-- My Saved Custom Themes --</option>';
         savedList.forEach(t => {
             const opt = document.createElement('option');
             opt.value = t.id;
@@ -114,8 +121,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (savedSelect) savedSelect.value = '';
             if (btnDeleteCustom) btnDeleteCustom.style.display = 'none';
 
-            const themeObj = { preset, name: LINCLE_PRESETS[preset]?.name || preset };
-            await lincleSaveTheme(themeObj);
+            if (preset === 'dark' || preset === 'light') {
+                await lincleSaveTheme({ preset });
+            } else {
+                // For Nordic, Emerald, Sunset, Dracula -> set as active Custom theme!
+                const presetTheme = LINCLE_PRESETS[preset];
+                const themeObj = {
+                    preset: 'custom',
+                    name: presetTheme?.name || preset,
+                    colors: { ...presetTheme },
+                };
+                Object.assign(customColors, presetTheme);
+                COLOR_KEYS.forEach(({ key }) => {
+                    const el = document.getElementById(`color_${key}`);
+                    if (el && customColors[key]) el.value = customColors[key];
+                });
+                await lincleSaveTheme(themeObj);
+                await ext.storage.local.set({ lincleCustomTheme: themeObj });
+            }
         });
     });
 
@@ -151,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Save custom theme to library
     if (btnSaveCustom) {
         btnSaveCustom.addEventListener('click', async () => {
-            const name = (nameInput ? nameInput.value.trim() : '') || 'Özel Tema';
+            const name = (nameInput ? nameInput.value.trim() : '') || 'Custom Theme';
             const saved = await lincleSaveThemeToLibrary(name, { ...customColors });
 
             const themeObj = { preset: 'custom', name: saved.name, colors: { ...saved.colors } };
@@ -165,9 +188,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const status = document.getElementById('saveStatus');
             if (status) {
-                status.textContent = `Tema "${name}" kaydedildi!`;
+                status.textContent = `Theme "${name}" saved!`;
                 status.style.display = 'inline';
-                setTimeout(() => { status.style.display = 'none'; status.textContent = 'Kaydedildi!'; }, 2500);
+                setTimeout(() => { status.style.display = 'none'; status.textContent = 'Saved!'; }, 2500);
             }
         });
     }

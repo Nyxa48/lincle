@@ -1,29 +1,39 @@
-// Lincle Background Service v2.5 - Cross-Browser Fix
+// Lincle Background Service Worker v3.0
 // Developed by: Emir Samed (Nyxa48)
+//
+// This background script runs in the extension context. It manages:
+//   1. Context menu integration (right-click on links to bypass)
+//   2. Keyboard shortcut commands (e.g. Alt+L to trigger manual cleanup)
+//   3. Tab navigation breadcrumb tracking (records redirect chains for debugging)
 
-// Cross-browser shim
+// ─── Cross-Browser Extension API Shim ─────────────────────────────────────────
+// Chrome uses 'chrome', Firefox uses 'browser'. This line ensures compatibility.
 const ext = (typeof browser !== "undefined") ? browser : chrome;
 
+// ─── 1. Context Menu Setup ───────────────────────────────────────────────────
+// Creates a right-click menu item when the extension is first installed or updated.
 ext.runtime.onInstalled.addListener(() => {
     ext.contextMenus.create({
         id: "lincle-bypass",
-        title: "🛡️ Lincle ile Temizle ve Git",
-        contexts: ["link"]
+        title: "Lincle: Clean Link & Open",
+        contexts: ["link"] // Only shows up when right-clicking a hyperlink
     });
 });
 
+// Handles right-click menu clicks
 ext.contextMenus.onClicked.addListener((info, tab) => {
-    // Sadece dinamik olarak tıklanan hedefe yönlendirir, hardcode içermez.
     if (info.menuItemId === "lincle-bypass" && info.linkUrl) {
+        // Open the clicked URL directly in a new tab, bypassing middleman shorteners
         ext.tabs.create({ url: info.linkUrl });
     }
 });
 
-// Aşama 2: Dinamik Klavye Kısayolu Dinleyicisi
+// ─── 2. Keyboard Shortcut Listener ───────────────────────────────────────────
+// Listens for custom keyboard commands configured in manifest.json (e.g., Alt+L).
 ext.commands.onCommand.addListener((command) => {
     if (command === "trigger-lincle") {
-        // Bug fix v2.5: callback style → async/await for cross-browser compat
-        ext.tabs.query({active: true, currentWindow: true}).then(tabs => {
+        // Find the currently active tab and send a message to trigger manual bypass
+        ext.tabs.query({ active: true, currentWindow: true }).then(tabs => {
             if (tabs[0]) {
                 ext.tabs.sendMessage(tabs[0].id, { action: "manualBypass" });
             }
@@ -31,45 +41,42 @@ ext.commands.onCommand.addListener((command) => {
     }
 });
 
-// AŞAMA 3.1: Redirect Breadcrumb Tracker (Sekme Yönlendirme İzleyicisi)
-let breadcrumbsEnabled = false;
+// ─── 3. Navigation Breadcrumb Tracker ────────────────────────────────────────
+// When enabled in settings, tracks redirect chains across tabs for debugging shorteners.
 let tabBreadcrumbs = {};
 
-// Ayarları dinle ve izleyiciyi sadece rıza varsa aç
-ext.storage.local.get("lincleOptions", (data) => {
-    breadcrumbsEnabled = data.lincleOptions?.enableBreadcrumbs || false;
-});
-ext.storage.onChanged.addListener((changes) => {
-    if (changes.lincleOptions) {
-        breadcrumbsEnabled = changes.lincleOptions.newValue.enableBreadcrumbs || false;
-    }
-});
-
-// ─── Breadcrumb Tracker ──────────────────────────────────────────────────
 ext.webNavigation.onBeforeNavigate.addListener(async (details) => {
-    if (details.frameId !== 0) return; // Only top-level frame
+    // Ignore iframe/subframe navigations (frameId 0 is the main page)
+    if (details.frameId !== 0) return;
+
+    // Check if user has enabled breadcrumb tracking in settings
     const opts = (await ext.storage.local.get("lincleOptions")).lincleOptions || {};
     if (!opts.enableBreadcrumbs) return;
 
     if (!tabBreadcrumbs[details.tabId]) tabBreadcrumbs[details.tabId] = [];
-    
-    // Geçiş tipi (Örn: server_redirect, client_redirect, link)
-    const transition = (details.transitionQualifiers || []).includes("server_redirect") ? "Sunucu Yonlendirmesi" : "Sayfa Yuklemesi";
 
+    // Classify transition type (HTTP server redirect vs standard page load)
+    const transition = (details.transitionQualifiers || []).includes("server_redirect")
+        ? "Server Redirect"
+        : "Page Load";
+
+    // Push new breadcrumb record
     tabBreadcrumbs[details.tabId].push({
-        time: new Date().toLocaleTimeString('tr-TR'),
+        time: new Date().toLocaleTimeString(),
         url: details.url,
         type: transition
     });
 
-    // Zincir çok uzarsa eskiyi sil (Performans)
-    if (tabBreadcrumbs[details.tabId].length > 10) tabBreadcrumbs[details.tabId].shift();
+    // Limit memory usage by capping chain history to 10 entries per tab
+    if (tabBreadcrumbs[details.tabId].length > 10) {
+        tabBreadcrumbs[details.tabId].shift();
+    }
 
-    // Veritabanına yaz ki Options sayfasından okunabilsin
+    // Save to local storage for display in the Options page
     ext.storage.local.set({ lincleBreadcrumbs: tabBreadcrumbs });
 });
 
-// Sekme kapatıldığında izleri sil (Garbage Collection)
+// Clean up memory when a tab is closed (Garbage collection)
 ext.tabs.onRemoved.addListener((tabId) => {
     if (tabBreadcrumbs[tabId]) {
         delete tabBreadcrumbs[tabId];
