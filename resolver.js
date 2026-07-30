@@ -300,9 +300,9 @@ const lincleStartTime = performance.now();
         } catch { /* non-fatal — keep empty */ }
     }
 
-    // Mevcut tryStaticExtraction fonksiyonunu bununla değiştir:
     function tryStaticExtraction() {
         const html = document.documentElement.outerHTML;
+        const currentCleanUrl = location.href.split('#')[0].replace(/\/$/, '');
 
         // Hem varsayılan hem de kullanıcının eklediği özel regexleri birleştir
         const allRegexes = [...STATIC_REGEXES, ...CUSTOM_STATIC_REGEXES];
@@ -311,7 +311,10 @@ const lincleStartTime = performance.now();
             try {
                 const match = html.match(pattern);
                 if (match && match[1] && isSafeHttpUrl(match[1]) && !isAdOrTrackingUrl(match[1])) {
-                    return match[1];
+                    const fullTarget = new URL(match[1], location.href).href.split('#')[0].replace(/\/$/, '');
+                    if (fullTarget !== currentCleanUrl) {
+                        return match[1];
+                    }
                 }
             } catch (e) { continue; } // Geçersiz regex girildiyse sistemi çökertme
         }
@@ -440,6 +443,14 @@ const lincleStartTime = performance.now();
     }
 
     async function goTo(url) {
+        try {
+            const targetUrl = new URL(url, location.href).href.split('#')[0].replace(/\/$/, '');
+            const currentUrl = location.href.split('#')[0].replace(/\/$/, '');
+
+            if (targetUrl === currentUrl) {
+                console.warn("[Lincle] Target URL is identical to current URL. Aborting redirect.");
+                return;
+            }
         // 1. Gerçek işlem süresini ölç (Hardcode yok)
         const executionTimeMs = performance.now() - lincleStartTime;
         const executionTimeSec = executionTimeMs / 1000;
