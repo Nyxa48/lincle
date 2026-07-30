@@ -451,6 +451,10 @@ const lincleStartTime = performance.now();
                 console.warn("[Lincle] Target URL is identical to current URL. Aborting redirect.");
                 return;
             }
+        } catch (e) {
+            console.error("Lincle URL Error:", e);
+            return;
+        }
         // 1. Gerçek işlem süresini ölç (Hardcode yok)
         const executionTimeMs = performance.now() - lincleStartTime;
         const executionTimeSec = executionTimeMs / 1000;
