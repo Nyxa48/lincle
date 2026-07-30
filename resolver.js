@@ -31,6 +31,10 @@ const lincleStartTime = performance.now();
         "amazon.com",
         "netflix.com",
         "pixeldrain.com",
+        // Game mod/community sites — lightboxes and modals are legitimate UI
+        "nexusmods.com",
+        // Server hosting — anti-adblock fingerprinting triggers false positives
+        "aternos.org",
         // Content/download index sites — these are NOT ad-gate pages.
         // Lincle running here caused wrong-link redirects (steamrip bug).
         "steamrip.com",

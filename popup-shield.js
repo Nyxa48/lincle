@@ -12,6 +12,58 @@
 (function () {
     'use strict';
 
+    // ─── Site-Level Protection Lists ──────────────────────────────────────────
+    // FULL_BYPASS: Lincle makes ZERO API modifications on these sites.
+    // This prevents false "ad-blocker detected" warnings on sites like Aternos
+    // that fingerprint native API overrides (window.open, Notification, etc.).
+    const FULL_BYPASS_SITES = [
+        'aternos.org',
+        'twitch.tv',
+        'spotify.com',
+        'discord.com',
+        'notion.so',
+        'figma.com',
+        'canva.com',
+        'docs.google.com',
+        'drive.google.com',
+        'outlook.live.com',
+        'mail.google.com',
+    ];
+
+    // OVERLAY_SAFE: Overlay/modal removal is disabled, but window.open blocking
+    // and notification suppression still work. For sites with legitimate modals
+    // (image lightboxes, galleries, login dialogs) that get falsely removed.
+    const OVERLAY_SAFE_SITES = [
+        'nexusmods.com',
+        'deviantart.com',
+        'artstation.com',
+        'behance.net',
+        'dribbble.com',
+        'unsplash.com',
+        'flickr.com',
+        'imgur.com',
+        'pinterest.com',
+        'medium.com',
+        'notion.so',
+        'trello.com',
+        'jira.atlassian.net',
+        'github.com',
+        'gitlab.com',
+        'stackoverflow.com',
+        'codepen.io',
+    ];
+
+    const currentHost = location.hostname.replace(/^www\./, '');
+
+    // If site is in the full bypass list, exit immediately without touching anything
+    if (FULL_BYPASS_SITES.some(s => currentHost === s || currentHost.endsWith('.' + s))) {
+        return;
+    }
+
+    const isOverlaySafe = OVERLAY_SAFE_SITES.some(
+        s => currentHost === s || currentHost.endsWith('.' + s)
+    );
+
     // ─── Cross-browser shim ───────────────────────────────────────────────────
     const ext = (typeof browser !== 'undefined') ? browser : chrome;
 
@@ -385,6 +437,8 @@
 
     function removeOverlays() {
         if (!shieldActive) return;
+        // Skip overlay removal entirely on sites with legitimate modals/lightboxes
+        if (isOverlaySafe) return;
         let removed = 0;
 
         activateOverflowGuard();
