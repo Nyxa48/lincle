@@ -133,7 +133,8 @@ function updateThemeIcon(themeObj) {
     const themeName = themeObj.name || LINCLE_PRESETS[preset]?.name || 'Theme';
     if (btn) btn.title = `Theme: ${themeName}`;
 
-    if (preset === 'dark')        use.setAttribute('href', '#ic-moon');
+    if (preset === 'void')        use.setAttribute('href', '#ic-void');
+    else if (preset === 'dark')   use.setAttribute('href', '#ic-moon');
     else if (preset === 'light')  use.setAttribute('href', '#ic-sun');
     else                          use.setAttribute('href', '#ic-palette');
 }

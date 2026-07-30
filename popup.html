@@ -2,174 +2,242 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:          #11111a;
-      --surface:     #1a1a28;
-      --surface2:    #232336;
-      --border:      #2e2e46;
-      --primary:     #00caf5;
-      --primary-dim: rgba(0,202,245,0.12);
-      --primary-glow:rgba(0,202,245,0.30);
-      --green:       #2ecc71;
-      --green-dim:   rgba(46,204,113,0.12);
-      --red:         #e74c3c;
-      --red-dim:     rgba(231,76,60,0.12);
-      --text:        #ededf8;
-      --text-dim:    #8080b0;
-      --radius:      14px;
-      --radius-sm:   10px;
+      --bg:          #000000;
+      --surface:     #252525;
+      --surface2:    #1a1a1a;
+      --border:      #333333;
+      --primary:     #ffffff;
+      --primary-dim: rgba(255,255,255,0.08);
+      --primary-glow:rgba(255,255,255,0.12);
+      --green:       #ffffff;
+      --green-dim:   rgba(255,255,255,0.06);
+      --red:         #666666;
+      --red-dim:     rgba(102,102,102,0.10);
+      --text:        #ffffff;
+      --text-dim:    #777777;
+
+      /* Metalab radii */
+      --radius:      50px;
+      --radius-sm:   50px;
+      --radius-pill: 1000px;
+
+      /* Editorial fonts */
+      --font-display: 'Cormorant Garamond', 'Georgia', serif;
+      --font-body:    'Inter', 'Segoe UI', system-ui, sans-serif;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      width: 360px;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      width: 380px;
+      font-family: var(--font-body);
+      font-weight: 400;
       font-size: 13px;
       background: var(--bg);
       color: var(--text);
-      padding: 18px;
+      padding: 24px;
       user-select: none;
+      letter-spacing: -0.01em;
     }
 
     /* ── Header ── */
     .header {
-      display: flex; align-items: center;
+      display: flex; align-items: flex-end;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
     }
-    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo { display: flex; align-items: center; gap: 14px; }
     .logo-icon {
-      width: 34px; height: 34px; border-radius: 9px;
-      background: linear-gradient(135deg, var(--primary) 0%, #0074c2 100%);
+      width: 40px; height: 40px; border-radius: var(--radius);
+      background: var(--surface);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 12px var(--primary-glow);
+      transition: background .2s;
     }
-    .logo-icon svg { color: #fff; }
-    .logo-text { font-size: 17px; font-weight: 800; color: var(--primary); letter-spacing: -0.4px; }
-    .logo-sub  { font-size: 10px; color: var(--text-dim); margin-top: 1px; letter-spacing: 0.2px; }
-    .header-actions { display: flex; gap: 5px; }
+    .logo-icon svg { color: var(--text); }
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: 300;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      line-height: 0.9;
+    }
+    .logo-sub {
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 300;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .header-actions { display: flex; gap: 6px; }
 
     /* ── Icon button ── */
     .icon-btn {
-      width: 30px; height: 30px; border-radius: 8px;
-      background: var(--surface2); border: 1px solid var(--border);
+      width: 32px; height: 32px; border-radius: var(--radius);
+      background: transparent; border: 1px solid var(--border);
       color: var(--text-dim); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: all .15s;
+      transition: all .2s ease;
     }
-    .icon-btn:hover { background: var(--primary-dim); color: var(--primary); border-color: var(--primary); }
-    .icon-btn:active { transform: scale(0.93); }
+    .icon-btn:hover { background: var(--surface); color: var(--text); border-color: var(--text-dim); }
+    .icon-btn:active { transform: scale(0.94); }
 
     /* ── Toggle switch ── */
-    .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .switch { position: relative; width: 38px; height: 20px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
     .slider {
       position: absolute; inset: 0; background: var(--border);
-      border-radius: 22px; cursor: pointer; transition: background .2s;
+      border-radius: var(--radius-pill); cursor: pointer; transition: background .25s ease;
     }
     .slider::before {
       content: ''; position: absolute;
-      width: 16px; height: 16px; border-radius: 50%;
-      background: #fff; top: 3px; left: 3px; transition: transform .2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,.35);
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--text-dim); top: 3px; left: 3px;
+      transition: transform .25s ease, background .25s ease;
     }
-    input:checked + .slider { background: var(--green); }
-    input:checked + .slider::before { transform: translateX(18px); }
+    input:checked + .slider { background: var(--text); }
+    input:checked + .slider::before { transform: translateX(18px); background: var(--bg); }
 
     /* ── Shield card ── */
     .shield-card {
       background: var(--surface);
-      border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px 15px;
-      margin-bottom: 12px;
-      display: flex; align-items: center; gap: 13px;
-      position: relative; overflow: hidden;
+      padding: 20px 22px;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 16px;
+      transition: background .3s ease;
     }
-    .shield-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--primary), transparent);
-    }
-    .shield-card.off::before { background: linear-gradient(90deg, var(--red), transparent); }
     .shield-icon-wrap {
-      width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0;
-      background: var(--primary-dim); border: 1px solid var(--primary-glow);
+      width: 48px; height: 48px; border-radius: var(--radius); flex-shrink: 0;
+      background: var(--bg);
       display: flex; align-items: center; justify-content: center;
-      color: var(--primary); transition: all .25s;
+      color: var(--text); transition: all .3s ease;
     }
-    .shield-icon-wrap.off { background: var(--red-dim); border-color: rgba(231,76,60,.30); color: var(--red); }
+    .shield-icon-wrap.off { color: var(--text-dim); }
     .shield-info { flex: 1; min-width: 0; }
-    .shield-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .6px; font-weight: 600; }
+    .shield-label {
+      font-size: 10px; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      font-weight: 300;
+      font-family: var(--font-body);
+    }
     .shield-status {
-      font-size: 14px; font-weight: 700; color: var(--green);
-      margin: 2px 0; display: flex; align-items: center; gap: 6px;
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 300; color: var(--text);
+      margin: 2px 0; display: flex; align-items: center; gap: 8px;
+      letter-spacing: -0.02em;
     }
-    .shield-status.off { color: var(--red); }
+    .shield-status.off { color: var(--text-dim); }
     .status-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--green); flex-shrink: 0;
-      box-shadow: 0 0 7px var(--green);
-      animation: pulse 2s infinite;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--text); flex-shrink: 0;
+      animation: pulse 2.5s ease infinite;
     }
-    .status-dot.off { background: var(--red); box-shadow: 0 0 7px var(--red); animation: none; }
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(0.85)} }
-    .shield-version { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+    .status-dot.off { background: var(--text-dim); animation: none; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .shield-version {
+      font-size: 10px; color: var(--text-dim);
+      font-weight: 300; letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
 
     /* ── Toggle rows ── */
-    .toggles { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .toggles { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
     .toggle-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; border-radius: var(--radius-sm);
-      background: var(--surface2); border: 1px solid var(--border);
-      cursor: pointer; transition: border-color .15s;
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer; transition: background .2s ease;
     }
-    .toggle-row:hover { border-color: var(--primary-glow); }
+    .toggle-row:hover { background: var(--surface2); }
     .toggle-row svg { color: var(--text-dim); flex-shrink: 0; }
     .toggle-info { flex: 1; min-width: 0; }
-    .toggle-label { font-size: 12.5px; font-weight: 600; }
-    .toggle-hint  { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+    .toggle-label {
+      font-size: 13px; font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    .toggle-hint {
+      font-size: 10px; color: var(--text-dim);
+      font-weight: 300; margin-top: 2px;
+      letter-spacing: 0.02em;
+    }
 
     /* ── Stats ── */
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      margin-bottom: 16px;
+    }
     .stat {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 11px 13px;
-      display: flex; align-items: center; gap: 11px;
+      background: var(--surface);
+      border-radius: var(--radius); padding: 18px 16px;
+      text-align: center;
     }
-    .stat-ic {
-      width: 36px; height: 36px; border-radius: 9px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    .stat-val {
+      font-family: var(--font-display);
+      font-size: 32px; font-weight: 300;
+      line-height: 0.9; letter-spacing: -0.03em;
+      color: var(--text);
     }
-    .stat-ic.blue  { background: var(--primary-dim); color: var(--primary); }
-    .stat-ic.green { background: var(--green-dim);   color: var(--green); }
-    .stat-val { font-size: 19px; font-weight: 800; line-height: 1.1; }
-    .stat-lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .4px; font-weight: 600; margin-top: 1px; }
+    .stat-lbl {
+      font-size: 10px; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      font-weight: 300; margin-top: 8px;
+    }
 
     /* ── Action button ── */
     .action-btn {
-      width: 100%; padding: 11px 14px; border-radius: var(--radius-sm);
-      border: 1px solid var(--primary); background: var(--primary);
-      color: #0a0a14; font-size: 13px; font-weight: 700;
+      width: 100%; padding: 14px 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text); font-family: var(--font-body);
+      font-size: 13px; font-weight: 400;
       cursor: pointer; display: flex; align-items: center;
-      justify-content: center; gap: 7px;
-      transition: all .15s; box-shadow: 0 3px 10px var(--primary-glow);
+      justify-content: center; gap: 8px;
+      transition: all .2s ease;
+      letter-spacing: -0.01em;
     }
-    .action-btn:hover { background: #00b5dc; border-color: #00b5dc; transform: translateY(-1px); }
-    .action-btn:active { transform: translateY(0); }
+    .action-btn:hover { background: var(--surface); border-color: var(--text-dim); }
+    .action-btn:active { transform: scale(0.98); }
 
     /* ── Toast ── */
     #clipResult {
-      margin-top: 8px; padding: 9px 11px;
-      border-radius: var(--radius-sm); font-size: 11.5px; font-weight: 600;
-      display: none; border: 1px solid var(--border);
-      background: var(--surface2); color: var(--text-dim);
-      word-break: break-all; line-height: 1.5;
+      margin-top: 10px; padding: 12px 16px;
+      border-radius: var(--radius); font-size: 11px; font-weight: 300;
+      display: none;
+      background: var(--surface); color: var(--text-dim);
+      word-break: break-all; line-height: 1.6;
+      letter-spacing: 0.01em;
     }
     #clipResult.show { display: block; }
-    #clipResult.success { border-color: var(--green); color: var(--green); background: var(--green-dim); }
-    #clipResult.error   { border-color: var(--red);   color: var(--red);   background: var(--red-dim); }
-    #clipResult.info    { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
+    #clipResult.success { color: var(--text); }
+    #clipResult.error   { color: var(--text-dim); }
+    #clipResult.info    { color: var(--text-dim); }
+
+    /* ── Metadata annotation (editorial marginalia) ── */
+    .meta-annotation {
+      font-size: 10px; font-weight: 300;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: var(--font-body);
+    }
+
+    /* ── Footer credits ── */
+    .footer {
+      margin-top: 20px; padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    .footer-left { font-size: 10px; color: var(--text-dim); font-weight: 300; letter-spacing: 0.06em; text-transform: uppercase; }
+    .footer-right { font-size: 10px; color: var(--text-dim); font-weight: 300; letter-spacing: 0.06em; }
   </style>
 </head>
 <body>
@@ -177,47 +245,52 @@
   <!-- SVG sprite -->
   <div style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
     <svg xmlns="http://www.w3.org/2000/svg"><defs>
-      <symbol id="ic-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
       </symbol>
-      <symbol id="ic-shield-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-shield-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>
       </symbol>
-      <symbol id="ic-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
         <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
       </symbol>
-      <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
       </symbol>
-      <symbol id="ic-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
         <rect x="8" y="2" width="8" height="4" rx="1"/>
       </symbol>
-      <symbol id="ic-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </symbol>
-      <symbol id="ic-power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>
       </symbol>
       <!-- Theme icons -->
-      <symbol id="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </symbol>
-      <symbol id="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="5"/>
         <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
         <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
         <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
       </symbol>
-      <symbol id="ic-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
         <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/>
         <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/>
         <circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/>
         <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.52-4.48-9.96-10-9.94z"/>
+      </symbol>
+      <!-- Void theme icon -->
+      <symbol id="ic-void" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <circle cx="12" cy="12" r="3"/>
       </symbol>
     </defs></svg>
   </div>
@@ -235,10 +308,10 @@
     </div>
     <div class="header-actions">
       <button class="icon-btn" id="themeToggleBtn" title="Theme">
-        <svg width="15" height="15" id="themeIcon"><use href="#ic-moon"/></svg>
+        <svg width="14" height="14" id="themeIcon"><use href="#ic-void"/></svg>
       </button>
       <button class="icon-btn" id="openOptions" title="Settings">
-        <svg width="15" height="15"><use href="#ic-settings"/></svg>
+        <svg width="14" height="14"><use href="#ic-settings"/></svg>
       </button>
     </div>
   </div>
@@ -261,7 +334,7 @@
   <!-- ── Toggles ── -->
   <div class="toggles">
     <label class="toggle-row" for="masterToggle">
-      <svg width="16" height="16"><use href="#ic-power"/></svg>
+      <svg width="15" height="15"><use href="#ic-power"/></svg>
       <div class="toggle-info">
         <div class="toggle-label" data-i18n="popMaster">Master Protection</div>
         <div class="toggle-hint" id="powerHint" data-i18n="popMasterHint">Toggle entire engine</div>
@@ -272,7 +345,7 @@
       </label>
     </label>
     <label class="toggle-row" for="shieldToggle">
-      <svg width="16" height="16" style="color:var(--primary)"><use href="#ic-shield-check"/></svg>
+      <svg width="15" height="15"><use href="#ic-shield-check"/></svg>
       <div class="toggle-info">
         <div class="toggle-label" data-i18n="popShieldToggle">Popup Shield</div>
         <div class="toggle-hint" data-i18n="popShieldHint">Bypasses overlays</div>
@@ -287,28 +360,28 @@
   <!-- ── Stats ── -->
   <div class="stats">
     <div class="stat">
-      <div class="stat-ic blue"><svg width="18" height="18"><use href="#ic-link"/></svg></div>
-      <div>
-        <div class="stat-val" id="valLinks">0</div>
-        <div class="stat-lbl" data-i18n="popCleaned">Cleaned</div>
-      </div>
+      <div class="stat-val" id="valLinks">0</div>
+      <div class="stat-lbl" data-i18n="popCleaned">Cleaned</div>
     </div>
     <div class="stat">
-      <div class="stat-ic green"><svg width="18" height="18"><use href="#ic-clock"/></svg></div>
-      <div>
-        <div class="stat-val" id="valTime">0s</div>
-        <div class="stat-lbl" data-i18n="popSaved">Saved</div>
-      </div>
+      <div class="stat-val" id="valTime">0s</div>
+      <div class="stat-lbl" data-i18n="popSaved">Saved</div>
     </div>
   </div>
 
   <!-- ── Action ── -->
   <button class="action-btn" id="cleanClipBtn">
-    <svg width="15" height="15"><use href="#ic-clipboard"/></svg>
+    <svg width="14" height="14"><use href="#ic-clipboard"/></svg>
     <span data-i18n="btnCleanClip">Clean Clipboard</span>
   </button>
 
   <div id="clipResult"></div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <div class="footer-left">Nyxa48</div>
+    <div class="footer-right meta-annotation" id="footerTime"></div>
+  </div>
 
   <script src="i18n.js"></script>
   <script src="theme-engine.js"></script>

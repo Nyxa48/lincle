@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Lincle",
-  "version": "3.6",
+  "version": "3.7",
   "description": "Zararlı ve agresif link kısaltıcıları otomatik algılayıp atlayarak doğrudan hedef linke ulaştırır.",
   "permissions": [
     "storage", 
@@ -30,6 +30,9 @@
       "matches": ["<all_urls>"],
       "exclude_matches": [
         "*://*.aternos.org/*",
+        "*://*.aternos.me/*",
+        "*://*.aternos.host/*",
+        "*://*.aternos.com/*",
         "*://*.twitch.tv/*",
         "*://*.spotify.com/*",
         "*://*.discord.com/*",
@@ -55,6 +58,9 @@
       "matches": ["<all_urls>"],
       "exclude_matches": [
         "*://*.aternos.org/*",
+        "*://*.aternos.me/*",
+        "*://*.aternos.host/*",
+        "*://*.aternos.com/*",
         "*://*.twitch.tv/*",
         "*://*.spotify.com/*",
         "*://*.discord.com/*",

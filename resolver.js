@@ -35,6 +35,9 @@ const lincleStartTime = performance.now();
         "nexusmods.com",
         // Server hosting — anti-adblock fingerprinting triggers false positives
         "aternos.org",
+        "aternos.me",
+        "aternos.host",
+        "aternos.com",
         // Content/download index sites — these are NOT ad-gate pages.
         // Lincle running here caused wrong-link redirects (steamrip bug).
         "steamrip.com",

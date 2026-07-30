@@ -18,6 +18,9 @@
     // that fingerprint native API overrides (window.open, Notification, etc.).
     const FULL_BYPASS_SITES = [
         'aternos.org',
+        'aternos.me',
+        'aternos.host',
+        'aternos.com',
         'twitch.tv',
         'spotify.com',
         'discord.com',
@@ -505,6 +508,7 @@
 
     function startOverlayWatcher() {
         if (!shieldActive) return;
+        if (isOverlaySafe) return; // Do not attach scroll-lock overrides to safe sites like nexusmods
 
         removeOverlays();
 

@@ -1,4 +1,4 @@
-// Lincle Theme Engine v2.0
+// Lincle Theme Engine v3.6
 // Shared between popup.js and options.js
 // Developed by: Emir Samed (Nyxa48)
 
@@ -6,6 +6,18 @@ const _themeExt = (typeof browser !== 'undefined') ? browser : chrome;
 
 // ─── Ready-Made Presets (Different Design Philosophies) ────────────────────
 const LINCLE_PRESETS = {
+    void: {
+        name:       'Void',
+        bg:         '#000000',
+        surface:    '#252525',
+        surface2:   '#1a1a1a',
+        border:     '#333333',
+        primary:    '#ffffff',
+        green:      '#ffffff',
+        red:        '#666666',
+        text:       '#ffffff',
+        textDim:    '#777777',
+    },
     dark: {
         name:       'Cyberpunk Dark',
         bg:         '#11111a',
@@ -112,17 +124,17 @@ function hexToRGBA(hex, alpha) {
 
 // ─── Apply Theme to Document ────────────────────────────────────────────────
 function lincleApplyTheme(themeObj) {
-    if (!themeObj) themeObj = { preset: 'dark' };
+    if (!themeObj) themeObj = { preset: 'void' };
 
     let colors;
     if (themeObj.preset === 'custom' && themeObj.colors) {
-        colors = { ...LINCLE_PRESETS.dark, ...themeObj.colors };
+        colors = { ...LINCLE_PRESETS.void, ...themeObj.colors };
     } else if (LINCLE_PRESETS[themeObj.preset]) {
         colors = LINCLE_PRESETS[themeObj.preset];
     } else if (themeObj.colors) {
-        colors = { ...LINCLE_PRESETS.dark, ...themeObj.colors };
+        colors = { ...LINCLE_PRESETS.void, ...themeObj.colors };
     } else {
-        colors = LINCLE_PRESETS.dark;
+        colors = LINCLE_PRESETS.void;
     }
 
     const root = document.documentElement;
@@ -149,7 +161,7 @@ async function lincleLoadTheme() {
         if (typeof themeObj === 'string') {
             themeObj = { preset: themeObj };
         }
-        if (!themeObj) themeObj = { preset: 'dark' };
+        if (!themeObj) themeObj = { preset: 'void' };
 
         // If custom theme is selected, ensure colors are loaded!
         if (themeObj.preset === 'custom') {
@@ -162,8 +174,8 @@ async function lincleLoadTheme() {
         lincleApplyTheme(themeObj);
         return themeObj;
     } catch {
-        lincleApplyTheme({ preset: 'dark' });
-        return { preset: 'dark' };
+        lincleApplyTheme({ preset: 'void' });
+        return { preset: 'void' };
     }
 }
 
@@ -177,11 +189,13 @@ async function lincleSaveTheme(themeObj) {
 // Strictly cycles through 3 states: dark → light → custom → dark ...
 async function lincleCycleTheme() {
     const d = await _themeExt.storage.local.get(['lincleTheme', 'lincleCustomTheme']);
-    let current = d.lincleTheme || { preset: 'dark' };
+    let current = d.lincleTheme || { preset: 'void' };
     if (typeof current === 'string') current = { preset: current };
 
     let next;
-    if (current.preset === 'dark') {
+    if (current.preset === 'void') {
+        next = { preset: 'dark' };
+    } else if (current.preset === 'dark') {
         next = { preset: 'light' };
     } else if (current.preset === 'light') {
         // Load custom / active theme saved from options
@@ -200,8 +214,8 @@ async function lincleCycleTheme() {
             };
         }
     } else {
-        // Back to dark
-        next = { preset: 'dark' };
+        // Back to void
+        next = { preset: 'void' };
     }
 
     await lincleSaveTheme(next);

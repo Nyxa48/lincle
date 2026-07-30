@@ -2,285 +2,290 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title data-i18n="optTitle">Lincle Ayarlari</title>
+  <title data-i18n="optTitle">Lincle Ayarları</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:         #11111a;
-      --surface:    #1a1a28;
-      --surface2:   #232336;
-      --border:     #2e2e46;
-      --primary:    #00caf5;
-      --primary-dim:rgba(0,202,245,0.12);
-      --primary-glow:rgba(0,202,245,0.30);
-      --green:      #2ecc71;
-      --green-dim:  rgba(46,204,113,0.12);
-      --red:        #e74c3c;
-      --red-dim:    rgba(231,76,60,0.12);
-      --text:       #ededf8;
-      --text-dim:   #8080b0;
+      --bg:          #000000;
+      --surface:     #252525;
+      --surface2:    #1a1a1a;
+      --border:      #333333;
+      --primary:     #ffffff;
+      --primary-dim: rgba(255,255,255,0.08);
+      --primary-glow:rgba(255,255,255,0.12);
+      --green:       #ffffff;
+      --green-dim:   rgba(255,255,255,0.06);
+      --red:         #666666;
+      --red-dim:     rgba(136,136,136,0.08);
+      --text:        #ffffff;
+      --text-dim:    #777777;
+
+      /* Metalab radii */
+      --radius:      50px;
+      --radius-sm:   50px;
+      --radius-pill: 1000px;
+
+      /* Editorial fonts */
+      --font-display: 'Cormorant Garamond', 'Georgia', serif;
+      --font-body:    'Inter', 'Segoe UI', system-ui, sans-serif;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: var(--font-body);
       background: var(--bg);
       color: var(--text);
-      padding: 36px 20px 60px;
-      line-height: 1.5;
+      padding: 60px 40px 100px;
+      line-height: 1.76;
+      font-size: 16px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
     }
-    .container { max-width: 720px; margin: 0 auto; }
+
+    .container { max-width: 900px; margin: 0 auto; }
 
     /* ── Header ── */
     .header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 24px;
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 60px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
     }
-    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-left { display: flex; align-items: center; gap: 24px; }
     .header-logo {
-      width: 38px; height: 38px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--primary), #0074c2);
+      width: 60px; height: 60px; border-radius: var(--radius);
+      background: var(--surface);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 14px var(--primary-glow);
+      transition: background .2s;
     }
-    .header-logo svg { color: #fff; }
-    .header-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .header-logo svg { color: var(--text); }
+    .header-title {
+      font-family: var(--font-display);
+      font-size: 64px; font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 0.8;
+      color: var(--text);
+    }
+
     /* ── Custom Flag Language Selector ── */
-    .custom-lang-dropdown {
-      position: relative; display: inline-block;
-    }
+    .custom-lang-dropdown { position: relative; display: inline-block; }
     .custom-lang-trigger {
-      display: flex; align-items: center; gap: 8px;
-      padding: 7px 12px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 10px;
-      color: var(--text); font-size: 13px; font-weight: 600;
-      cursor: pointer; transition: all .15s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 24px; background: transparent;
+      border: 1px solid var(--text-dim); border-radius: var(--radius-pill);
+      color: var(--text); font-family: var(--font-body);
+      font-size: 12px; font-weight: 300; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer; transition: all .2s ease;
     }
-    .custom-lang-trigger:hover {
-      border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-dim);
-    }
-    .custom-lang-flag {
-      display: flex; align-items: center; flex-shrink: 0;
-    }
-    .custom-lang-chevron {
-      color: var(--text-dim); transition: transform .2s; margin-left: 2px;
-    }
-    .custom-lang-dropdown.open .custom-lang-chevron {
-      transform: rotate(180deg);
-    }
+    .custom-lang-trigger:hover { border-color: var(--text); background: var(--surface); }
+    .custom-lang-flag { display: flex; align-items: center; flex-shrink: 0; }
+    .custom-lang-chevron { color: var(--text-dim); transition: transform .25s ease; margin-left: 4px; }
+    .custom-lang-dropdown.open .custom-lang-chevron { transform: rotate(180deg); }
     .custom-lang-menu {
-      position: absolute; top: calc(100% + 6px); right: 0; z-index: 1000;
+      position: absolute; top: calc(100% + 12px); right: 0; z-index: 1000;
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 6px; width: 175px;
-      max-height: 320px; overflow-y: auto;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-      display: none; opacity: 0; transform: translateY(-6px);
-      transition: opacity .15s, transform .15s;
+      border-radius: 24px; padding: 12px; width: 220px;
+      max-height: 400px; overflow-y: auto;
+      display: none; opacity: 0; transform: translateY(-8px);
+      transition: opacity .2s, transform .2s;
     }
-    .custom-lang-dropdown.open .custom-lang-menu {
-      display: block; opacity: 1; transform: translateY(0);
-    }
+    .custom-lang-dropdown.open .custom-lang-menu { display: block; opacity: 1; transform: translateY(0); }
     .custom-lang-item {
-      display: flex; align-items: center; gap: 9px;
-      padding: 8px 10px; border-radius: 8px;
-      font-size: 13px; font-weight: 600; color: var(--text);
-      cursor: pointer; transition: background .12s, color .12s;
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 12px;
+      font-size: 14px; font-weight: 300; color: var(--text-dim);
+      cursor: pointer; transition: background .2s, color .2s;
     }
-    .custom-lang-item:hover {
-      background: var(--primary-dim); color: var(--primary);
-    }
-    .custom-lang-item.selected {
-      background: var(--surface2); color: var(--primary); font-weight: 700;
-    }
+    .custom-lang-item:hover { background: var(--surface2); color: var(--text); }
+    .custom-lang-item.selected { background: var(--bg); color: var(--text); font-weight: 400; }
 
     /* ── Stats Bar ── */
     .stats-bar {
-      display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
-      margin-bottom: 20px;
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 24px;
+      margin-bottom: 40px;
     }
     .stat-chip {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px; text-align: center;
+      background: var(--surface);
+      border-radius: var(--radius); padding: 32px 24px; text-align: center;
     }
-    .stat-chip-val { font-size: 22px; font-weight: 800; color: var(--primary); }
-    .stat-chip-lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; margin-top: 2px; }
+    .stat-chip-val {
+      font-family: var(--font-display);
+      font-size: 48px; font-weight: 300;
+      color: var(--text);
+      line-height: 0.9; letter-spacing: -0.02em;
+    }
+    .stat-chip-lbl {
+      font-size: 12px; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      font-weight: 300; margin-top: 16px;
+    }
 
     /* ── Collapsible Card ── */
     .card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; margin-bottom: 12px; overflow: hidden;
-      transition: border-color .2s;
+      background: var(--surface);
+      border-radius: var(--radius); margin-bottom: 24px; overflow: hidden;
+      transition: background .3s ease;
     }
-    .card:hover { border-color: var(--primary-glow); }
     .card-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 14px 18px; cursor: pointer; user-select: none;
+      display: flex; align-items: center; gap: 16px;
+      padding: 24px 32px; cursor: pointer; user-select: none;
     }
     .card-header svg { color: var(--text-dim); flex-shrink: 0; }
     .card-header-title {
-      flex: 1; font-size: 14px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .4px; color: var(--text-dim);
+      flex: 1; font-family: var(--font-display);
+      font-size: 28px; font-weight: 300;
+      letter-spacing: -0.02em; color: var(--text);
     }
     .card-chevron {
-      width: 20px; height: 20px; color: var(--text-dim);
-      transition: transform .25s; flex-shrink: 0;
+      width: 24px; height: 24px; color: var(--text-dim);
+      transition: transform .3s ease; flex-shrink: 0;
     }
     .card.open .card-chevron { transform: rotate(180deg); }
     .card-body {
       max-height: 0; overflow: hidden;
-      transition: max-height .3s ease;
-      padding: 0 18px;
+      transition: max-height .4s ease;
+      padding: 0 32px;
     }
-    .card.open .card-body {
-      max-height: 2000px;
-      padding: 0 18px 18px;
-    }
+    .card.open .card-body { max-height: 3000px; padding: 0 32px 32px; }
 
     /* ── Form elements ── */
-    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
-    .helper { font-size: 12px; color: var(--text-dim); margin-top: 3px; margin-bottom: 12px; }
+    label {
+      display: block; font-size: 12px; font-weight: 300;
+      color: var(--text-dim); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 12px;
+    }
+    .helper {
+      font-size: 14px; color: var(--text-dim);
+      margin-top: 8px; margin-bottom: 20px;
+    }
 
     input[type="number"], textarea, select, input[type="text"] {
-      width: 100%; padding: 10px 13px;
-      border: 1px solid var(--border); border-radius: 8px;
-      background: var(--surface2); color: var(--text);
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 13px; transition: border-color .2s;
+      width: 100%; padding: 16px 20px;
+      border: 1px solid var(--border); border-radius: 12px;
+      background: var(--bg); color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px; font-weight: 300; transition: border-color .2s;
     }
-    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
-    textarea { height: 110px; resize: vertical; line-height: 1.5; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--text-dim); }
+    textarea { height: 160px; resize: vertical; line-height: 1.76; }
 
-    .check-row {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 14px;
-    }
-    .check-row input[type="checkbox"] {
-      width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;
-    }
-    .check-row label { margin: 0; font-weight: 400; cursor: pointer; }
+    .check-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .check-row input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; flex-shrink: 0; }
+    .check-row label { margin: 0; font-weight: 400; color: var(--text); text-transform: none; font-size: 16px; letter-spacing: -0.01em; cursor: pointer; }
 
     .danger-box {
-      background: var(--red-dim); border: 1px solid rgba(231,76,60,.25);
-      border-radius: 8px; padding: 12px; margin-top: 16px;
+      background: var(--red-dim);
+      border-radius: 24px; padding: 24px; margin-top: 32px;
     }
     .danger-box .check-row { margin-bottom: 0; }
-    .danger-box label { color: var(--red); font-weight: 500; }
+    .danger-box label { color: var(--text); }
 
     /* ── Buttons ── */
     .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-      padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
-      cursor: pointer; border: 1px solid var(--border); background: var(--surface2);
-      color: var(--text); transition: all .15s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 24px; border-radius: var(--radius-pill); font-family: var(--font-body);
+      font-size: 13px; font-weight: 400; letter-spacing: -0.01em;
+      cursor: pointer; border: 1px solid var(--border); background: transparent;
+      color: var(--text); transition: all .2s ease;
     }
-    .btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
+    .btn:hover { border-color: var(--text-dim); background: var(--surface); }
     .btn:active { transform: scale(0.97); }
-    .btn-primary {
-      background: var(--primary); color: #0a0a14; border-color: var(--primary);
-      box-shadow: 0 3px 10px var(--primary-glow);
-    }
-    .btn-primary:hover { background: #00b5dc; border-color: #00b5dc; color: #0a0a14; }
-    .btn-danger { border-color: var(--red); color: var(--red); }
-    .btn-danger:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); }
-    .btn-group { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    .btn-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .btn-primary:hover { background: var(--text-dim); border-color: var(--text-dim); color: var(--bg); }
+    .btn-danger { color: var(--text-dim); }
+    .btn-danger:hover { background: var(--surface2); color: var(--text); border-color: var(--text-dim); }
+    .btn-group { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
 
     /* ── Color Picker Grid & HEX inputs ── */
     .color-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-      margin: 14px 0;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin: 24px 0;
     }
-    @media (max-width: 680px) {
-      .color-grid { grid-template-columns: 1fr 1fr; }
-    }
+    @media (max-width: 680px) { .color-grid { grid-template-columns: 1fr 1fr; } }
     .color-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 10px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 9px;
-      transition: border-color .15s, box-shadow .15s;
+      display: flex; align-items: center; gap: 16px;
+      padding: 12px 16px; background: var(--bg);
+      border-radius: var(--radius-sm);
+      transition: border-color .2s; border: 1px solid transparent;
     }
-    .color-item:focus-within {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px var(--primary-dim);
-    }
+    .color-item:focus-within { border-color: var(--text-dim); }
     .color-swatch-wrap {
-      width: 32px; height: 32px; border-radius: 7px; flex-shrink: 0;
+      width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
       overflow: hidden; border: 1px solid var(--border);
       position: relative; cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.18);
     }
     .color-swatch-wrap input[type="color"] {
       position: absolute; top: -10px; left: -10px;
-      width: 55px; height: 55px; border: none; cursor: pointer;
+      width: 70px; height: 70px; border: none; cursor: pointer;
       background: none; padding: 0; opacity: 0;
     }
-    .color-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-    .color-item-label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .hex-input-wrap {
-      display: flex; align-items: center; background: var(--bg);
-      border: 1px solid var(--border); border-radius: 5px;
-      padding: 2px 6px; height: 24px; width: 100%;
-    }
-    .hex-hash { font-size: 11px; font-weight: 700; color: var(--text-dim); margin-right: 2px; }
+    .color-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+    .color-item-label { font-size: 10px; font-weight: 300; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hex-input-wrap { display: flex; align-items: center; background: transparent; height: 28px; width: 100%; }
+    .hex-hash { font-size: 14px; font-weight: 300; color: var(--text-dim); margin-right: 4px; }
     .hex-input {
       border: none !important; background: transparent !important;
       padding: 0 !important; height: 100% !important; width: 100% !important;
       font-family: ui-monospace, SFMono-Regular, Consolas, monospace !important;
-      font-size: 11px !important; font-weight: 700 !important;
+      font-size: 14px !important; font-weight: 400 !important;
       color: var(--text) !important; text-transform: uppercase;
     }
-    .hex-input:focus { outline: none !important; }
 
     /* ── Preset Segment ── */
     .preset-seg {
-      display: flex; gap: 0; border-radius: 8px; overflow: hidden;
-      border: 1px solid var(--border); margin-bottom: 12px;
+      display: flex; gap: 0; border-radius: var(--radius-pill); overflow: hidden;
+      border: 1px solid var(--border); margin-bottom: 24px;
     }
     .preset-btn {
-      flex: 1; padding: 9px 0; text-align: center;
-      font-size: 12px; font-weight: 700; cursor: pointer;
-      background: var(--surface2); color: var(--text-dim);
+      flex: 1; padding: 16px 0; text-align: center;
+      font-family: var(--font-body);
+      font-size: 13px; font-weight: 400; cursor: pointer;
+      background: transparent; color: var(--text-dim);
       border: none; border-right: 1px solid var(--border);
-      transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .preset-btn:last-child { border-right: none; }
-    .preset-btn.active { background: var(--primary); color: #0a0a14; }
-    .preset-btn:hover:not(.active) { background: var(--primary-dim); color: var(--primary); }
+    .preset-btn.active { background: var(--text); color: var(--bg); }
+    .preset-btn:hover:not(.active) { background: var(--surface2); color: var(--text); }
 
     /* ── Terminal box ── */
     .terminal-box {
-      background: var(--surface2); border: 1px solid var(--border);
-      padding: 14px; border-radius: 8px;
+      background: var(--bg); border: 1px solid var(--border);
+      padding: 24px; border-radius: 24px;
       font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 12px; max-height: 220px; overflow-y: auto;
-      color: var(--text-dim); line-height: 1.6;
+      font-size: 13px; max-height: 300px; overflow-y: auto;
+      color: var(--text-dim); line-height: 1.76;
     }
-    .chain-item { border-bottom: 1px dashed var(--border); padding-bottom: 10px; margin-bottom: 10px; }
+    .chain-item { border-bottom: 1px dashed var(--border); padding-bottom: 16px; margin-bottom: 16px; }
     .chain-item:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-    .chain-time { color: var(--primary); font-weight: 600; }
-    .chain-from { color: var(--red); }
-    .chain-to { color: var(--text); font-weight: 600; }
+    .chain-time { color: var(--text); font-weight: 400; }
+    .chain-from { color: var(--text-dim); }
+    .chain-to { color: var(--text); font-weight: 400; }
 
     /* ── Save area ── */
     .save-area {
-      text-align: center; margin-top: 24px; padding-top: 8px;
+      text-align: center; margin-top: 60px;
     }
-    .save-area .btn-primary { padding: 12px 48px; font-size: 15px; border-radius: 10px; }
+    .save-area .btn-primary { padding: 16px 64px; font-size: 16px; }
     #saveStatus {
-      color: var(--green); margin-top: 10px; font-weight: 700;
-      font-size: 14px; display: none;
+      color: var(--text); margin-top: 16px; font-weight: 300;
+      font-size: 14px; display: none; font-family: var(--font-body);
     }
-
-    /* ── Separator ── */
-    .sep { margin-top: 18px; }
+    .sep { margin-top: 32px; border-bottom: 1px solid var(--border); padding-bottom: 32px; }
   </style>
 </head>
 <body>
   <!-- SVG icons -->
   <div style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
     <svg xmlns="http://www.w3.org/2000/svg"><defs>
-      <symbol id="ic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="6 9 12 15 18 9"/>
       </symbol>
-      <symbol id="ic-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="4" y="4" width="16" height="16" rx="2"/>
         <rect x="9" y="9" width="6" height="6"/>
         <line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/>
@@ -288,54 +293,51 @@
         <line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/>
         <line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>
       </symbol>
-      <symbol id="ic-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
         <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/>
         <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/>
         <circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/>
         <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.52-4.48-9.96-10-9.94z"/>
       </symbol>
-      <symbol id="ic-database" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-database" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <ellipse cx="12" cy="5" rx="9" ry="3"/>
         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
         <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
       </symbol>
-      <symbol id="ic-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
       </symbol>
-      <symbol id="ic-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
       </symbol>
-      <symbol id="ic-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
         <polyline points="14 2 14 8 20 8"/>
         <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </symbol>
-      <symbol id="ic-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
         <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
       </symbol>
-      <symbol id="ic-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
         <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
       </symbol>
-      <symbol id="ic-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
         <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
       </symbol>
-      <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
         <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
       </symbol>
-      <symbol id="ic-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
         <polyline points="22,6 12,13 2,6"/>
       </symbol>
-      <symbol id="ic-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
-      </symbol>
-      <symbol id="ic-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
       </symbol>
     </defs></svg>
   </div>
@@ -346,7 +348,7 @@
     <div class="header">
       <div class="header-left">
         <div class="header-logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
           </svg>
         </div>
@@ -357,7 +359,7 @@
           <button type="button" class="custom-lang-trigger" id="customLangTrigger">
             <span class="custom-lang-flag" id="currentLangFlag"></span>
             <span class="custom-lang-name" id="currentLangName">English</span>
-            <svg class="custom-lang-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="custom-lang-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="custom-lang-menu" id="customLangMenu">
             <!-- Populated dynamically with vector SVG flags -->
@@ -389,65 +391,69 @@
     <!-- ═══ Theme & Appearance ═══ -->
     <div class="card open" data-card>
       <div class="card-header" data-toggle>
-        <svg width="16" height="16"><use href="#ic-palette"/></svg>
+        <svg width="24" height="24"><use href="#ic-palette"/></svg>
         <span class="card-header-title" data-i18n="themeTitle">Tema & Görünüm</span>
-        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
-        <label style="font-weight:700;margin-bottom:8px" data-i18n="themePresetTitle">Hazır Temalar (Presets)</label>
-        <div class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
-          <button class="preset-btn active" data-preset="dark">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00caf5"></span>
+        <label data-i18n="themePresetTitle">Hazır Temalar (Presets)</label>
+        <div class="preset-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;">
+          <button class="preset-btn active" data-preset="void">
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#ffffff;border:1px solid #333"></span>
+            <span>Void</span>
+          </button>
+          <button class="preset-btn" data-preset="dark">
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#00caf5"></span>
             <span>Cyberpunk Dark</span>
           </button>
           <button class="preset-btn" data-preset="light">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0096d2"></span>
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#0096d2"></span>
             <span>Clean Light</span>
           </button>
           <button class="preset-btn" data-preset="nordic">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#88c0d0"></span>
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#88c0d0"></span>
             <span>Nordic Slate</span>
           </button>
           <button class="preset-btn" data-preset="emerald">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10b981"></span>
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#10b981"></span>
             <span>Emerald Matrix</span>
           </button>
           <button class="preset-btn" data-preset="sunset">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f59e0b"></span>
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#f59e0b"></span>
             <span>Sunset Amber</span>
           </button>
           <button class="preset-btn" data-preset="dracula">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#bd93f9"></span>
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#bd93f9"></span>
             <span>Dracula Violet</span>
           </button>
         </div>
 
-        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-            <label style="font-weight:700;margin:0" data-i18n="themeCustomTitle">Özel Tema Kütüphanesi & Düzenleyici</label>
-            <button class="btn" id="btnToggleCustom" style="padding:4px 10px;font-size:11px;">
-              <svg width="12" height="12"><use href="#ic-palette"/></svg>
+        <div style="border-top:1px solid var(--border);padding-top:32px;margin-top:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <label style="margin:0" data-i18n="themeCustomTitle">Özel Tema Kütüphanesi & Düzenleyici</label>
+            <button class="btn" id="btnToggleCustom">
+              <svg width="14" height="14"><use href="#ic-palette"/></svg>
               <span data-i18n="themeEditorBtn">Renk Düzenleyici</span>
             </button>
           </div>
 
-          <div id="savedThemesWrapper" style="margin-bottom:12px;display:flex;gap:8px;">
+          <div id="savedThemesWrapper" style="margin-bottom:24px;display:flex;gap:12px;">
             <select id="savedThemesSelect" style="flex:1;">
               <option value="" data-i18n="themeSavedSelect">-- Kayıtlı Özel Temalarım --</option>
             </select>
-            <button class="btn btn-danger" id="btnDeleteCustomTheme" title="Seçili Temayı Sil" style="padding:8px 12px;display:none;">
-              <svg width="14" height="14"><use href="#ic-trash"/></svg>
+            <button class="btn btn-danger" id="btnDeleteCustomTheme" title="Seçili Temayı Sil" style="display:none;">
+              <svg width="16" height="16"><use href="#ic-trash"/></svg>
             </button>
           </div>
 
-          <div id="customColorSection" style="display:none;background:var(--surface2);border:1px solid var(--border);padding:14px;border-radius:10px;margin-bottom:14px;">
-            <label for="themeNameInput" style="font-size:12px;font-weight:600;" data-i18n="themeNameLabel">Tema İsmi:</label>
-            <input type="text" id="themeNameInput" value="Neo Custom" data-i18n-ph="themeNameDefault" placeholder="Theme Name..." style="margin-bottom:12px;">
+          <div id="customColorSection" style="display:none;background:var(--bg);border:1px solid var(--border);padding:24px;border-radius:24px;margin-bottom:24px;">
+            <label for="themeNameInput" data-i18n="themeNameLabel">Tema İsmi:</label>
+            <input type="text" id="themeNameInput" value="Neo Custom" data-i18n-ph="themeNameDefault" placeholder="Theme Name..." style="margin-bottom:24px;">
 
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <label style="font-size:12px;font-weight:600;margin:0;" data-i18n="themePaletteLabel">Renk Paleti:</label>
-              <button class="btn" id="btnAutoHarmonize" type="button" style="padding:3px 8px;font-size:11px;" title="Auto-calculate matching cards and buttons from background">
-                <svg width="12" height="12"><use href="#ic-zap"/></svg>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <label style="margin:0;" data-i18n="themePaletteLabel">Renk Paleti:</label>
+              <button class="btn" id="btnAutoHarmonize" type="button" title="Auto-calculate matching cards and buttons from background">
+                <svg width="14" height="14"><use href="#ic-zap"/></svg>
                 <span data-i18n="themeAutoHarmonize">Otomatik Tonlama</span>
               </button>
             </div>
@@ -456,18 +462,18 @@
             </div>
 
             <button class="btn btn-primary" id="btnSaveCustomTheme" style="width:100%;">
-              <svg width="14" height="14"><use href="#ic-save"/></svg>
+              <svg width="16" height="16"><use href="#ic-save"/></svg>
               <span data-i18n="themeSaveBtn">Temayı Kütüphaneye Kaydet</span>
             </button>
           </div>
 
           <div class="btn-group">
             <button class="btn" id="btnExportTheme">
-              <svg width="14" height="14"><use href="#ic-download"/></svg>
+              <svg width="16" height="16"><use href="#ic-download"/></svg>
               <span data-i18n="themeExportBtn">Temayı Dışa Aktar (JSON)</span>
             </button>
             <button class="btn" id="btnImportTheme">
-              <svg width="14" height="14"><use href="#ic-upload"/></svg>
+              <svg width="16" height="16"><use href="#ic-upload"/></svg>
               <span data-i18n="themeImportBtn">Tema İçe Aktar (JSON)</span>
             </button>
           </div>
@@ -478,9 +484,9 @@
     <!-- ═══ Algorithm & System ═══ -->
     <div class="card" data-card>
       <div class="card-header" data-toggle>
-        <svg width="16" height="16"><use href="#ic-cpu"/></svg>
+        <svg width="24" height="24"><use href="#ic-cpu"/></svg>
         <span class="card-header-title" data-i18n="algTitle">Algoritma ve Sistem</span>
-        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
         <div class="check-row">
@@ -512,9 +518,9 @@
     <!-- ═══ Domain List & Shortcuts ═══ -->
     <div class="card" data-card>
       <div class="card-header" data-toggle>
-        <svg width="16" height="16"><use href="#ic-database"/></svg>
+        <svg width="24" height="24"><use href="#ic-database"/></svg>
         <span class="card-header-title" data-i18n="wlTitle">Domain Listesi ve Kısayollar</span>
-        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
         <label for="domainList" data-i18n="domainOpt">Engellenen Domainler:</label>
@@ -524,7 +530,7 @@
         <label data-i18n="shortcutOpt">Klavye Kısayolu:</label>
         <div class="helper" data-i18n="shortcutHelp">Tarayıcı ayarlarından değiştirebilirsiniz.</div>
         <button class="btn" id="btnShortcuts">
-          <svg width="14" height="14"><use href="#ic-key"/></svg>
+          <svg width="16" height="16"><use href="#ic-key"/></svg>
           <span data-i18n="btnShortcut">Kısayolları Düzenle</span>
         </button>
       </div>
@@ -533,27 +539,27 @@
     <!-- ═══ Researcher: Bulk Resolver ═══ -->
     <div class="card" data-card>
       <div class="card-header" data-toggle>
-        <svg width="16" height="16"><use href="#ic-zap"/></svg>
+        <svg width="24" height="24"><use href="#ic-zap"/></svg>
         <span class="card-header-title" data-i18n="bulkTitle">Araştırmacı: Toplu Çözümleyici</span>
-        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
         <div class="helper" data-i18n="bulkHelp">Arka planda toplu link çözer.</div>
         <textarea id="bulkInput" placeholder="..."></textarea>
-        <button class="btn btn-primary" id="btnBulkResolve" style="width:100%;margin-top:10px">
-          <svg width="14" height="14"><use href="#ic-zap"/></svg>
+        <button class="btn btn-primary" id="btnBulkResolve" style="width:100%;margin-top:16px">
+          <svg width="16" height="16"><use href="#ic-zap"/></svg>
           <span data-i18n="btnBulk">Toplu Çözümle</span>
         </button>
-        <textarea id="bulkOutput" placeholder="..." style="margin-top:10px" readonly></textarea>
+        <textarea id="bulkOutput" placeholder="..." style="margin-top:16px" readonly></textarea>
       </div>
     </div>
 
     <!-- ═══ Researcher: Custom Regex ═══ -->
     <div class="card" data-card>
       <div class="card-header" data-toggle>
-        <svg width="16" height="16"><use href="#ic-terminal"/></svg>
+        <svg width="24" height="24"><use href="#ic-terminal"/></svg>
         <span class="card-header-title" data-i18n="regexTitle">Araştırmacı: Özel Regex Kuralları</span>
-        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
         <div class="helper" data-i18n="regexHelp">Layer 0 URL ayıklama kurallarınızı ekleyin.</div>
@@ -564,28 +570,28 @@
     <!-- ═══ System Logs ═══ -->
     <div class="card" data-card>
       <div class="card-header" data-toggle>
-        <svg width="16" height="16"><use href="#ic-file"/></svg>
+        <svg width="24" height="24"><use href="#ic-file"/></svg>
         <span class="card-header-title" data-i18n="logTitle">Sistem Logları</span>
-        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
         <label data-i18n="chainOpt">Yönlendirme Zinciri</label>
-        <div id="chainContainer" class="terminal-box" style="margin-bottom:10px">--</div>
+        <div id="chainContainer" class="terminal-box" style="margin-bottom:16px">--</div>
         <button class="btn" id="btnClearChain">
-          <svg width="14" height="14"><use href="#ic-trash"/></svg>
+          <svg width="16" height="16"><use href="#ic-trash"/></svg>
           <span data-i18n="btnClearChain">Zinciri Temizle</span>
         </button>
 
-        <div class="sep"></div>
+        <div class="sep" style="padding-bottom:16px"></div>
         <label data-i18n="failOpt">Başarısızlık Raporları</label>
-        <textarea id="failureList" class="terminal-box" style="margin-bottom:10px;color:var(--red)" readonly></textarea>
+        <textarea id="failureList" class="terminal-box" style="margin-bottom:16px;color:var(--text)" readonly></textarea>
         <div class="btn-group">
           <button class="btn" id="btnEmailDev">
-            <svg width="14" height="14"><use href="#ic-mail"/></svg>
+            <svg width="16" height="16"><use href="#ic-mail"/></svg>
             <span data-i18n="btnEmail">Geliştiriciye Raporla</span>
           </button>
           <button class="btn btn-danger" id="btnClearFailures">
-            <svg width="14" height="14"><use href="#ic-trash"/></svg>
+            <svg width="16" height="16"><use href="#ic-trash"/></svg>
             <span data-i18n="btnClearFail">Raporları Temizle</span>
           </button>
         </div>
@@ -595,7 +601,7 @@
     <!-- ── Save ── -->
     <div class="save-area">
       <button class="btn btn-primary" id="saveBtn">
-        <svg width="16" height="16"><use href="#ic-save"/></svg>
+        <svg width="18" height="18"><use href="#ic-save"/></svg>
         <span data-i18n="btnSave">Tüm Ayarları Kaydet</span>
       </button>
       <div id="saveStatus" data-i18n="saveStatus">Kaydedildi!</div>
