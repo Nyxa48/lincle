@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Lincle",
-  "version": "3.5",
+  "version": "3.6",
   "description": "Zararlı ve agresif link kısaltıcıları otomatik algılayıp atlayarak doğrudan hedef linke ulaştırır.",
   "permissions": [
     "storage", 
@@ -28,12 +28,50 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
+      "exclude_matches": [
+        "*://*.aternos.org/*",
+        "*://*.twitch.tv/*",
+        "*://*.spotify.com/*",
+        "*://*.discord.com/*",
+        "*://*.crunchyroll.com/*",
+        "*://*.hulu.com/*",
+        "*://*.funimation.com/*",
+        "*://*.disneyplus.com/*",
+        "*://*.peacocktv.com/*",
+        "*://*.dazn.com/*",
+        "*://*.mail.google.com/*",
+        "*://*.docs.google.com/*",
+        "*://*.drive.google.com/*",
+        "*://*.outlook.live.com/*",
+        "*://*.notion.so/*",
+        "*://*.figma.com/*",
+        "*://*.canva.com/*"
+      ],
       "js": ["popup-shield.js"],
       "run_at": "document_start",
       "all_frames": false
     },
     {
       "matches": ["<all_urls>"],
+      "exclude_matches": [
+        "*://*.aternos.org/*",
+        "*://*.twitch.tv/*",
+        "*://*.spotify.com/*",
+        "*://*.discord.com/*",
+        "*://*.crunchyroll.com/*",
+        "*://*.hulu.com/*",
+        "*://*.funimation.com/*",
+        "*://*.disneyplus.com/*",
+        "*://*.peacocktv.com/*",
+        "*://*.dazn.com/*",
+        "*://*.mail.google.com/*",
+        "*://*.docs.google.com/*",
+        "*://*.drive.google.com/*",
+        "*://*.outlook.live.com/*",
+        "*://*.notion.so/*",
+        "*://*.figma.com/*",
+        "*://*.canva.com/*"
+      ],
       "js": ["resolver.js"],
       "run_at": "document_idle",
       "all_frames": false
