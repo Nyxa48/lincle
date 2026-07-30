@@ -17,10 +17,6 @@
     // This prevents false "ad-blocker detected" warnings on sites like Aternos
     // that fingerprint native API overrides (window.open, Notification, etc.).
     const FULL_BYPASS_SITES = [
-        'aternos.org',
-        'aternos.me',
-        'aternos.host',
-        'aternos.com',
         'twitch.tv',
         'spotify.com',
         'discord.com',
@@ -57,6 +53,53 @@
     ];
 
     const currentHost = location.hostname.replace(/^www\./, '');
+
+    // ─── 0. Universal Anti-Adblock & Fingerprint Defuser Engine ─────────────
+    // Neutralizes common global JS flags used by FuckAdBlock, BlockAdBlock,
+    // Aternos, Linkvertise, and ad-gate scripts to detect adblockers.
+    try {
+        const ANTI_ADBLOCK_GLOBALS = {
+            canRunAds: true,
+            isAdblockActive: false,
+            adblock: false,
+            ab: false,
+            frequentlyAskedQuestions: true,
+            google_ad_client: true,
+        };
+        for (const [prop, val] of Object.entries(ANTI_ADBLOCK_GLOBALS)) {
+            try {
+                Object.defineProperty(window, prop, {
+                    get: () => val,
+                    set: () => {},
+                    configurable: true
+                });
+            } catch (e) {}
+        }
+    } catch (e) {}
+
+    // Inject universal CSS shield to instantly suppress anti-adblock modals & restore backdrop blur
+    try {
+        const shieldStyle = document.createElement('style');
+        shieldStyle.id = 'lincle-universal-shield-css';
+        shieldStyle.textContent = `
+            .adblock, .adblock-overlay, #adblock-overlay, .ab-notice, #ab-notice, 
+            #ab-message, .ab-message, .php-adblock, .adblock-warning, #notice-adblock, 
+            [class*="adblock"], [id*="adblock"], [class*="ab-message"], [class*="anti-adblock"] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                height: 0 !important;
+                width: 0 !important;
+            }
+            body, html, .page, #main, .body, #content, .server-body, .server-header, .navigation {
+                filter: none !important;
+                -webkit-filter: none !important;
+                backdrop-filter: none !important;
+            }
+        `;
+        (document.head || document.documentElement).appendChild(shieldStyle);
+    } catch (e) {}
 
     // If site is in the full bypass list, exit immediately without touching anything
     if (FULL_BYPASS_SITES.some(s => currentHost === s || currentHost.endsWith('.' + s))) {
