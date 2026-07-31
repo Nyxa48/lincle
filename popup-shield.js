@@ -54,6 +54,11 @@
         'gitlab.com',
         'stackoverflow.com',
         'codepen.io',
+        // Content index sites — these have search modals and legitimate download flows
+        // that get falsely detected as ad overlays.
+        'steamrip.com',
+        'fitgirl-repacks.site',
+        'cs.rin.ru',
     ];
 
     const currentHost = location.hostname.replace(/^www\./, '');
@@ -193,6 +198,27 @@
         '[class*="human-verify"]',
     ];
 
+    // Returns true if an overlay element is a legitimate UI component that Lincle
+    // must never destroy: search dialogs, login forms, image lightboxes, etc.
+    // Criteria: contains an interactive input, has an explicit dialog/search role,
+    // or belongs to a class name pattern typically used for real search/auth modals.
+    function isLegitimateModal(el) {
+        try {
+            // Any overlay containing a focusable input / textarea / select is legitimate
+            if (el.querySelector('input, textarea, select, [contenteditable="true"]')) return true;
+
+            // ARIA roles that signal intentional, user-opened dialogs
+            const role = (el.getAttribute('role') || '').toLowerCase();
+            if (role === 'dialog' || role === 'search' || role === 'alertdialog') return true;
+
+            // Class/id name patterns that unambiguously indicate a search or auth modal
+            const combined = ((el.className || '') + ' ' + (el.id || '')).toLowerCase();
+            if (/\b(search|login|sign-?in|sign-?up|register|auth|account|newsletter|nav-?menu|mega-?menu)\b/.test(combined)) return true;
+
+            return false;
+        } catch { return false; }
+    }
+
     function isCoveringOverlay(el) {
         try {
             const style = window.getComputedStyle(el);
@@ -205,7 +231,12 @@
             const isHighZ = parseInt(style.zIndex, 10) > 100;
             const isLarge = rect.width > vw * 0.4 && rect.height > vh * 0.3;
 
-            return isFixed && isVisible && isHighZ && isLarge;
+            if (!(isFixed && isVisible && isHighZ && isLarge)) return false;
+
+            // Final safety gate: never flag legitimate modals as targets
+            if (isLegitimateModal(el)) return false;
+
+            return true;
         } catch { return false; }
     }
 
