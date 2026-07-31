@@ -1,6 +1,6 @@
 # Lincle
 
-![Version](https://img.shields.io/badge/version-3.7-00caf5.svg?style=for-the-badge&labelColor=11111a)
+![Version](https://img.shields.io/badge/version-3.8-00caf5.svg?style=for-the-badge&labelColor=11111a)
 ![Manifest](https://img.shields.io/badge/manifest-V3-10b981.svg?style=for-the-badge&labelColor=11111a)
 ![Languages](https://img.shields.io/badge/languages-14_Supported-bd93f9.svg?style=for-the-badge&labelColor=11111a)
 ![Privacy](https://img.shields.io/badge/privacy-100%25_Local-2ecc71.svg?style=for-the-badge&labelColor=11111a)
