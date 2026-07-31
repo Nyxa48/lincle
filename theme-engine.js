@@ -295,31 +295,42 @@ async function lincleLoadTheme() {
 async function lincleSaveTheme(themeObj) {
     await _themeExt.storage.local.set({ lincleTheme: themeObj });
     lincleApplyTheme(themeObj);
+
+    // Track last non-void, non-light preset for the popup 3-state cycle
+    const p = themeObj.preset;
+    if (p && p !== 'void' && p !== 'light') {
+        await _themeExt.storage.local.set({ lincleLastPreset: themeObj });
+    }
 }
 
 // ─── Cycle Preset (popup button) ─────────────────────────────────────────────
-// Cycles through all 8 presets in order, then wraps back.
+// 3-state cycle: void (dark default) → light → last saved preset/custom → void
 async function lincleCycleTheme() {
-    const d = await _themeExt.storage.local.get(['lincleTheme', 'lincleCustomTheme']);
+    const d = await _themeExt.storage.local.get(['lincleTheme', 'lincleCustomTheme', 'lincleLastPreset']);
     let current = d.lincleTheme || { preset: 'void' };
     if (typeof current === 'string') current = { preset: current };
+    if (current.preset === 'dark') current.preset = 'cyberpunk'; // migration
 
-    // Migration: 'dark' → 'cyberpunk'
-    if (current.preset === 'dark') current.preset = 'cyberpunk';
-
-    const currentIdx = PRESET_CYCLE_ORDER.indexOf(current.preset);
-    const nextPreset = PRESET_CYCLE_ORDER[(currentIdx + 1) % PRESET_CYCLE_ORDER.length];
+    // The 3rd slot is: lastPreset saved from Options, or cyberpunk as fallback
+    const lastPreset = d.lincleLastPreset
+        || (d.lincleCustomTheme?.colors
+            ? { preset: 'custom', name: d.lincleCustomTheme.name || 'Custom', colors: d.lincleCustomTheme.colors }
+            : { preset: 'cyberpunk' });
 
     let next;
-    if (nextPreset === 'custom') {
-        next = d.lincleCustomTheme?.colors
-            ? { preset: 'custom', name: d.lincleCustomTheme.name || 'Custom', colors: d.lincleCustomTheme.colors }
-            : { preset: 'void' };
+    if (current.preset === 'void') {
+        // void → light
+        next = { preset: 'light' };
+    } else if (current.preset === 'light') {
+        // light → last selected preset / custom
+        next = lastPreset;
     } else {
-        next = { preset: nextPreset };
+        // anything else → back to void
+        next = { preset: 'void' };
     }
 
-    await lincleSaveTheme(next);
+    await _themeExt.storage.local.set({ lincleTheme: next });
+    lincleApplyTheme(next);
     return next;
 }
 

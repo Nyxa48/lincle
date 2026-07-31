@@ -85,8 +85,10 @@
       background: transparent; border: 1px solid var(--border);
       color: var(--text-dim); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
+      padding: 0;
       transition: all .2s ease;
     }
+    .icon-btn svg { display: block; flex-shrink: 0; }
     .icon-btn:hover { background: var(--surface); color: var(--text); border-color: var(--text-dim); }
     .icon-btn:active { transform: scale(0.94); }
 

@@ -127,20 +127,21 @@ async function initUI() {
 
 // ── Theme Icon Updater ──────────────────────────────────────────────────
 function updateThemeIcon(themeObj) {
-    const btn  = document.getElementById('themeToggleBtn');
-    const use  = document.querySelector('#themeIcon use');
+    const btn     = document.getElementById('themeToggleBtn');
+    const use     = document.querySelector('#themeIcon use');
     if (!use) return;
     const preset    = lincleGetPresetName(themeObj);
     const presetDef = LINCLE_PRESETS[preset];
     const themeName = themeObj.name || presetDef?.name || preset;
     if (btn) btn.title = `Theme: ${themeName}`;
 
-    // Map preset → icon
-    if      (preset === 'void')       use.setAttribute('href', '#ic-void');
-    else if (preset === 'light')      use.setAttribute('href', '#ic-sun');
-    else if (presetDef && !presetDef.dark) use.setAttribute('href', '#ic-sun');
-    else if (preset === 'custom')     use.setAttribute('href', '#ic-palette');
-    else                              use.setAttribute('href', '#ic-moon');
+    // 3-state cycle icons:
+    // void  → circle-dot (ic-void)  — darkest minimal
+    // light → sun        (ic-sun)   — light mode
+    // other → palette    (ic-palette) — any custom/preset 3rd slot
+    if      (preset === 'void')  use.setAttribute('href', '#ic-void');
+    else if (preset === 'light') use.setAttribute('href', '#ic-sun');
+    else                         use.setAttribute('href', '#ic-palette');
 }
 
 // ── Shield UI Updater ───────────────────────────────────────────────────
