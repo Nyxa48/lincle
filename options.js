@@ -312,34 +312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await populateSavedThemes();
 
-    // Preset button clicks (Dark, Light, Nordic, Emerald, Sunset, Dracula)
-    presetBtns.forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const preset = btn.dataset.preset;
-            setActivePresetUI(preset);
-            if (savedSelect) savedSelect.value = '';
-            if (btnDeleteCustom) btnDeleteCustom.style.display = 'none';
-
-            if (preset === 'dark' || preset === 'light') {
-                await lincleSaveTheme({ preset });
-            } else {
-                // For Nordic, Emerald, Sunset, Dracula -> set as active Custom theme!
-                const presetTheme = LINCLE_PRESETS[preset];
-                const themeObj = {
-                    preset: 'custom',
-                    name: presetTheme?.name || preset,
-                    colors: { ...presetTheme },
-                };
-                Object.assign(customColors, presetTheme);
-                COLOR_KEYS.forEach(({ key }) => {
-                    const el = document.getElementById(`color_${key}`);
-                    if (el && customColors[key]) el.value = customColors[key];
-                });
-                await lincleSaveTheme(themeObj);
-                await ext.storage.local.set({ lincleCustomTheme: themeObj });
-            }
-        });
-    });
+    // Note: preset button click handlers are attached inside renderPresetGrid() above.
 
     // Select a saved theme from dropdown
     if (savedSelect) {
