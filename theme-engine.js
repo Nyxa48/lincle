@@ -1,116 +1,190 @@
-// Lincle Theme Engine v3.6
+// Lincle Theme Engine v3.8
 // Shared between popup.js and options.js
 // Developed by: Emir Samed (Nyxa48)
 
 const _themeExt = (typeof browser !== 'undefined') ? browser : chrome;
 
-// ─── Ready-Made Presets (Different Design Philosophies) ────────────────────
+// ─── Font Presets ────────────────────────────────────────────────────────────
+// 4 fonts selected for universal language coverage + modern aesthetics.
+// Each entry includes Google Fonts URL fragment and CSS family strings.
+const LINCLE_FONTS = {
+    inter: {
+        name:    'Inter',
+        label:   'Inter — Clean & Modern',
+        sample:  'Aa Bb 123 — Link Cleaner',
+        display: "'Inter', 'Segoe UI', system-ui, sans-serif",
+        body:    "'Inter', 'Segoe UI', system-ui, sans-serif",
+        gfonts:  'Inter:wght@300;400;500',
+    },
+    geist: {
+        name:    'Geist',
+        label:   'Geist — Technical Sans',
+        sample:  'Aa Bb 123 — Link Cleaner',
+        display: "'Geist', 'Inter', system-ui, sans-serif",
+        body:    "'Geist', 'Inter', system-ui, sans-serif",
+        gfonts:  'Geist:wght@300;400;500',
+    },
+    noto: {
+        name:    'Noto Sans',
+        label:   'Noto Sans — Universal',
+        sample:  'Aa あ 中 한 — عالمي',
+        display: "'Noto Sans', 'Segoe UI', system-ui, sans-serif",
+        body:    "'Noto Sans', 'Segoe UI', system-ui, sans-serif",
+        gfonts:  'Noto+Sans:wght@300;400;500',
+    },
+    outfit: {
+        name:    'Outfit',
+        label:   'Outfit — Geometric',
+        sample:  'Aa Bb 123 — Link Cleaner',
+        display: "'Outfit', 'Inter', system-ui, sans-serif",
+        body:    "'Outfit', 'Inter', system-ui, sans-serif",
+        gfonts:  'Outfit:wght@300;400;500',
+    },
+};
+
+// ─── Ready-Made Presets ───────────────────────────────────────────────────────
+// 8 presets: 1 dark default, 1 light, 6 themed dark presets.
 const LINCLE_PRESETS = {
     void: {
-        name:       'Void',
-        bg:         '#000000',
-        surface:    '#252525',
-        surface2:   '#1a1a1a',
-        border:     '#333333',
-        primary:    '#ffffff',
-        green:      '#ffffff',
-        red:        '#666666',
-        text:       '#ffffff',
-        textDim:    '#777777',
-    },
-    dark: {
-        name:       'Cyberpunk Dark',
-        bg:         '#11111a',
-        surface:    '#1a1a28',
-        surface2:   '#232336',
-        border:     '#2e2e46',
-        primary:    '#00caf5',
-        green:      '#2ecc71',
-        red:        '#e74c3c',
-        text:       '#ededf8',
-        textDim:    '#8080b0',
+        name:    'Void',
+        dark:    true,
+        accent:  '#ffffff',
+        bg:      '#000000',
+        surface: '#1c1c1c',
+        surface2:'#141414',
+        border:  '#2e2e2e',
+        primary: '#ffffff',
+        green:   '#a0a0a0',
+        red:     '#666666',
+        text:    '#ffffff',
+        textDim: '#555555',
     },
     light: {
-        name:       'Clean Light',
-        bg:         '#f4f4fe',
-        surface:    '#ffffff',
-        surface2:   '#ececf8',
-        border:     '#d2d2ec',
-        primary:    '#0096d2',
-        green:      '#27ae60',
-        red:        '#c0392b',
-        text:       '#15152a',
-        textDim:    '#656595',
+        name:    'Clean Light',
+        dark:    false,
+        accent:  '#0096d2',
+        bg:      '#f4f4f6',
+        surface: '#ffffff',
+        surface2:'#ececf0',
+        border:  '#d4d4dc',
+        primary: '#0078c8',
+        green:   '#1a9e5a',
+        red:     '#c0392b',
+        text:    '#111120',
+        textDim: '#60608a',
+    },
+    cyberpunk: {
+        name:    'Cyberpunk',
+        dark:    true,
+        accent:  '#00caf5',
+        bg:      '#0d0d14',
+        surface: '#14141f',
+        surface2:'#1c1c2c',
+        border:  '#252538',
+        primary: '#00caf5',
+        green:   '#2ecc71',
+        red:     '#e74c3c',
+        text:    '#e8e8f8',
+        textDim: '#6060a0',
     },
     nordic: {
-        name:       'Nordic Slate',
-        bg:         '#1b2028',
-        surface:    '#222733',
-        surface2:   '#2c3242',
-        border:     '#3a4256',
-        primary:    '#88c0d0',
-        green:      '#a3be8c',
-        red:        '#bf616a',
-        text:       '#eceff4',
-        textDim:    '#81a1c1',
+        name:    'Nordic Slate',
+        dark:    true,
+        accent:  '#88c0d0',
+        bg:      '#1a1f28',
+        surface: '#222733',
+        surface2:'#2c3244',
+        border:  '#3a4260',
+        primary: '#88c0d0',
+        green:   '#a3be8c',
+        red:     '#bf616a',
+        text:    '#eceff4',
+        textDim: '#7090b0',
     },
     emerald: {
-        name:       'Emerald Matrix',
-        bg:         '#0b1311',
-        surface:    '#13201d',
-        surface2:   '#1b2d29',
-        border:     '#263f39',
-        primary:    '#10b981',
-        green:      '#34d399',
-        red:        '#f87171',
-        text:       '#ecfdf5',
-        textDim:    '#6ee7b7',
+        name:    'Emerald',
+        dark:    true,
+        accent:  '#10b981',
+        bg:      '#091210',
+        surface: '#111f1c',
+        surface2:'#182c27',
+        border:  '#1f3d38',
+        primary: '#10b981',
+        green:   '#34d399',
+        red:     '#f87171',
+        text:    '#e8fdf5',
+        textDim: '#4a9e80',
     },
     sunset: {
-        name:       'Sunset Amber',
-        bg:         '#171219',
-        surface:    '#221b25',
-        surface2:   '#2e2433',
-        border:     '#403247',
-        primary:    '#f59e0b',
-        green:      '#10b981',
-        red:        '#ef4444',
-        text:       '#fdf4ff',
-        textDim:    '#c084fc',
+        name:    'Sunset',
+        dark:    true,
+        accent:  '#f59e0b',
+        bg:      '#120e10',
+        surface: '#1e1620',
+        surface2:'#2a1e2e',
+        border:  '#382840',
+        primary: '#f59e0b',
+        green:   '#22c55e',
+        red:     '#ef4444',
+        text:    '#fdf4ff',
+        textDim: '#9060a0',
     },
     dracula: {
-        name:       'Dracula Violet',
-        bg:         '#181524',
-        surface:    '#221d33',
-        surface2:   '#2d2744',
-        border:     '#3e365c',
-        primary:    '#bd93f9',
-        green:      '#50fa7b',
-        red:        '#ff5555',
-        text:       '#f8f8f2',
-        textDim:    '#a79ac5',
+        name:    'Dracula',
+        dark:    true,
+        accent:  '#bd93f9',
+        bg:      '#12101c',
+        surface: '#1c1830',
+        surface2:'#28223e',
+        border:  '#362e50',
+        primary: '#bd93f9',
+        green:   '#50fa7b',
+        red:     '#ff5555',
+        text:    '#f8f8f2',
+        textDim: '#8070b0',
+    },
+    rose: {
+        name:    'Rose Pine',
+        dark:    true,
+        accent:  '#ebbcba',
+        bg:      '#191724',
+        surface: '#1f1d2e',
+        surface2:'#26233a',
+        border:  '#31324e',
+        primary: '#ebbcba',
+        green:   '#9ccfd8',
+        red:     '#eb6f92',
+        text:    '#e0def4',
+        textDim: '#6e6a86',
     },
 };
 
-// CSS variable map  →  key in preset colors
+// Ordered list for cycling (popup theme button)
+const PRESET_CYCLE_ORDER = ['void', 'cyberpunk', 'nordic', 'emerald', 'sunset', 'dracula', 'rose', 'light'];
+
+// CSS variable map → key in preset colors
 const CSS_VAR_MAP = {
-    '--bg':          'bg',
-    '--surface':     'surface',
-    '--surface2':    'surface2',
-    '--border':      'border',
-    '--primary':     'primary',
-    '--green':       'green',
-    '--red':         'red',
-    '--text':        'text',
-    '--text-dim':    'textDim',
+    '--bg':       'bg',
+    '--surface':  'surface',
+    '--surface2': 'surface2',
+    '--border':   'border',
+    '--primary':  'primary',
+    '--green':    'green',
+    '--red':      'red',
+    '--text':     'text',
+    '--text-dim': 'textDim',
 };
 
+// ─── Derived Colors ───────────────────────────────────────────────────────────
 function computeDerived(colors) {
+    const p = colors.primary || '#00caf5';
+    const g = colors.green   || '#2ecc71';
+    const r = colors.red     || '#e74c3c';
     return {
-        '--primary-dim':  hexToRGBA(colors.primary || '#00caf5', 0.14),
-        '--primary-glow': hexToRGBA(colors.primary || '#00caf5', 0.32),
-        '--green-dim':    hexToRGBA(colors.green   || '#2ecc71', 0.14),
-        '--red-dim':      hexToRGBA(colors.red     || '#e74c3c', 0.14),
+        '--primary-dim':  hexToRGBA(p, 0.14),
+        '--primary-glow': hexToRGBA(p, 0.28),
+        '--green-dim':    hexToRGBA(g, 0.14),
+        '--red-dim':      hexToRGBA(r, 0.14),
     };
 }
 
@@ -122,7 +196,7 @@ function hexToRGBA(hex, alpha) {
     return `rgba(${r},${g},${b},${alpha})`;
 }
 
-// ─── Apply Theme to Document ────────────────────────────────────────────────
+// ─── Apply Theme ──────────────────────────────────────────────────────────────
 function lincleApplyTheme(themeObj) {
     if (!themeObj) themeObj = { preset: 'void' };
 
@@ -138,37 +212,75 @@ function lincleApplyTheme(themeObj) {
     }
 
     const root = document.documentElement;
-
     for (const [cssVar, key] of Object.entries(CSS_VAR_MAP)) {
         if (colors[key]) root.style.setProperty(cssVar, colors[key]);
     }
-
-    const derived = computeDerived(colors);
-    for (const [cssVar, val] of Object.entries(derived)) {
+    for (const [cssVar, val] of Object.entries(computeDerived(colors))) {
         root.style.setProperty(cssVar, val);
     }
 
-    root.setAttribute('data-theme', themeObj.preset === 'light' ? 'light' : 'dark');
+    const isDark = colors.dark !== false;
+    root.setAttribute('data-theme', isDark ? 'dark' : 'light');
 }
 
-// ─── Load Theme from Storage ────────────────────────────────────────────────
+// ─── Apply Font ───────────────────────────────────────────────────────────────
+function lincleApplyFont(fontKey) {
+    const font = LINCLE_FONTS[fontKey] || LINCLE_FONTS.inter;
+    const root = document.documentElement;
+    root.style.setProperty('--font-display', font.display);
+    root.style.setProperty('--font-body', font.body);
+    root.setAttribute('data-font', fontKey);
+}
+
+// Load and inject Google Font dynamically (avoids having all 4 loaded at once)
+function lincleInjectFont(fontKey) {
+    const font = LINCLE_FONTS[fontKey];
+    if (!font) return;
+    const id = `lincle-gfont-${fontKey}`;
+    if (document.getElementById(id)) return; // Already injected
+    const link = document.createElement('link');
+    link.id   = id;
+    link.rel  = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${font.gfonts}&display=swap`;
+    document.head.appendChild(link);
+}
+
+async function lincleLoadFont() {
+    try {
+        const d = await _themeExt.storage.local.get('lincleFont');
+        const fontKey = d.lincleFont || 'inter';
+        lincleInjectFont(fontKey);
+        lincleApplyFont(fontKey);
+        return fontKey;
+    } catch {
+        lincleApplyFont('inter');
+        return 'inter';
+    }
+}
+
+async function lincleSaveFont(fontKey) {
+    await _themeExt.storage.local.set({ lincleFont: fontKey });
+    lincleInjectFont(fontKey);
+    lincleApplyFont(fontKey);
+}
+
+// ─── Load Theme ───────────────────────────────────────────────────────────────
 async function lincleLoadTheme() {
     try {
         const d = await _themeExt.storage.local.get(['lincleTheme', 'lincleCustomTheme']);
         let themeObj = d.lincleTheme;
 
-        // Migration: old format was just string
-        if (typeof themeObj === 'string') {
-            themeObj = { preset: themeObj };
-        }
+        // Migration: old format was just a string
+        if (typeof themeObj === 'string') themeObj = { preset: themeObj };
         if (!themeObj) themeObj = { preset: 'void' };
 
-        // If custom theme is selected, ensure colors are loaded!
-        if (themeObj.preset === 'custom') {
-            if (!themeObj.colors && d.lincleCustomTheme && d.lincleCustomTheme.colors) {
-                themeObj.colors = d.lincleCustomTheme.colors;
-                themeObj.name   = d.lincleCustomTheme.name || 'Custom Theme';
-            }
+        // Rename old 'dark' preset key → 'cyberpunk'
+        if (themeObj.preset === 'dark') themeObj.preset = 'cyberpunk';
+
+        // Load custom colors if needed
+        if (themeObj.preset === 'custom' && !themeObj.colors && d.lincleCustomTheme?.colors) {
+            themeObj.colors = d.lincleCustomTheme.colors;
+            themeObj.name   = d.lincleCustomTheme.name || 'Custom Theme';
         }
 
         lincleApplyTheme(themeObj);
@@ -179,74 +291,67 @@ async function lincleLoadTheme() {
     }
 }
 
-// ─── Save Theme to Storage ──────────────────────────────────────────────────
+// ─── Save Theme ───────────────────────────────────────────────────────────────
 async function lincleSaveTheme(themeObj) {
     await _themeExt.storage.local.set({ lincleTheme: themeObj });
     lincleApplyTheme(themeObj);
 }
 
-// ─── Cycle Preset (for popup button) ────────────────────────────────────────
-// Strictly cycles through 3 states: dark → light → custom → dark ...
+// ─── Cycle Preset (popup button) ─────────────────────────────────────────────
+// Cycles through all 8 presets in order, then wraps back.
 async function lincleCycleTheme() {
     const d = await _themeExt.storage.local.get(['lincleTheme', 'lincleCustomTheme']);
     let current = d.lincleTheme || { preset: 'void' };
     if (typeof current === 'string') current = { preset: current };
 
+    // Migration: 'dark' → 'cyberpunk'
+    if (current.preset === 'dark') current.preset = 'cyberpunk';
+
+    const currentIdx = PRESET_CYCLE_ORDER.indexOf(current.preset);
+    const nextPreset = PRESET_CYCLE_ORDER[(currentIdx + 1) % PRESET_CYCLE_ORDER.length];
+
     let next;
-    if (current.preset === 'void') {
-        next = { preset: 'dark' };
-    } else if (current.preset === 'dark') {
-        next = { preset: 'light' };
-    } else if (current.preset === 'light') {
-        // Load custom / active theme saved from options
-        if (d.lincleCustomTheme && d.lincleCustomTheme.colors) {
-            next = {
-                preset: 'custom',
-                name: d.lincleCustomTheme.name || 'Custom Theme',
-                colors: d.lincleCustomTheme.colors,
-            };
-        } else {
-            // Fallback custom theme (Nordic Slate) if none configured yet
-            next = {
-                preset: 'custom',
-                name: 'Nordic Slate',
-                colors: LINCLE_PRESETS.nordic,
-            };
-        }
+    if (nextPreset === 'custom') {
+        next = d.lincleCustomTheme?.colors
+            ? { preset: 'custom', name: d.lincleCustomTheme.name || 'Custom', colors: d.lincleCustomTheme.colors }
+            : { preset: 'void' };
     } else {
-        // Back to void
-        next = { preset: 'void' };
+        next = { preset: nextPreset };
     }
 
     await lincleSaveTheme(next);
     return next;
 }
 
-// ─── Export Theme as JSON File ──────────────────────────────────────────────
+// ─── Export / Import ──────────────────────────────────────────────────────────
 function lincleExportTheme(themeObj, filename = 'lincle-theme') {
+    let version = '3.8';
+    try {
+        const m = (typeof browser !== 'undefined' ? browser : chrome).runtime.getManifest();
+        if (m && m.version) version = m.version;
+    } catch { /* non-fatal */ }
+
     const exportObj = {
-        name: themeObj.name || LINCLE_PRESETS[themeObj.preset]?.name || 'Lincle Custom Theme',
-        preset: themeObj.preset || 'custom',
-        colors: themeObj.colors || LINCLE_PRESETS[themeObj.preset] || LINCLE_PRESETS.dark,
-        version: '2.0',
+        name:    themeObj.name || LINCLE_PRESETS[themeObj.preset]?.name || 'Lincle Theme',
+        preset:  themeObj.preset || 'custom',
+        colors:  themeObj.colors || LINCLE_PRESETS[themeObj.preset] || LINCLE_PRESETS.void,
+        version,
     };
     const json = JSON.stringify(exportObj, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const cleanName = (exportObj.name || filename).toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-    a.download = `${cleanName}.lincle-theme.json`;
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `${(exportObj.name).toLowerCase().replace(/[^a-z0-9_-]/g, '_')}.lincle-theme.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
 
-// ─── Import Theme from JSON File ────────────────────────────────────────────
 function lincleImportTheme(callback) {
     const input = document.createElement('input');
-    input.type = 'file';
+    input.type   = 'file';
     input.accept = '.json';
     input.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -262,26 +367,25 @@ function lincleImportTheme(callback) {
                 } else if (obj && obj.preset) {
                     callback(obj);
                 }
-            } catch { /* invalid JSON */ }
+            } catch { /* invalid JSON — silently ignore */ }
         };
         reader.readAsText(file);
     });
     input.click();
 }
 
-// ─── Get Saved Themes Library ────────────────────────────────────────────────
+// ─── Saved Themes Library ─────────────────────────────────────────────────────
 async function lincleGetSavedThemes() {
     const d = await _themeExt.storage.local.get('lincleSavedThemes');
     return d.lincleSavedThemes || [];
 }
 
 async function lincleSaveThemeToLibrary(name, colors) {
-    const d = await _themeExt.storage.local.get('lincleSavedThemes');
+    const d    = await _themeExt.storage.local.get('lincleSavedThemes');
     const list = d.lincleSavedThemes || [];
-    const id = 'custom_' + Date.now();
+    const id   = 'custom_' + Date.now();
     const newTheme = { id, name, colors };
 
-    // Update or push
     const existingIdx = list.findIndex(t => t.name.toLowerCase() === name.toLowerCase());
     if (existingIdx !== -1) {
         list[existingIdx] = newTheme;
@@ -294,14 +398,15 @@ async function lincleSaveThemeToLibrary(name, colors) {
 }
 
 async function lincleDeleteSavedTheme(id) {
-    const d = await _themeExt.storage.local.get('lincleSavedThemes');
-    let list = d.lincleSavedThemes || [];
-    list = list.filter(t => t.id !== id);
+    const d    = await _themeExt.storage.local.get('lincleSavedThemes');
+    const list = (d.lincleSavedThemes || []).filter(t => t.id !== id);
     await _themeExt.storage.local.set({ lincleSavedThemes: list });
     return list;
 }
 
 function lincleGetPresetName(themeObj) {
-    if (!themeObj) return 'dark';
-    return themeObj.preset || 'dark';
+    if (!themeObj) return 'void';
+    const preset = themeObj.preset || 'void';
+    // Migration guard
+    return preset === 'dark' ? 'cyberpunk' : preset;
 }

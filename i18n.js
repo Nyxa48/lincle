@@ -1,4 +1,4 @@
-// Lincle i18n Engine v4.0 - SVG Flags & 14 Languages
+﻿// Lincle i18n Engine v4.0 - SVG Flags & 14 Languages
 // Developed by: Emir Samed (Nyxa48)
 // Languages: EN (Default), TR, DE, FR, ES, PT, IT, RU, DA, JA, ZH, KO, AR, PL
 
@@ -42,7 +42,8 @@ const lincleDict = {
         themeBg: "Arkaplan", themeSurface: "Kartlar", themeSurface2: "Butonlar & Paneller", themePrimary: "Vurgu Rengi",
         themeGreen: "Başarı", themeRed: "Hata", themeText: "Metin",
         themeTextDim: "Soluk Metin", themeBorder: "Kenarlık",
-        themeAutoHarmonize: "Otomatik Tonlama",
+        themeAutoHarmonize: "Otomatik Tonlama",
+        fontTitle: "Font Seçimi",
 
         // Popup
         popShield: "Koruma Kalkanı", popCleaned: "Temizlenen", popSaved: "Tasarruf",
@@ -102,7 +103,8 @@ const lincleDict = {
         themeBg: "Background", themeSurface: "Cards", themeSurface2: "Buttons & Panels", themePrimary: "Accent",
         themeGreen: "Success", themeRed: "Error", themeText: "Text",
         themeTextDim: "Muted Text", themeBorder: "Border",
-        themeAutoHarmonize: "Auto-Harmonize",
+        themeAutoHarmonize: "Auto-Harmonize",
+        fontTitle: "Font",
 
         popShield: "Protection Shield", popCleaned: "Cleaned", popSaved: "Saved",
         popMaster: "Master Protection", popShieldToggle: "Popup & Modal Shield",
@@ -160,7 +162,8 @@ const lincleDict = {
         themeBg: "Hintergrund", themeSurface: "Karten", themeSurface2: "Schaltflächen & Elemente", themePrimary: "Akzent",
         themeGreen: "Erfolg", themeRed: "Fehler", themeText: "Text",
         themeTextDim: "Gedämpfter Text", themeBorder: "Rahmen",
-        themeAutoHarmonize: "Auto-Harmonisieren",
+        themeAutoHarmonize: "Auto-Harmonisieren",
+        fontTitle: "Schriftart",
 
         popShield: "Schutzschild", popCleaned: "Gereinigt", popSaved: "Gespart",
         popMaster: "Hauptschutz", popShieldToggle: "Popup-Schutzschild",
@@ -218,7 +221,8 @@ const lincleDict = {
         themeBg: "Arrière-plan", themeSurface: "Cartes", themeSurface2: "Boutons & Éléments", themePrimary: "Accentuation",
         themeGreen: "Succès", themeRed: "Erreur", themeText: "Texte",
         themeTextDim: "Texte Estompé", themeBorder: "Bordure",
-        themeAutoHarmonize: "Auto-Harmoniser",
+        themeAutoHarmonize: "Auto-Harmoniser",
+        fontTitle: "Police",
 
         popShield: "Bouclier de protection", popCleaned: "Nettoyé", popSaved: "Économisé",
         popMaster: "Protection Principale", popShieldToggle: "Bouclier Popup",
@@ -262,7 +266,8 @@ const lincleDict = {
         themeBg: "Fondo", themeSurface: "Tarjetas", themeSurface2: "Botones y Elementos", themePrimary: "Acento",
         themeGreen: "Éxito", themeRed: "Error", themeText: "Texto",
         themeTextDim: "Texto Atenuado", themeBorder: "Borde",
-        themeAutoHarmonize: "Auto-Armonizar",
+        themeAutoHarmonize: "Auto-Armonizar",
+        fontTitle: "Fuente",
 
         popShield: "Escudo de protección", popCleaned: "Limpiado", popSaved: "Ahorrado",
         popMaster: "Protección Principal", popShieldToggle: "Escudo Popup",
@@ -306,7 +311,8 @@ const lincleDict = {
         themeBg: "Fundo", themeSurface: "Cartões", themeSurface2: "Botões e Elementos", themePrimary: "Destaque",
         themeGreen: "Sucesso", themeRed: "Erro", themeText: "Texto",
         themeTextDim: "Texto Suave", themeBorder: "Borda",
-        themeAutoHarmonize: "Auto-Harmonizar",
+        themeAutoHarmonize: "Auto-Harmonizar",
+        fontTitle: "Fonte",
 
         popShield: "Escudo de Proteção", popCleaned: "Limpado", popSaved: "Salvo",
         popMaster: "Proteção Principal", popShieldToggle: "Escudo de Popups",
@@ -350,7 +356,8 @@ const lincleDict = {
         themeBg: "Sfondo", themeSurface: "Schede", themeSurface2: "Pulsanti ed Elementi", themePrimary: "Accento",
         themeGreen: "Successo", themeRed: "Errore", themeText: "Testo",
         themeTextDim: "Testo Attenuato", themeBorder: "Bordo",
-        themeAutoHarmonize: "Auto-Armonizza",
+        themeAutoHarmonize: "Auto-Armonizza",
+        fontTitle: "Carattere",
 
         popShield: "Scudo di Protezione", popCleaned: "Pulito", popSaved: "Risparmiato",
         popMaster: "Protezione Principale", popShieldToggle: "Scudo Popup",
@@ -394,7 +401,8 @@ const lincleDict = {
         themeBg: "Фон", themeSurface: "Карточки", themeSurface2: "Кнопки и Панели", themePrimary: "Акцент",
         themeGreen: "Успех", themeRed: "Ошибка", themeText: "Текст",
         themeTextDim: "Приглушенный Текст", themeBorder: "Рамка",
-        themeAutoHarmonize: "Авто-Гармонизация",
+        themeAutoHarmonize: "Авто-Гармонизация",
+        fontTitle: "Шрифт",
 
         popShield: "Защитный Щит", popCleaned: "Очищено", popSaved: "Сэкономлено",
         popMaster: "Главная Защита", popShieldToggle: "Щит Всплывающих Окон",
@@ -438,7 +446,8 @@ const lincleDict = {
         themeBg: "Baggrund", themeSurface: "Kort", themeSurface2: "Knapper & Elementer", themePrimary: "Accent",
         themeGreen: "Succes", themeRed: "Fejl", themeText: "Tekst",
         themeTextDim: "Dæmpet Tekst", themeBorder: "Kant",
-        themeAutoHarmonize: "Auto-Harmoniser",
+        themeAutoHarmonize: "Auto-Harmoniser",
+        fontTitle: "Police",
 
         popShield: "Beskyttelsesskjold", popCleaned: "Renset", popSaved: "Sparet",
         popMaster: "Hovedbeskyttelse", popShieldToggle: "Popup-skjold",
@@ -482,7 +491,8 @@ const lincleDict = {
         themeBg: "背景色", themeSurface: "カード", themeSurface2: "ボタン＆パネル", themePrimary: "アクセント",
         themeGreen: "成功", themeRed: "エラー", themeText: "テキスト",
         themeTextDim: "ミュートテキスト", themeBorder: "ボーダー",
-        themeAutoHarmonize: "自動配色の調整",
+        themeAutoHarmonize: "自動配色の調整",
+        fontTitle: "フォント",
 
         popShield: "保護シールド", popCleaned: "クリーン数", popSaved: "節約時間",
         popMaster: "マスター保護", popShieldToggle: "ポップアップシールド",
@@ -527,7 +537,8 @@ const lincleDict = {
         themeBg: "背景", themeSurface: "卡片", themeSurface2: "按钮与面板", themePrimary: "强调色",
         themeGreen: "成功", themeRed: "错误", themeText: "文本",
         themeTextDim: "暗淡文本", themeBorder: "边框",
-        themeAutoHarmonize: "自动配色",
+        themeAutoHarmonize: "自动配色",
+        fontTitle: "字体",
 
         popShield: "保护防护罩", popCleaned: "已清理", popSaved: "已节省",
         popMaster: "主保护", popShieldToggle: "弹窗防护罩",
@@ -572,7 +583,8 @@ const lincleDict = {
         themeBg: "배경", themeSurface: "카드", themeSurface2: "버튼 및 패널", themePrimary: "포인트 색상",
         themeGreen: "성공", themeRed: "오류", themeText: "텍스트",
         themeTextDim: "보조 텍스트", themeBorder: "테두리",
-        themeAutoHarmonize: "자동 조화",
+        themeAutoHarmonize: "자동 조화",
+        fontTitle: "글꼴",
 
         popShield: "보호 실드", popCleaned: "정리됨", popSaved: "절약됨",
         popMaster: "마스터 보호", popShieldToggle: "팝업 실드",
@@ -617,7 +629,8 @@ const lincleDict = {
         themeBg: "الخلفية", themeSurface: "البطاقات", themeSurface2: "الأزرار واللوحات", themePrimary: "اللون الرئيسي",
         themeGreen: "نجاح", themeRed: "خطأ", themeText: "النص",
         themeTextDim: "النص الخافت", themeBorder: "الحدود",
-        themeAutoHarmonize: "التناسق التلقائي",
+        themeAutoHarmonize: "التناسق التلقائي",
+        fontTitle: "الخط",
 
         popShield: "درع الحماية", popCleaned: "تم تنظيفه", popSaved: "الوقت الموفر",
         popMaster: "الحماية الرئيسية", popShieldToggle: "درع النوافذ المنبثقة",
@@ -661,7 +674,8 @@ const lincleDict = {
         themeBg: "Tło", themeSurface: "Karty", themeSurface2: "Przyciski i panele", themePrimary: "Akcent",
         themeGreen: "Sukces", themeRed: "Błąd", themeText: "Tekst",
         themeTextDim: "Przygaszony tekst", themeBorder: "Obramowanie",
-        themeAutoHarmonize: "Automatyczne dopasowanie",
+        themeAutoHarmonize: "Automatyczne dopasowanie",
+        fontTitle: "Czcionka",
 
         popShield: "Tarcza ochronna", popCleaned: "Oczyszczone", popSaved: "Zaoszczędzono",
         popMaster: "Główna ochrona", popShieldToggle: "Tarcza pop-up",
@@ -710,3 +724,5 @@ async function applyTranslations() {
         if (dict[key]) el.placeholder = dict[key];
     });
 }
+
+

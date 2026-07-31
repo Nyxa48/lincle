@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
-  <title data-i18n="optTitle">Lincle Ayarları</title>
+  <title data-i18n="optTitle">Lincle Settings</title>
+  <!-- Fonts loaded dynamically by theme-engine.js -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <link id="lincle-gfont-inter" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap">
   <style>
     :root {
       --bg:          #000000;
@@ -27,8 +28,8 @@
       --radius-sm:   50px;
       --radius-pill: 1000px;
 
-      /* Editorial fonts */
-      --font-display: 'Cormorant Garamond', 'Georgia', serif;
+      /* Fonts — overridden at runtime by theme-engine lincleApplyFont() */
+      --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
       --font-body:    'Inter', 'Segoe UI', system-ui, sans-serif;
     }
 
@@ -252,6 +253,32 @@
     .preset-btn.active { background: var(--text); color: var(--bg); }
     .preset-btn:hover:not(.active) { background: var(--surface2); color: var(--text); }
 
+    /* Font selector cards */
+    .font-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+      margin-bottom: 0;
+    }
+    .font-card {
+      padding: 18px 20px; border-radius: 20px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      cursor: pointer; transition: all .2s ease;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .font-card:hover { border-color: var(--text-dim); background: var(--surface2); }
+    .font-card.active { border-color: var(--primary); background: var(--surface); }
+    .font-card-name {
+      font-size: 13px; font-weight: 500; color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .font-card-sample {
+      font-size: 20px; font-weight: 300; color: var(--text-dim);
+      letter-spacing: -0.02em; line-height: 1.2;
+    }
+    .font-card-tag {
+      font-size: 10px; color: var(--text-dim); text-transform: uppercase;
+      letter-spacing: 0.08em; font-weight: 400;
+    }
+
     /* ── Terminal box ── */
     .terminal-box {
       background: var(--bg); border: 1px solid var(--border);
@@ -396,37 +423,9 @@
         <svg class="card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="card-body">
-        <label data-i18n="themePresetTitle">Hazır Temalar (Presets)</label>
-        <div class="preset-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;">
-          <button class="preset-btn active" data-preset="void">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#ffffff;border:1px solid #333"></span>
-            <span>Void</span>
-          </button>
-          <button class="preset-btn" data-preset="dark">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#00caf5"></span>
-            <span>Cyberpunk Dark</span>
-          </button>
-          <button class="preset-btn" data-preset="light">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#0096d2"></span>
-            <span>Clean Light</span>
-          </button>
-          <button class="preset-btn" data-preset="nordic">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#88c0d0"></span>
-            <span>Nordic Slate</span>
-          </button>
-          <button class="preset-btn" data-preset="emerald">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#10b981"></span>
-            <span>Emerald Matrix</span>
-          </button>
-          <button class="preset-btn" data-preset="sunset">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#f59e0b"></span>
-            <span>Sunset Amber</span>
-          </button>
-          <button class="preset-btn" data-preset="dracula">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#bd93f9"></span>
-            <span>Dracula Violet</span>
-          </button>
-        </div>
+        <label data-i18n="themePresetTitle">Preset Themes</label>
+        <!-- Preset buttons are rendered dynamically by options.js from LINCLE_PRESETS -->
+        <div class="preset-grid" id="presetGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;"></div>
 
         <div style="border-top:1px solid var(--border);padding-top:32px;margin-top:16px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -478,6 +477,15 @@
             </button>
           </div>
         </div>
+
+        <!-- ── Font Selector ── -->
+        <div style="border-top:1px solid var(--border);padding-top:32px;margin-top:16px;">
+          <label data-i18n="fontTitle" style="margin-bottom:16px;display:block;">Font</label>
+          <div class="font-grid" id="fontGrid">
+            <!-- Populated by options.js from LINCLE_FONTS -->
+          </div>
+        </div>
+
       </div>
     </div>
 

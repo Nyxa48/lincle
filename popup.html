@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- Fonts are loaded dynamically by theme-engine.js based on user selection -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <link id="lincle-gfont-inter" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap">
   <style>
     :root {
       --bg:          #000000;
@@ -26,8 +27,8 @@
       --radius-sm:   50px;
       --radius-pill: 1000px;
 
-      /* Editorial fonts */
-      --font-display: 'Cormorant Garamond', 'Georgia', serif;
+      /* Fonts — overridden at runtime by theme-engine lincleApplyFont() */
+      --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
       --font-body:    'Inter', 'Segoe UI', system-ui, sans-serif;
     }
 

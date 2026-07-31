@@ -10,8 +10,9 @@ async function initUI() {
     const currentLang = langData.lincleLang || 'en';
     await applyTranslations();
 
-    // ── Theme (via theme-engine.js) ─────────────────────────────────────
+    // ── Theme + Font (via theme-engine.js) ──────────────────────────────
     let currentTheme = await lincleLoadTheme();
+    await lincleLoadFont();
     updateThemeIcon(currentTheme);
 
     document.getElementById('themeToggleBtn').addEventListener('click', async () => {
@@ -53,14 +54,14 @@ async function initUI() {
     }
 
     // ── Stats ────────────────────────────────────────────────────────────
-    const statsData = await ext.storage.local.get("lincleStats");
+    const statsData = await ext.storage.local.get('lincleStats');
     const stats     = statsData.lincleStats || { cleanedLinks: 0, savedSeconds: 0 };
     const isTr      = currentLang === 'tr';
-    const sec       = stats.savedSeconds || 0;
+    const sec       = Number(stats.savedSeconds) || 0;
     const timeText  = sec >= 3600 ? `${(sec/3600).toFixed(1)}${isTr?'sa':'h'}`
                     : sec >= 60   ? `${(sec/60).toFixed(1)}${isTr?'dk':'m'}`
                                   : `${Math.floor(sec)}${isTr?'sn':'s'}`;
-    setEl('valLinks', (stats.cleanedLinks || 0).toLocaleString());
+    setEl('valLinks', (Number(stats.cleanedLinks) || 0).toLocaleString());
     setEl('valTime',  timeText);
 
     // ── Version ──────────────────────────────────────────────────────────
@@ -126,17 +127,20 @@ async function initUI() {
 
 // ── Theme Icon Updater ──────────────────────────────────────────────────
 function updateThemeIcon(themeObj) {
-    const btn = document.getElementById('themeToggleBtn');
-    const use = document.querySelector('#themeIcon use');
+    const btn  = document.getElementById('themeToggleBtn');
+    const use  = document.querySelector('#themeIcon use');
     if (!use) return;
-    const preset = lincleGetPresetName(themeObj);
-    const themeName = themeObj.name || LINCLE_PRESETS[preset]?.name || 'Theme';
+    const preset    = lincleGetPresetName(themeObj);
+    const presetDef = LINCLE_PRESETS[preset];
+    const themeName = themeObj.name || presetDef?.name || preset;
     if (btn) btn.title = `Theme: ${themeName}`;
 
-    if (preset === 'void')        use.setAttribute('href', '#ic-void');
-    else if (preset === 'dark')   use.setAttribute('href', '#ic-moon');
-    else if (preset === 'light')  use.setAttribute('href', '#ic-sun');
-    else                          use.setAttribute('href', '#ic-palette');
+    // Map preset → icon
+    if      (preset === 'void')       use.setAttribute('href', '#ic-void');
+    else if (preset === 'light')      use.setAttribute('href', '#ic-sun');
+    else if (presetDef && !presetDef.dark) use.setAttribute('href', '#ic-sun');
+    else if (preset === 'custom')     use.setAttribute('href', '#ic-palette');
+    else                              use.setAttribute('href', '#ic-moon');
 }
 
 // ── Shield UI Updater ───────────────────────────────────────────────────

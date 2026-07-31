@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load theme via engine
     const currentTheme = await lincleLoadTheme();
+    await lincleLoadFont();
 
     // ── Collapsible Cards ───────────────────────────────────────────────
     document.querySelectorAll('[data-toggle]').forEach(header => {
@@ -97,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderLangSelector();
 
     // ── Theme Preset & Library Management ──────────────────────────────
-    const presetBtns       = document.querySelectorAll('[data-preset]');
+    const presetGrid       = document.getElementById('presetGrid');
     const customSection    = document.getElementById('customColorSection');
     const colorGrid        = document.getElementById('colorGrid');
     const btnToggleCustom  = document.getElementById('btnToggleCustom');
@@ -106,20 +107,78 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnDeleteCustom  = document.getElementById('btnDeleteCustomTheme');
     const nameInput        = document.getElementById('themeNameInput');
 
-    function setActivePresetUI(themeTarget) {
-        const presetName = typeof themeTarget === 'string' ? themeTarget : (themeTarget.preset || '');
-        const themeName  = typeof themeTarget === 'object' ? (themeTarget.name || '') : '';
-        presetBtns.forEach(b => {
-            const pKey  = b.dataset.preset;
-            const pName = LINCLE_PRESETS[pKey]?.name || '';
-            const isActive = pKey === presetName || (themeName && pName && themeName.toLowerCase() === pName.toLowerCase());
-            b.classList.toggle('active', isActive);
+    // Dynamically render all 8 preset buttons from LINCLE_PRESETS
+    function renderPresetGrid(activeTheme) {
+        if (!presetGrid) return;
+        presetGrid.innerHTML = '';
+        const activePreset = activeTheme?.preset || 'void';
+        const activeName   = activeTheme?.name || '';
+
+        Object.entries(LINCLE_PRESETS).forEach(([key, preset]) => {
+            const btn = document.createElement('button');
+            btn.className   = 'preset-btn';
+            btn.dataset.preset = key;
+            const isActive = key === activePreset
+                || (activeName && preset.name && activeName.toLowerCase() === preset.name.toLowerCase());
+            if (isActive) btn.classList.add('active');
+
+            // Accent dot color
+            const dotBorder = preset.dark === false ? '1px solid ' + (preset.border || '#ccc') : 'none';
+            btn.innerHTML = `
+                <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${preset.accent || preset.primary};border:${dotBorder};flex-shrink:0"></span>
+                <span>${preset.name}</span>
+            `;
+            btn.addEventListener('click', async () => {
+                await lincleSaveTheme({ preset: key });
+                renderPresetGrid({ preset: key });
+                customColors && Object.assign(customColors, LINCLE_PRESETS[key]);
+                renderColorGrid();
+            });
+            presetGrid.appendChild(btn);
         });
     }
 
-    setActivePresetUI(currentTheme);
+    renderPresetGrid(currentTheme);
 
-    const customColors = { ...(currentTheme.colors || LINCLE_PRESETS.dark) };
+    // Helper used by old code referencing presetBtns
+    function setActivePresetUI(themeTarget) { renderPresetGrid(themeTarget); }
+
+    const customColors = { ...(currentTheme.colors || LINCLE_PRESETS.void) };
+
+    // ── Font Selector ────────────────────────────────────────────────────
+    const fontGrid = document.getElementById('fontGrid');
+    let activeFontKey = await (async () => {
+        try {
+            const d = await ext.storage.local.get('lincleFont');
+            return d.lincleFont || 'inter';
+        } catch { return 'inter'; }
+    })();
+
+    function renderFontGrid(selectedKey) {
+        if (!fontGrid) return;
+        fontGrid.innerHTML = '';
+        Object.entries(LINCLE_FONTS).forEach(([key, font]) => {
+            // Inject font if not already loaded
+            lincleInjectFont(key);
+
+            const card = document.createElement('button');
+            card.className = 'font-card' + (key === selectedKey ? ' active' : '');
+            card.type = 'button';
+            card.innerHTML = `
+                <span class="font-card-name">${font.name}</span>
+                <span class="font-card-sample" style="font-family:${font.display}">${font.sample}</span>
+                <span class="font-card-tag">${key === selectedKey ? '✓ Active' : key}</span>
+            `;
+            card.addEventListener('click', async () => {
+                activeFontKey = key;
+                await lincleSaveFont(key);
+                renderFontGrid(key);
+            });
+            fontGrid.appendChild(card);
+        });
+    }
+
+    renderFontGrid(activeFontKey);
 
     // Toggle color editor box
     if (btnToggleCustom) {
