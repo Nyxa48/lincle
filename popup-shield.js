@@ -204,16 +204,19 @@
     // or belongs to a class name pattern typically used for real search/auth modals.
     function isLegitimateModal(el) {
         try {
-            // Any overlay containing a focusable input / textarea / select is legitimate
+            // Never remove elements inside header, nav, footer, or navigation regions
+            if (el.closest('header, nav, footer, [role="navigation"], [role="banner"]')) return true;
+
+            // Any overlay containing a focusable input / textarea / select / editable field is legitimate
             if (el.querySelector('input, textarea, select, [contenteditable="true"]')) return true;
 
-            // ARIA roles that signal intentional, user-opened dialogs
+            // ARIA roles that signal intentional, user-opened dialogs, menus, or regions
             const role = (el.getAttribute('role') || '').toLowerCase();
-            if (role === 'dialog' || role === 'search' || role === 'alertdialog') return true;
+            if (['dialog', 'search', 'alertdialog', 'menu', 'menubar', 'navigation', 'region', 'tabpanel'].includes(role)) return true;
 
-            // Class/id name patterns that unambiguously indicate a search or auth modal
+            // Class/id name patterns that unambiguously indicate legitimate site UI
             const combined = ((el.className || '') + ' ' + (el.id || '')).toLowerCase();
-            if (/\b(search|login|sign-?in|sign-?up|register|auth|account|newsletter|nav-?menu|mega-?menu)\b/.test(combined)) return true;
+            if (/\b(search|login|sign-?in|sign-?up|register|auth|account|user|profile|newsletter|nav|menu|mega-?menu|cart|basket|checkout|sidebar|drawer|lightbox|gallery|preview|player|video)\b/.test(combined)) return true;
 
             return false;
         } catch { return false; }
