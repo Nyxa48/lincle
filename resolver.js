@@ -652,23 +652,36 @@ const lincleStartTime = performance.now();
         const host = location.hostname;
         if (await isDomainExcluded(host)) return;
 
+        // 1. Check if the current domain is a known / trusted link shortener
+        const trusted = await getTrustedEntry(host);
+
+        // 2. Check if the page text exhibits clear ad-gate / countdown / shortener characteristics
+        const bodyText = (document.body ? document.body.innerText : "").slice(
+            0,
+            4000,
+        );
+        const isGate = looksLikeGatePage(bodyText);
+
+        // ARCHITECTURAL SAFEGUARD:
+        // On regular websites (NOT a known shortener AND NOT exhibiting ad-gate text/countdown),
+        // Lincle must NEVER run static URL extraction or attempt automatic redirects.
+        if (!trusted && !isGate) {
+            return;
+        }
+
+        // If domain IS a trusted shortener OR page IS an ad-gate:
         const staticUrl = tryStaticExtraction();
         if (staticUrl) {
             goTo(staticUrl);
             return;
         }
 
-        const trusted = await getTrustedEntry(host);
         if (trusted) {
             runActiveResolver(trusted.skipSelector || null);
             return;
         }
 
-        const bodyText = (document.body ? document.body.innerText : "").slice(
-            0,
-            4000,
-        );
-        if (!!findSkipButton(null) && looksLikeGatePage(bodyText)) {
+        if (isGate && !!findSkipButton(null)) {
             runActiveResolver(null);
         }
     }
