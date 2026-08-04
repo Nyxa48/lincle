@@ -1,4 +1,4 @@
-﻿// Lincle i18n Engine v4.0 - SVG Flags & 14 Languages
+// Lincle i18n Engine v3.8.2 - SVG Flags & 14 Languages
 // Developed by: Emir Samed (Nyxa48)
 // Languages: EN (Default), TR, DE, FR, ES, PT, IT, RU, DA, JA, ZH, KO, AR, PL
 

@@ -1,4 +1,4 @@
-// Lincle Theme Engine v3.8
+// Lincle Theme Engine v3.8.2
 // Shared between popup.js and options.js
 // Developed by: Emir Samed (Nyxa48)
 
@@ -336,7 +336,7 @@ async function lincleCycleTheme() {
 
 // ─── Export / Import ──────────────────────────────────────────────────────────
 function lincleExportTheme(themeObj, filename = 'lincle-theme') {
-    let version = '3.8';
+    let version = '3.8.2';
     try {
         const m = (typeof browser !== 'undefined' ? browser : chrome).runtime.getManifest();
         if (m && m.version) version = m.version;

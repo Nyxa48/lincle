@@ -1,4 +1,4 @@
-// Lincle Popup Shield v3.5 — runs at document_start
+// Lincle Popup Shield v3.8.2 — runs at document_start
 // Developed by: Emir Samed (Nyxa48)
 //
 // Injected before the page's own scripts so we can override/intercept

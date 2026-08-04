@@ -1,4 +1,4 @@
-// Lincle Options v3.0 - Theme Engine + Collapsible Cards
+// Lincle Options v3.8.2 - Theme Engine + Collapsible Cards
 // Developed by: Emir Samed (Nyxa48)
 const ext = (typeof browser !== 'undefined') ? browser : chrome;
 

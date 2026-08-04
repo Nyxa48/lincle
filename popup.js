@@ -1,4 +1,4 @@
-// Lincle Popup UI v3.0
+// Lincle Popup UI v3.8.2
 // Developed by: Emir Samed (Nyxa48)
 const ext = (typeof browser !== "undefined") ? browser : chrome;
 
